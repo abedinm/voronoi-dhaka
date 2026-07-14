@@ -47,6 +47,14 @@ These come from known Dhaka landmark lists:
 - **water_pump / fuel / bus_stop** — reproducible zone-clustered scatter
   (seeded RNG) around the populated zone centres. `# SYNTHETIC`
 
+## Population (section benefit analysis)
+
+`data/raw/bgd_pop_1km.tif` — WorldPop Bangladesh, 1 km, UN-adjusted 2020
+(`bgd_ppp_2020_1km_Aggregated_UNadj.tif`, ~0.8 MB). Downloaded from
+`data.worldpop.org`. Used to weight the per-section benefit score by how many
+people live in each location, and to report underserved population. Study-area
+total ≈ 13.5 M. Re-downloaded automatically if the file is missing.
+
 ## Zones (Track C)
 
 The 8 named zones (Uttara, Mirpur, Bashundhara, Banani, Gulshan, Dhanmondi,

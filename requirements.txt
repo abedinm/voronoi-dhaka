@@ -14,3 +14,6 @@ pytest>=7.4
 
 # PDF report
 reportlab>=4.0
+
+# population raster (section benefit weighting)
+rasterio>=1.3

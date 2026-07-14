@@ -42,6 +42,10 @@ POIs from OpenStreetMap and caches them under `data/`; later runs are offline.
    (Uttara, Mirpur, Gulshan, Dhanmondi …) each cell falls in.
 5. **Recommendations** — greedy farthest-point placement of new facilities,
    with before/after access numbers.
+6. **Section benefit** — each of the 8 areas scored by how well its *people* are
+   served (WorldPop population-weighted, emergency services weighted higher),
+   answering which areas benefit most and where new facilities would help most
+   (`outputs/figures/section_benefit.png`, PDF §7).
 
 ## How it works
 

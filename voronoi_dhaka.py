@@ -74,6 +74,17 @@ GRID_SPACING_M = 250.0           # metres — nearest-distance grid
 RANDOM_SEED = 42
 RECOMMEND_K = 3                  # new facilities proposed per service
 
+# Population raster (WorldPop Bangladesh, 1 km, UN-adjusted 2020) for weighting
+# the section benefit analysis by how many people actually live somewhere.
+POP_RASTER_URL = ("https://data.worldpop.org/GIS/Population/Global_2000_2020_1km_UNadj/"
+                  "2020/BGD/bgd_ppp_2020_1km_Aggregated_UNadj.tif")
+POP_RASTER_PATH = RAW_DIR / "bgd_pop_1km.tif"
+
+# Critical-service weights: emergencies (hospital, fire) and water count more
+# than fuel/bus when scoring how well a section is served.
+SERVICE_WEIGHT = {"metro_station": 1.0, "hospital": 2.0, "water_pump": 1.5,
+                  "fuel": 1.0, "bus_stop": 1.0, "fire_station": 2.0}
+
 
 @dataclass(frozen=True)
 class ServiceType:
@@ -772,6 +783,113 @@ def greedy_new_facilities(sv: ServiceVoronoi, cov: CoverageResult,
 
 
 # =========================================================================== #
+# SECTION BENEFIT (population + critical-service weighted)
+# =========================================================================== #
+def get_population_raster():
+    """Download+cache the WorldPop raster; return its path, or None if offline."""
+    if POP_RASTER_PATH.exists():
+        return POP_RASTER_PATH
+    try:
+        import urllib.request
+        print("    [pop] downloading WorldPop Bangladesh raster ...")
+        urllib.request.urlretrieve(POP_RASTER_URL, POP_RASTER_PATH)
+        return POP_RASTER_PATH
+    except Exception as exc:
+        print(f"    [pop] download failed ({type(exc).__name__}); using area weighting")
+        return None
+
+
+def _grid_lonlat(grid: np.ndarray):
+    gs = gpd.GeoSeries(gpd.points_from_xy(grid[:, 0], grid[:, 1]),
+                       crs=CRS_METRIC).to_crs(CRS_GEO)
+    return list(zip(gs.x.to_numpy(), gs.y.to_numpy()))
+
+
+def sample_population(grid: np.ndarray):
+    """Population density at each metric grid point (0 where nodata/negative)."""
+    import rasterio
+    path = get_population_raster()
+    if path is None:
+        return None
+    with rasterio.open(path) as src:
+        vals = np.array([float(v[0]) for v in src.sample(_grid_lonlat(grid))])
+    return np.where(vals < 0, 0.0, vals)
+
+
+def section_population(boundary, ref: ZoneRef):
+    """Real population per section (each raster pixel counted once)."""
+    import rasterio
+    path = get_population_raster()
+    if path is None:
+        return None
+    with rasterio.open(path) as src:
+        band = src.read(1).astype(float)
+        band = np.where(band < 0, 0.0, band)
+        rows, cols = np.nonzero(band > 0)
+        xs, ys = rasterio.transform.xy(src.transform, list(rows), list(cols))
+    gs = gpd.GeoSeries(gpd.points_from_xy(xs, ys), crs=CRS_GEO).to_crs(CRS_METRIC)
+    pts = np.column_stack([gs.x.to_numpy(), gs.y.to_numpy()])
+    vals = band[rows, cols]
+    inside = shapely.contains_xy(boundary, pts[:, 0], pts[:, 1])
+    pts, vals = pts[inside], vals[inside]
+    sidx = KDTree(ref.centers_m).query(pts)[1]
+    return np.array([vals[sidx == i].sum() for i in range(len(ref.names))])
+
+
+@dataclass
+class SectionBenefit:
+    df: pd.DataFrame               # section, pop_est, benefit_score, weakest_service
+    names: list[str]               # section names in native (index) order
+    per_service_frac: dict         # service key -> (nsec,) well-served fraction
+    underserved_people: dict       # service key -> (nsec,) underserved population
+    section_pop: np.ndarray | None
+    pop_weighted: bool
+
+
+def section_benefit(voronois: dict[str, ServiceVoronoi], ref: ZoneRef) -> SectionBenefit:
+    """Score each section by how well its people are served, weighting critical
+    services higher and (if available) weighting locations by population."""
+    boundary = next(iter(voronois.values())).boundary
+    grid = make_grid(boundary)
+    sec = KDTree(ref.centers_m).query(grid)[1]
+    nsec = len(ref.names)
+
+    pop = sample_population(grid)
+    pop_weighted = pop is not None
+    weights = pop if pop_weighted else np.ones(len(grid))
+    sec_pop = section_population(boundary, ref) if pop_weighted else None
+    grid_count = np.array([(sec == i).sum() for i in range(nsec)], dtype=float)
+
+    comp = np.zeros(nsec)
+    wsum = sum(SERVICE_WEIGHT.values())
+    per_service, under_people = {}, {}
+    weak_name = [""] * nsec
+    weak_val = [np.inf] * nsec
+    for key, sv in voronois.items():
+        thr = SERVICE_TYPES[key].underserved_m
+        well = (nearest_distance(grid, sv.seeds) <= thr).astype(float)
+        frac = np.full(nsec, np.nan)
+        for i in range(nsec):
+            m = sec == i
+            W = weights[m].sum()
+            frac[i] = (weights[m] * well[m]).sum() / W if W > 0 else np.nan
+        per_service[key] = frac
+        comp += SERVICE_WEIGHT[key] * np.nan_to_num(frac)
+        underfrac = 1.0 - np.nan_to_num(frac)
+        under_people[key] = underfrac * (sec_pop if pop_weighted else grid_count)
+        for i in range(nsec):
+            if frac[i] < weak_val[i]:
+                weak_val[i], weak_name[i] = frac[i], SERVICE_TYPES[key].label
+    comp = comp / wsum * 100.0
+
+    rows = [{"section": s, "pop_est": int(sec_pop[i]) if pop_weighted else None,
+             "benefit_score": round(float(comp[i]), 1), "weakest_service": weak_name[i]}
+            for i, s in enumerate(ref.names)]
+    df = pd.DataFrame(rows).sort_values("benefit_score", ascending=False).reset_index(drop=True)
+    return SectionBenefit(df, list(ref.names), per_service, under_people, sec_pop, pop_weighted)
+
+
+# =========================================================================== #
 # VIZ
 # =========================================================================== #
 def _add_basemap(ax) -> None:
@@ -867,6 +985,34 @@ def plot_zone_colored_voronoi(sv: ServiceVoronoi, ref: ZoneRef, flagship: bool =
     ax.set_axis_off()
     name = "zones_dhaka_flagship" if flagship else f"zones_{sv.key}"
     out = FIGURES_DIR / f"{name}.png"
+    fig.savefig(out, dpi=FIGURE_DPI, bbox_inches="tight")
+    plt.close(fig)
+    return str(out)
+
+
+def plot_section_benefit(voronois: dict[str, ServiceVoronoi], ref: ZoneRef,
+                         sb: SectionBenefit) -> str:
+    """Choropleth: 8 sections coloured green→red by how well their people are served."""
+    boundary = next(iter(voronois.values())).boundary
+    zv = build_zone_voronoi(boundary, ref).to_crs(WEB)
+    score = dict(zip(sb.df["section"], sb.df["benefit_score"]))
+    zv["benefit"] = zv["zone_name"].map(score)
+
+    fig, ax = plt.subplots(figsize=(11, 12))
+    zv.plot(ax=ax, column="benefit", cmap="RdYlGn", vmin=50, vmax=95, alpha=0.6,
+            edgecolor="#222222", linewidth=1.6, legend=True,
+            legend_kwds={"label": "benefit score (% of people well served)", "shrink": 0.5})
+    centers = gpd.GeoSeries(gpd.points_from_xy(ref.centers_m[:, 0], ref.centers_m[:, 1]),
+                            crs=CRS_METRIC).to_crs(WEB)
+    for name, pt in zip(ref.names, centers):
+        ax.annotate(f"{name}\n{score.get(name, 0):.0f}", (pt.x, pt.y), ha="center", va="center",
+                    fontsize=10, fontweight="bold",
+                    bbox=dict(boxstyle="round,pad=0.2", fc="white", ec="#333", alpha=0.82))
+    _add_basemap(ax)
+    weighting = "population + critical-service weighted" if sb.pop_weighted else "area weighted"
+    ax.set_title(f"Which Dhaka areas benefit most from utilities\n({weighting})", fontsize=13)
+    ax.set_axis_off()
+    out = FIGURES_DIR / "section_benefit.png"
     fig.savefig(out, dpi=FIGURE_DPI, bbox_inches="tight")
     plt.close(fig)
     return str(out)
@@ -1029,7 +1175,7 @@ def _sections_legend(ref: ZoneRef) -> folium.Element:
 # =========================================================================== #
 # PDF REPORT
 # =========================================================================== #
-def build_pdf_report(voronois, coverages, table, recs, flagship_key) -> str:
+def build_pdf_report(voronois, coverages, table, recs, flagship_key, sb) -> str:
     from PIL import Image as PILImage
     from reportlab.lib import colors
     from reportlab.lib.enums import TA_CENTER
@@ -1216,8 +1362,57 @@ def build_pdf_report(voronois, coverages, table, recs, flagship_key) -> str:
                         for (lon, lat), z in zip(rec.new_points_lonlat, rec.new_zones))
         story.append(Paragraph(f"<b>{SERVICE_TYPES[key].label}:</b> {pts}", body))
 
-    # --- 7. flagship ---
-    story += [PageBreak(), Paragraph("7. Zone-coloured flagship map", h1),
+    # --- 7. which areas benefit / where to add ---
+    story += [PageBreak(), Paragraph("7. Which areas benefit most — and where to add", h1),
+              Paragraph(
+        ("Each section is scored by the share of its <b>people</b> within reach of "
+         "each utility, averaging the six services with emergencies (hospital, fire) "
+         "and water weighted higher. Population is from WorldPop (1&nbsp;km, 2020)."
+         if sb.pop_weighted else
+         "Each section is scored by the share of its <b>area</b> within reach of each "
+         "utility (no population raster was available), with hospital, fire and water "
+         "weighted higher."), body),
+              fig(str(FIGURES_DIR / "section_benefit.png"), max_h=15 * cm,
+                  caption="Sections coloured green (well served) to red (underserved).")]
+    bhead = (["Section", "Population", "Benefit", "Weakest service"] if sb.pop_weighted
+             else ["Section", "Benefit", "Weakest service"])
+    bdata = [bhead]
+    for _, r in sb.df.iterrows():
+        if sb.pop_weighted:
+            bdata.append([r["section"], f"{r['pop_est']/1e6:.2f} M",
+                          f"{r['benefit_score']:.0f}", r["weakest_service"]])
+        else:
+            bdata.append([r["section"], f"{r['benefit_score']:.0f}", r["weakest_service"]])
+    bcw = [3.4 * cm, 3.0 * cm, 2.6 * cm, 4.3 * cm] if sb.pop_weighted else [4.5 * cm, 3 * cm, 5 * cm]
+    btbl = Table(bdata, colWidths=bcw, repeatRows=1)
+    btbl.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#2c3e50")),
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+        ("FONTSIZE", (0, 0), (-1, -1), 8),
+        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("ALIGN", (1, 0), (-2, -1), "CENTER"),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f2f4f6")]),
+        ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#cccccc")),
+        ("TOPPADDING", (0, 0), (-1, -1), 4), ("BOTTOMPADDING", (0, 0), (-1, -1), 4)]))
+    best, worst = sb.df.iloc[0], sb.df.iloc[-1]
+    story += [btbl, Spacer(1, 0.3 * cm),
+              Paragraph("<i>Table 3. Section benefit ranking (higher = better served).</i>", cap),
+              Paragraph(
+        f"<b>Most benefited:</b> {best['section']} (score {best['benefit_score']:.0f}). "
+        f"<b>Least benefited:</b> {worst['section']} (score {worst['benefit_score']:.0f}).", body),
+              Paragraph("Where new facilities would help the most people:", h2)]
+    for key in SERVICE_TYPES:
+        up = sb.underserved_people[key]
+        order = list(np.argsort(up)[::-1][:2])
+        if sb.pop_weighted:
+            parts = ", ".join(f"{sb.names[i]} (~{up[i]/1000:.0f}k underserved)" for i in order)
+        else:
+            parts = ", ".join(f"{sb.names[i]}" for i in order)
+        story.append(Paragraph(f"<b>{SERVICE_TYPES[key].label}:</b> {parts}", body))
+
+    # --- 8. flagship ---
+    story += [PageBreak(), Paragraph("8. Zone-coloured flagship map", h1),
               Paragraph(
         "The real service Voronoi with every cell coloured by the named Dhaka zone "
         "its seed falls in (nearest zone centre). Dashed lines are the coarse "
@@ -1226,19 +1421,21 @@ def build_pdf_report(voronois, coverages, table, recs, flagship_key) -> str:
               fig(str(FIGURES_DIR / "zones_dhaka_flagship.png"), max_h=18 * cm,
                   caption="Figure. Dhaka Voronoi coloured by named zone (densest service).")]
 
-    # --- 8. limitations & repro ---
-    story += [PageBreak(), Paragraph("8. Limitations", h1),
+    # --- 9. limitations & repro ---
+    story += [PageBreak(), Paragraph("9. Limitations", h1),
               Paragraph(
         "• OpenStreetMap completeness varies by category, so facility counts are a "
         "lower bound.<br/>"
-        "• Access is area-weighted, not population-weighted — sparsely populated "
-        "fringes (rivers, low-density edges) count equally with dense wards, which "
-        "pulls some recommendations toward the eastern periphery.<br/>"
+        "• The coverage metrics (§4) and the greedy recommendations (§6) are "
+        "area-based, so they lean toward the low-density eastern fringe. The section "
+        "benefit analysis (§7) corrects for this — it is population-weighted "
+        "(WorldPop 1&nbsp;km, 2020) with emergency services weighted higher, and is "
+        "the people-first view of where to invest.<br/>"
         "• The study window is the Dhaka bbox intersected with the OSM admin "
         "polygon; peripheral cells extend to that boundary.<br/>"
         "• Any synthetic fallback points would be flagged in <i>data/SOURCE.md</i> "
         "and the <i>source</i> column (none were needed here).", body),
-              Paragraph("9. Reproducibility", h1),
+              Paragraph("10. Reproducibility", h1),
               Paragraph(
         "The entire analysis and this report are produced by a single script:", body),
               Paragraph(
@@ -1264,16 +1461,16 @@ def main(force_figures: bool = False) -> None:
     print("Voronoi analysis of Dhaka utility services")
     print("=" * 60)
 
-    print("\n[1/6] textbook Voronoi")
+    print("\n[1/7] textbook Voronoi")
     if force_figures or not (FIGURES_DIR / "textbook_all.png").exists():
         render_textbook()
 
-    print("[2/6] data (OSM, cached)")
+    print("[2/7] data (OSM, cached)")
     boundary = boundary_metric()
     for key in SERVICE_TYPES:
         load_points(key)
 
-    print("[3/6] Voronoi + coverage")
+    print("[3/7] Voronoi + coverage")
     ref = zone_reference()
     voronois, coverages, rows = {}, {}, []
     for key in SERVICE_TYPES:
@@ -1287,11 +1484,19 @@ def main(force_figures: bool = False) -> None:
     table.to_csv(REPORT_DIR / "coverage_metrics.csv", index=False)
     flagship_key = max(voronois, key=lambda k: voronois[k].n)
 
-    print("[4/6] recommendations")
+    print("[4/7] recommendations")
     recs = {key: greedy_new_facilities(sv, coverages[key], ref)
             for key, sv in voronois.items()}
 
-    print("[5/6] figures")
+    print("[5/7] section benefit (population + critical-service weighted)")
+    sb = section_benefit(voronois, ref)
+    plot_section_benefit(voronois, ref, sb)
+    for _, r in sb.df.iterrows():
+        pop = f"{r['pop_est']/1e6:.2f}M" if sb.pop_weighted else "n/a"
+        print(f"      {r['section']:12s} benefit={r['benefit_score']:5.1f}  pop={pop:>7s}  "
+              f"weakest={r['weakest_service']}")
+
+    print("[6/7] figures")
     for key, sv in voronois.items():
         cov = coverages[key]
         for path, fn in [
@@ -1306,10 +1511,11 @@ def main(force_figures: bool = False) -> None:
         plot_zone_colored_voronoi(voronois[flagship_key], ref, flagship=True)
     headline_html = folium_sections_map(voronois, ref)
 
-    print("[6/6] PDF report")
-    pdf = build_pdf_report(voronois, coverages, table, recs, flagship_key)
+    print("[7/7] PDF report")
+    pdf = build_pdf_report(voronois, coverages, table, recs, flagship_key, sb)
     print("\nDONE")
     print("  PDF (static)                                   ->", pdf)
+    print("  Benefit map                                    -> outputs/figures/section_benefit.png")
     print("  Interactive — Dhaka sections + all utilities   ->", headline_html)
     print("  Interactive — per-utility Voronoi coverage     -> outputs/report/interactive_<service>.html")
 
