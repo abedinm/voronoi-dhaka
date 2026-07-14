@@ -41,7 +41,6 @@ import numpy as np
 import osmnx as ox
 import pandas as pd
 import shapely
-from folium.plugins import HeatMap
 from matplotlib.patches import Patch
 from matplotlib.patches import Polygon as MplPolygon
 from scipy.spatial import KDTree, Voronoi
@@ -763,11 +762,15 @@ def greedy_new_facilities(sv: ServiceVoronoi, cov: CoverageResult,
 # =========================================================================== #
 # VIZ
 # =========================================================================== #
-def _add_basemap(ax, source=cx.providers.CartoDB.Positron) -> None:
-    try:
-        cx.add_basemap(ax, crs=WEB, source=source, attribution_size=5)
-    except Exception as exc:
-        print(f"    [basemap] skipped ({type(exc).__name__})")
+def _add_basemap(ax) -> None:
+    """Draw a real Dhaka street map under the axes (coloured roads + labels)."""
+    for source in (cx.providers.CartoDB.Voyager, cx.providers.CartoDB.Positron):
+        try:
+            cx.add_basemap(ax, crs=WEB, source=source, attribution_size=5)
+            return
+        except Exception as exc:
+            print(f"    [basemap] {source.get('name', '?')} failed ({type(exc).__name__})")
+    print("    [basemap] skipped (offline)")
 
 
 def _boundary_web(sv): return gpd.GeoSeries([sv.boundary], crs=CRS_METRIC).to_crs(WEB)
@@ -778,8 +781,8 @@ def plot_service_voronoi(sv: ServiceVoronoi, cov: CoverageResult) -> str:
     svc = SERVICE_TYPES[sv.key]
     gdf = sv.cells_gdf().to_crs(WEB)
     fig, ax = plt.subplots(figsize=(10, 11))
-    gdf.plot(ax=ax, column="area_km2", cmap="YlOrRd", alpha=0.6, edgecolor="#3a3a3a",
-             linewidth=0.4, legend=True,
+    gdf.plot(ax=ax, column="area_km2", cmap="YlOrRd", alpha=0.5, edgecolor="#2a2a2a",
+             linewidth=0.5, legend=True,
              legend_kwds={"label": "Voronoi cell area (km²)", "shrink": 0.5})
     under = gdf[gdf["seed_index"].isin(cov.underserved_cells)]
     if len(under):
@@ -791,28 +794,6 @@ def plot_service_voronoi(sv: ServiceVoronoi, cov: CoverageResult) -> str:
                  "red outline = underserved cell (area > mean + 1σ)", fontsize=12)
     ax.set_axis_off()
     out = FIGURES_DIR / f"voronoi_{sv.key}.png"
-    fig.savefig(out, dpi=FIGURE_DPI, bbox_inches="tight")
-    plt.close(fig)
-    return str(out)
-
-
-def plot_nn_heatmap(sv: ServiceVoronoi, cov: CoverageResult) -> str:
-    svc = SERVICE_TYPES[sv.key]
-    grid = gpd.GeoSeries(gpd.points_from_xy(cov.grid_xy[:, 0], cov.grid_xy[:, 1]),
-                         crs=CRS_METRIC).to_crs(WEB)
-    gx, gy = grid.x.to_numpy(), grid.y.to_numpy()
-    fig, ax = plt.subplots(figsize=(10, 11))
-    tcf = ax.tricontourf(gx, gy, cov.grid_nn_m / 1000.0, levels=14, cmap="inferno", alpha=0.72)
-    fig.colorbar(tcf, ax=ax, shrink=0.5).set_label("distance to nearest facility (km)")
-    _seeds_web(sv).plot(ax=ax, color="white", markersize=8, marker="o",
-                        edgecolor="black", linewidth=0.4, zorder=5)
-    _boundary_web(sv).boundary.plot(ax=ax, color="black", linewidth=1.3)
-    _add_basemap(ax)
-    ax.set_title(f"Dhaka {svc.label} — nearest-facility distance heatmap\n"
-                 f"threshold {cov.threshold_m/1000:.1f} km · "
-                 f"{100*cov.frac_grid_underserved:.0f}% of area underserved", fontsize=12)
-    ax.set_axis_off()
-    out = FIGURES_DIR / f"heatmap_{sv.key}.png"
     fig.savefig(out, dpi=FIGURE_DPI, bbox_inches="tight")
     plt.close(fig)
     return str(out)
@@ -903,14 +884,6 @@ def folium_service_map(sv: ServiceVoronoi, cov: CoverageResult, rec: RecommendRe
         folium.CircleMarker([r.geometry.y, r.geometry.x], radius=3, color=svc.color,
                             fill=True, fill_opacity=0.9, popup=str(r["name"])).add_to(fgf)
     fgf.add_to(m)
-    mask = cov.grid_nn_m > cov.threshold_m
-    if mask.any():
-        gp = gpd.GeoSeries(gpd.points_from_xy(cov.grid_xy[mask, 0], cov.grid_xy[mask, 1]),
-                           crs=CRS_METRIC).to_crs(CRS_GEO)
-        heat = [[p.y, p.x, float(w)] for p, w in zip(gp, cov.grid_nn_m[mask])]
-        fh = folium.FeatureGroup(name="Underserved heat", show=False)
-        HeatMap(heat, radius=14, blur=18).add_to(fh)
-        fh.add_to(m)
     fn = folium.FeatureGroup(name="Proposed new sites", show=True)
     for i, (lon, lat) in enumerate(rec.new_points_lonlat):
         folium.Marker([lat, lon], icon=folium.Icon(color="red", icon="plus"),
@@ -1065,10 +1038,9 @@ def build_pdf_report(voronois, coverages, table, recs, flagship_key) -> str:
             f"{100*cov.frac_grid_underserved:.0f}% of the city lies beyond the "
             f"{cov.threshold_m/1000:.1f} km threshold, with the worst-served point "
             f"{cov.max_nn_m/1000:.1f} km from any facility.", body),
-                  fig(str(FIGURES_DIR / f"voronoi_{key}.png"), max_h=11 * cm,
-                      caption=f"Voronoi cells for {label}, coloured by area (red = underserved)."),
-                  fig(str(FIGURES_DIR / f"heatmap_{key}.png"), max_h=11 * cm,
-                      caption=f"Nearest-{label.lower()} distance heatmap.")]
+                  fig(str(FIGURES_DIR / f"voronoi_{key}.png"), max_h=17 * cm,
+                      caption=f"{label} Voronoi over the Dhaka street map, "
+                              "cells coloured by area (red outline = underserved).")]
 
     # --- 5. underserved summary ---
     worst = table.sort_values("pct_grid_underserved", ascending=False)
@@ -1194,7 +1166,6 @@ def main(force_figures: bool = False) -> None:
         cov = coverages[key]
         for path, fn in [
             (FIGURES_DIR / f"voronoi_{key}.png", lambda: plot_service_voronoi(sv, cov)),
-            (FIGURES_DIR / f"heatmap_{key}.png", lambda: plot_nn_heatmap(sv, cov)),
             (FIGURES_DIR / f"recommendations_{key}.png", lambda: plot_recommendations(sv, recs[key])),
             (FIGURES_DIR / f"zones_{key}.png", lambda: plot_zone_colored_voronoi(sv, ref)),
         ]:

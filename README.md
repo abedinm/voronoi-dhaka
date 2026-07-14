@@ -32,8 +32,9 @@ POIs from OpenStreetMap and caches them under `data/`; later runs are offline.
    exactly three cells meeting at each vertex, cells tiling the box.
 2. **Six services from OpenStreetMap** — metro, hospitals, water pumps, fuel,
    bus stops, fire stations.
-3. **Coverage** — cell area + nearest-facility distance heatmap; a location is
-   "underserved" past a per-service distance threshold.
+3. **Coverage** — each service's Voronoi drawn over the real Dhaka street map,
+   cells coloured by area; a location is "underserved" past a per-service
+   nearest-facility distance threshold.
 4. **Zone map** — the real Voronoi coloured by the eight named Dhaka areas
    (Uttara, Mirpur, Gulshan, Dhanmondi …) each cell falls in.
 5. **Recommendations** — greedy farthest-point placement of new facilities,
