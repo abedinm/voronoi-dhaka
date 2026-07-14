@@ -931,8 +931,9 @@ def folium_zone_map(sv: ServiceVoronoi, ref: ZoneRef, flagship: bool = False) ->
     seeds = sv.seeds_gdf().to_crs(CRS_GEO)
     fg = folium.FeatureGroup(name=f"{svc.label} facilities", show=True)
     for _, r in seeds.iterrows():
-        folium.CircleMarker([r.geometry.y, r.geometry.x], radius=2.5, color="#111111",
-                            fill=True, fill_opacity=0.9, popup=str(r["name"])).add_to(fg)
+        folium.CircleMarker([r.geometry.y, r.geometry.x], radius=3.5, weight=1.2,
+                            color="#1a1a1a", fill=True, fill_color=svc.color,
+                            fill_opacity=0.95, popup=str(r["name"])).add_to(fg)
     fg.add_to(m)
     folium.LayerControl(collapsed=False).add_to(m)
     name = "interactive_flagship_zones" if flagship else f"interactive_zones_{sv.key}"
