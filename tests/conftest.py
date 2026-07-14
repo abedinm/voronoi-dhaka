@@ -6,8 +6,7 @@ import numpy as np
 import pytest
 from shapely.geometry import box
 
-from src.voronoi_core import clip_voronoi_to_box, compute_voronoi
-from src.voronoi_dhaka import ServiceVoronoi
+from voronoi_dhaka import ServiceVoronoi, clip_voronoi_to_box, compute_voronoi
 
 # A rectangle roughly the size/position of Dhaka in UTM 46N metres.
 _X0, _Y0, _W, _H = 760_000.0, 2_600_000.0, 15_000.0, 20_000.0

@@ -5,7 +5,7 @@ from __future__ import annotations
 import numpy as np
 import shapely
 
-from src.coverage import compute_coverage, make_grid, metrics_row, nearest_distance
+from voronoi_dhaka import compute_coverage, make_grid, metrics_row, nearest_distance
 
 
 def test_grid_points_lie_inside_boundary(sv_hospital):

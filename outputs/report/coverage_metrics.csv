@@ -1,7 +1,7 @@
-service,label,n_facilities,n_cells,total_area_km2,mean_cell_km2,std_cell_km2,max_cell_km2,n_underserved_cells,threshold_m,mean_nn_m,p90_nn_m,max_nn_m,pct_grid_underserved
-metro_station,Metro station,26,26,461.0,17.731,15.609,53.486,4,2000.0,3563.6,7223.3,10163.6,67.2
-hospital,Hospital,286,286,461.0,1.612,4.295,47.059,17,2000.0,1702.1,3950.1,8194.3,32.7
-water_pump,Water pump / source,118,118,461.0,3.907,8.46,47.837,9,1000.0,2800.6,6219.1,10866.3,73.3
-fuel,Fuel station,135,135,461.0,3.415,4.987,32.653,14,1500.0,2166.0,5316.8,10111.8,47.3
-bus_stop,Bus stop,314,314,461.0,1.468,3.521,44.014,15,800.0,1707.4,4316.4,9836.3,57.1
-fire_station,Fire station,22,22,461.0,20.954,14.939,56.813,5,3000.0,2795.9,5125.8,7434.7,41.4
+service,label,n_facilities,total_area_km2,mean_cell_km2,max_cell_km2,n_underserved_cells,threshold_m,mean_nn_m,p90_nn_m,max_nn_m,pct_grid_underserved
+metro_station,Metro station,26,461.0,17.731,53.486,4,2000.0,3563.6,7223.3,10163.6,67.2
+hospital,Hospital,286,461.0,1.612,47.059,17,2000.0,1702.1,3950.1,8194.3,32.7
+water_pump,Water pump / source,118,461.0,3.907,47.837,9,1000.0,2800.6,6219.1,10866.3,73.3
+fuel,Fuel station,135,461.0,3.415,32.653,14,1500.0,2166.0,5316.8,10111.8,47.3
+bus_stop,Bus stop,314,461.0,1.468,44.014,15,800.0,1707.4,4316.4,9836.3,57.1
+fire_station,Fire station,22,461.0,20.954,56.813,5,3000.0,2795.9,5125.8,7434.7,41.4

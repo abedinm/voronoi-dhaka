@@ -6,8 +6,8 @@ import numpy as np
 import pytest
 from shapely.geometry import Point
 
-from src.textbook import SKETCHES
-from src.voronoi_core import (
+from voronoi_dhaka import (
+    SKETCHES,
     assert_general_position,
     cells_tile_box,
     classify_ridges,

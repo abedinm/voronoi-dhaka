@@ -5,8 +5,7 @@ from __future__ import annotations
 import numpy as np
 import shapely
 
-from src.coverage import compute_coverage
-from src.recommend import greedy_new_facilities
+from voronoi_dhaka import compute_coverage, greedy_new_facilities
 
 
 def test_returns_k_new_points(sv_hospital):

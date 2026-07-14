@@ -1,83 +1,60 @@
 # Voronoi Analysis of Utility Services in Dhaka City
 
-A reproducible study of how well Dhaka's utility services cover the city,
-using **Voronoi diagrams**. Two tracks:
+One script that partitions Dhaka into **Voronoi cells** around real utility
+locations, measures how well each service covers the city, recommends where to
+add facilities, and writes it all up as a **PDF report**.
 
-- **Track A — textbook Voronoi.** Three hand-sketches (P.B, M.R, Phiruz)
-  redrawn as mathematically correct Voronoi diagrams: seeds in general
-  position, straight perpendicular-bisector edges, exactly three cells meeting
-  at every vertex, cells tiling the box.
-- **Track B — applied Dhaka.** Real OpenStreetMap locations for six services
-  (metro, hospitals, water sources, fuel, bus stops, fire stations), a Voronoi
-  partition clipped to the city boundary, coverage analysis (well-served vs
-  underserved), and greedy recommendations for new facilities.
-- **Track C — zone-coloured flagship map.** The real service Voronoi with every
-  cell coloured by the named Dhaka zone (Uttara, Mirpur, Gulshan, …) its seed
-  falls in — a genuine Voronoi diagram split into recognizable neighbourhoods.
-
-## Quickstart
+## Run it
 
 ```bash
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 
-python -m src.main     # reproduces all data, figures and the report
-pytest                 # correctness gates (29 tests)
+python voronoi_dhaka.py     # does everything, writes outputs/Dhaka_Voronoi_Report.pdf
+pytest                      # 29 correctness tests
 ```
 
-The first run fetches POIs from OpenStreetMap and caches them under
-`data/raw/`; later runs are offline and deterministic.
+Add `--force` to regenerate every figure from scratch. The first run fetches
+POIs from OpenStreetMap and caches them under `data/`; later runs are offline.
 
-## What gets produced
+## What it produces
 
-```
-outputs/figures/
-  textbook_PB.png  textbook_MR.png  textbook_PHIRUZ.png  textbook_all.png
-  voronoi_<service>.png        # cells coloured by area, over a basemap
-  heatmap_<service>.png        # nearest-facility distance heatmap
-  recommendations_<service>.png
-  zones_<service>.png          # zone-coloured Voronoi (Track C)
-  zones_dhaka_flagship.png     # the flagship map (densest service)
-outputs/report/
-  coverage_metrics.csv         # per-service metrics table
-  recommendations.md           # per-service before/after + coordinates
-  interactive_<service>.html   # folium: cells, facilities, heat, proposals
-  zones_<service>.html         # folium: cells coloured by zone
-  FINAL_REPORT.md              # auto-stitched write-up
-```
+- **`outputs/Dhaka_Voronoi_Report.pdf`** — the report, figures embedded inline.
+- `outputs/figures/*.png` — every figure at 300 DPI.
+- `outputs/report/interactive_<service>.html` — folium maps (toggle cells,
+  facilities, underserved heat, proposed sites).
+- `outputs/report/coverage_metrics.csv` — the metrics table.
+
+## What's in the analysis
+
+1. **Textbook Voronoi** — three sketches (P.B, M.R, Phiruz) redrawn as
+   mathematically correct diagrams: straight perpendicular-bisector edges,
+   exactly three cells meeting at each vertex, cells tiling the box.
+2. **Six services from OpenStreetMap** — metro, hospitals, water pumps, fuel,
+   bus stops, fire stations.
+3. **Coverage** — cell area + nearest-facility distance heatmap; a location is
+   "underserved" past a per-service distance threshold.
+4. **Zone map** — the real Voronoi coloured by the eight named Dhaka areas
+   (Uttara, Mirpur, Gulshan, Dhanmondi …) each cell falls in.
+5. **Recommendations** — greedy farthest-point placement of new facilities,
+   with before/after access numbers.
 
 ## How it works
 
-- **CRS.** Input/output in WGS84 (EPSG:4326); every distance and area is
-  computed in UTM zone 46N (EPSG:32646, metres).
-- **Exact Voronoi cells.** Each cell is the intersection of the half-planes
-  defined by the perpendicular bisectors to its Delaunay neighbours, clipped to
-  the study box and then to the real boundary — so every interior edge is a
-  true perpendicular bisector and the cells tile the region exactly
-  (`src/voronoi_core.py`).
-- **Coverage.** Cell area, and nearest-facility distance on a 250 m grid via a
-  KDTree; a location is underserved past a per-service distance threshold
-  (`src/coverage.py`).
-- **Recommendations.** Greedy farthest-point placement: repeatedly add a
-  facility at the worst-served grid point (`src/recommend.py`).
-
-## Layout
+Everything lives in **`voronoi_dhaka.py`** (one file, sectioned by comment
+banners: config → geometry → textbook → data → coverage → zones → recommend →
+viz → PDF → main). Distances and areas are computed in a metric CRS
+(UTM 46N, EPSG:32646). Each Voronoi cell is the intersection of the half-planes
+bounded by the perpendicular bisectors to its Delaunay neighbours — so every
+interior edge is a true perpendicular bisector and the cells tile the region
+exactly.
 
 ```
-src/
-  config.py        CRS, bbox, service catalogue, named zones
-  voronoi_core.py  pure-math Voronoi + bisector geometry
-  textbook.py      Track A — the three clean diagrams
-  data_fetch.py    OSM POI collection (+ synthetic fallback)
-  data_clean.py    reproject, dedup, boundary clip
-  voronoi_dhaka.py Track B — clipped Voronoi per service
-  coverage.py      cell area, nearest-distance grid, underserved flags
-  zones.py         Track C — nearest-zone membership
-  recommend.py     greedy facility placement
-  viz.py           static maps, heatmaps, flagship, folium
-  main.py          full pipeline + FINAL_REPORT.md
-tests/             voronoi_core, coverage, recommend
-data/              raw/ processed/ SOURCE.md
+voronoi_dhaka.py       # the whole program
+tests/                 # voronoi geometry, coverage, recommendations
+data/                  # raw/ processed/ SOURCE.md  (cached OSM POIs)
+outputs/               # figures/ report/  + the PDF
+requirements.txt
 ```
 
-See `data/SOURCE.md` for data provenance and the synthetic-fallback policy.
+See `data/SOURCE.md` for data provenance.
