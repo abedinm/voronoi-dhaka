@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_c5397eba2b94755c1047133740a2ab2b {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+    
+                    <style>
+                        .foliumtooltip {
+                            
+                        }
+                       .foliumtooltip table{
+                            margin: auto;
+                        }
+                        .foliumtooltip tr{
+                            text-align: left;
+                        }
+                        .foliumtooltip th{
+                            padding: 2px; padding-right: 8px;
+                        }
+                    </style>
+            
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_c5397eba2b94755c1047133740a2ab2b" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_c5397eba2b94755c1047133740a2ab2b = L.map(
+                "map_c5397eba2b94755c1047133740a2ab2b",
+                {
+                    center: [23.779999999999994, 90.41499999999999],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 12,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_0dd54ac0e75e9d9b20c7247b332158ad = L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 20,
+  "maxNativeZoom": 20,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"https://carto.com/attributions\"\u003eCARTO\u003c/a\u003e",
+  "subdomains": "abcd",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_0dd54ac0e75e9d9b20c7247b332158ad.addTo(map_c5397eba2b94755c1047133740a2ab2b);
+        
+    
+        function geo_json_fde0d19c9dfe8e3a8ba0cd17288d1c1d_styler(feature) {
+            switch(feature.id) {
+                case "0": case "13": case "17": case "18": case "19": 
+                    return {"color": "#333333", "fillColor": "#8c564b", "fillOpacity": 0.6, "weight": 0.5};
+                case "1": case "10": 
+                    return {"color": "#333333", "fillColor": "#17becf", "fillOpacity": 0.6, "weight": 0.5};
+                case "2": case "8": case "12": case "14": 
+                    return {"color": "#333333", "fillColor": "#e377c2", "fillOpacity": 0.6, "weight": 0.5};
+                case "3": case "7": case "9": case "16": 
+                    return {"color": "#333333", "fillColor": "#2ca02c", "fillOpacity": 0.6, "weight": 0.5};
+                case "4": case "21": 
+                    return {"color": "#333333", "fillColor": "#1f77b4", "fillOpacity": 0.6, "weight": 0.5};
+                case "15": 
+                    return {"color": "#333333", "fillColor": "#ff7f0e", "fillOpacity": 0.6, "weight": 0.5};
+                default:
+                    return {"color": "#333333", "fillColor": "#9467bd", "fillOpacity": 0.6, "weight": 0.5};
+            }
+        }
+
+        function geo_json_fde0d19c9dfe8e3a8ba0cd17288d1c1d_onEachFeature(feature, layer) {
+
+            layer.on({
+            });
+        };
+        var geo_json_fde0d19c9dfe8e3a8ba0cd17288d1c1d = L.geoJson(null, {
+                onEachFeature: geo_json_fde0d19c9dfe8e3a8ba0cd17288d1c1d_onEachFeature,
+            
+                style: geo_json_fde0d19c9dfe8e3a8ba0cd17288d1c1d_styler,
+            ...{
+}
+        });
+
+        function geo_json_fde0d19c9dfe8e3a8ba0cd17288d1c1d_add (data) {
+            geo_json_fde0d19c9dfe8e3a8ba0cd17288d1c1d
+                .addData(data);
+        }
+            geo_json_fde0d19c9dfe8e3a8ba0cd17288d1c1d_add({"features": [{"geometry": {"coordinates": [[[90.37519067086606, 23.698380318913927], [90.37890758114318, 23.69252388204442], [90.38431345853597, 23.660020304428727], [90.33, 23.659999999999997], [90.33000490897484, 23.732438492566732], [90.37519067086606, 23.698380318913927]]], "type": "Polygon"}, "id": "0", "properties": {"area_km2": 30.792138417879222, "seed_index": 0, "zone_color": "#8c564b", "zone_name": "Dhanmondi"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.45615254420814, 23.682839354855027], [90.4657867372413, 23.732417588867097], [90.49055179231603, 23.776460645097895], [90.50000545117196, 23.777245444561974], [90.5, 23.659999999999997], [90.45839160508655, 23.660017262781807], [90.45615254420814, 23.682839354855027]]], "type": "Polygon"}, "id": "1", "properties": {"area_km2": 43.816806745919095, "seed_index": 1, "zone_color": "#17becf", "zone_name": "Khilgaon"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.37890758114318, 23.69252388204441], [90.39845977372428, 23.712905412161], [90.41855590001688, 23.716119480448846], [90.45615254420814, 23.682839354855027], [90.45839160508655, 23.660017262781807], [90.38431345853597, 23.660020304428727], [90.37890758114318, 23.69252388204441]]], "type": "Polygon"}, "id": "2", "properties": {"area_km2": 37.890834036888116, "seed_index": 2, "zone_color": "#e377c2", "zone_name": "Motijheel"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.46107250188174, 23.7751024616585], [90.42950494041102, 23.768193866825573], [90.40449215562099, 23.80073630152619], [90.46107250188174, 23.7751024616585]]], "type": "Polygon"}, "id": "3", "properties": {"area_km2": 6.780618646333839, "seed_index": 3, "zone_color": "#2ca02c", "zone_name": "Gulshan"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.44157428392622, 23.867949892315018], [90.40306381944593, 23.84110013915719], [90.37253209181895, 23.836343652579153], [90.3300031480019, 23.861372328718158], [90.33000204582129, 23.876671023220545], [90.44157428392622, 23.867949892315018]]], "type": "Polygon"}, "id": "4", "properties": {"area_km2": 30.585999621719278, "seed_index": 4, "zone_color": "#1f77b4", "zone_name": "Uttara"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.40882415040525, 23.83090637261624], [90.3878594846495, 23.814921924822446], [90.37253209181897, 23.836343652579153], [90.40306381944593, 23.841100139157188], [90.40882415040525, 23.83090637261624]]], "type": "Polygon"}, "id": "5", "properties": {"area_km2": 5.832277246839863, "seed_index": 5, "zone_color": "#9467bd", "zone_name": "Bashundhara"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.40882415040525, 23.83090637261624], [90.42570937572206, 23.81724824098007], [90.4006436637614, 23.803705583571073], [90.39461748855875, 23.802979725381217], [90.3878594846495, 23.814921924822446], [90.40882415040525, 23.83090637261624]]], "type": "Polygon"}, "id": "6", "properties": {"area_km2": 6.141583701739807, "seed_index": 6, "zone_color": "#9467bd", "zone_name": "Bashundhara"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.40890400461535, 23.74587820623404], [90.3872637024182, 23.760438618005303], [90.38117674453598, 23.784199124624354], [90.38332301060339, 23.785585818798424], [90.42306272583414, 23.76543844897969], [90.40890400461535, 23.74587820623404]]], "type": "Polygon"}, "id": "7", "properties": {"area_km2": 9.09055621341786, "seed_index": 7, "zone_color": "#2ca02c", "zone_name": "Gulshan"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.39760516370487, 23.735494136440124], [90.39845977372428, 23.712905412160993], [90.37890758114318, 23.69252388204441], [90.37519067086606, 23.69838031891392], [90.38237925037544, 23.733882881120728], [90.39760516370487, 23.735494136440124]]], "type": "Polygon"}, "id": "8", "properties": {"area_km2": 7.106558020629641, "seed_index": 8, "zone_color": "#e377c2", "zone_name": "Motijheel"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.39461748855875, 23.802979725381217], [90.4006436637614, 23.803705583571073], [90.40449215562099, 23.80073630152619], [90.42950494041102, 23.76819386682558], [90.42306272583414, 23.765438448979697], [90.38332301060339, 23.785585818798424], [90.39461748855875, 23.802979725381217]]], "type": "Polygon"}, "id": "9", "properties": {"area_km2": 8.61476061701814, "seed_index": 9, "zone_color": "#2ca02c", "zone_name": "Gulshan"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.49055179231603, 23.776460645097895], [90.4657867372413, 23.732417588867104], [90.41495223387872, 23.737069346227276], [90.40877158287405, 23.742517535207302], [90.40890400461535, 23.74587820623404], [90.42306272583414, 23.765438448979697], [90.42950494041102, 23.768193866825573], [90.46107250188177, 23.775102461658506], [90.48761631457081, 23.77792935386624], [90.49055179231603, 23.776460645097895]]], "type": "Polygon"}, "id": "10", "properties": {"area_km2": 26.933022809861473, "seed_index": 10, "zone_color": "#17becf", "zone_name": "Khilgaon"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.49055179231603, 23.776460645097895], [90.48761631457081, 23.777929353866238], [90.45084075068387, 23.82332005961706], [90.44714865991351, 23.8689208191229], [90.46949424059457, 23.900013856238935], [90.5, 23.89999999999999], [90.50000545117196, 23.777245444561974], [90.49055179231603, 23.776460645097895]]], "type": "Polygon"}, "id": "11", "properties": {"area_km2": 56.81256916962929, "seed_index": 11, "zone_color": "#9467bd", "zone_name": "Bashundhara"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.41855590001688, 23.716119480448846], [90.39845977372428, 23.712905412161], [90.39760516370487, 23.735494136440124], [90.40877158287405, 23.742517535207302], [90.41495223387872, 23.737069346227273], [90.41855590001688, 23.716119480448846]]], "type": "Polygon"}, "id": "12", "properties": {"area_km2": 5.256343639798527, "seed_index": 12, "zone_color": "#e377c2", "zone_name": "Motijheel"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.37160743224011, 23.7407785809464], [90.38237925037544, 23.733882881120728], [90.37519067086606, 23.698380318913923], [90.33000490897484, 23.732438492566732], [90.33000527617668, 23.743191324397813], [90.37160743224011, 23.7407785809464]]], "type": "Polygon"}, "id": "13", "properties": {"area_km2": 15.107760146496132, "seed_index": 13, "zone_color": "#8c564b", "zone_name": "Dhanmondi"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.41495223387872, 23.737069346227273], [90.4657867372413, 23.732417588867104], [90.45615254420814, 23.682839354855027], [90.41855590001688, 23.716119480448846], [90.41495223387872, 23.737069346227273]]], "type": "Polygon"}, "id": "14", "properties": {"area_km2": 18.271323093868244, "seed_index": 14, "zone_color": "#e377c2", "zone_name": "Motijheel"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.37253209181897, 23.836343652579153], [90.38785948464951, 23.814921924822436], [90.39461748855875, 23.802979725381217], [90.38332301060339, 23.785585818798424], [90.38117674453598, 23.784199124624344], [90.3300058249878, 23.779198815762637], [90.3300031480019, 23.861372328718158], [90.37253209181897, 23.836343652579153]]], "type": "Polygon"}, "id": "15", "properties": {"area_km2": 40.2697580919656, "seed_index": 15, "zone_color": "#ff7f0e", "zone_name": "Mirpur"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.46107250188173, 23.775102461658506], [90.40449215562099, 23.80073630152619], [90.4006436637614, 23.803705583571073], [90.42570937572205, 23.81724824098007], [90.45084075068387, 23.823320059617064], [90.48761631457081, 23.77792935386624], [90.46107250188173, 23.775102461658506]]], "type": "Polygon"}, "id": "16", "properties": {"area_km2": 23.65211952372598, "seed_index": 16, "zone_color": "#2ca02c", "zone_name": "Gulshan"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.38124163687004, 23.754121779867287], [90.3716074322401, 23.7407785809464], [90.33000527617668, 23.743191324397813], [90.33000581517682, 23.775041575508403], [90.38124163687004, 23.754121779867287]]], "type": "Polygon"}, "id": "17", "properties": {"area_km2": 12.490818584850572, "seed_index": 17, "zone_color": "#8c564b", "zone_name": "Dhanmondi"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.38117674453598, 23.784199124624344], [90.3872637024182, 23.760438618005303], [90.38124163687004, 23.754121779867294], [90.33000581517682, 23.775041575508403], [90.3300058249878, 23.779198815762637], [90.38117674453598, 23.784199124624344]]], "type": "Polygon"}, "id": "18", "properties": {"area_km2": 10.926899613437008, "seed_index": 18, "zone_color": "#8c564b", "zone_name": "Dhanmondi"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.38124163687004, 23.7541217798673], [90.3872637024182, 23.760438618005303], [90.40890400461535, 23.745878206234043], [90.40877158287405, 23.742517535207302], [90.39760516370488, 23.735494136440124], [90.38237925037544, 23.733882881120728], [90.3716074322401, 23.740778580946404], [90.38124163687004, 23.7541217798673]]], "type": "Polygon"}, "id": "19", "properties": {"area_km2": 6.564037304778374, "seed_index": 19, "zone_color": "#8c564b", "zone_name": "Dhanmondi"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.40882415040525, 23.830906372616248], [90.40306381944593, 23.841100139157184], [90.44157428392622, 23.867949892315018], [90.44714865991351, 23.8689208191229], [90.45084075068387, 23.823320059617064], [90.42570937572205, 23.81724824098007], [90.40882415040525, 23.830906372616248]]], "type": "Polygon"}, "id": "20", "properties": {"area_km2": 17.25539239352906, "seed_index": 20, "zone_color": "#9467bd", "zone_name": "Bashundhara"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.44714865991351, 23.8689208191229], [90.44157428392622, 23.867949892315018], [90.33000204582129, 23.876671023220545], [90.33, 23.9], [90.46949424059457, 23.900013856238935], [90.44714865991351, 23.8689208191229]]], "type": "Polygon"}, "id": "21", "properties": {"area_km2": 40.803398398180896, "seed_index": 21, "zone_color": "#1f77b4", "zone_name": "Uttara"}, "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+    geo_json_fde0d19c9dfe8e3a8ba0cd17288d1c1d.bindTooltip(
+    function(layer){
+    let div = L.DomUtil.create('div');
+    
+    let handleObject = feature => {
+        if (feature === null) {
+            return '';
+        } else if (typeof(feature)=='object') {
+            return JSON.stringify(feature);
+        } else {
+            return feature;
+        }
+    }
+    let fields = ["zone_name", "area_km2"];
+    let aliases = ["zone", "cell km\u00b2"];
+    let table = '<table>' +
+        String(
+        fields.map(
+        (v,i)=>
+        `<tr>
+            <th>${aliases[i]}</th>
+            
+            <td>${handleObject(layer.feature.properties[v])}</td>
+        </tr>`).join(''))
+    +'</table>';
+    div.innerHTML=table;
+    
+    return div
+    }
+    ,{
+  "sticky": true,
+  "className": "foliumtooltip",
+});
+                     
+    
+            geo_json_fde0d19c9dfe8e3a8ba0cd17288d1c1d.addTo(map_c5397eba2b94755c1047133740a2ab2b);
+        
+</script>
+</html>
