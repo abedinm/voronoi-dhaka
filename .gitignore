@@ -1,0 +1,11 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# OSM tile / query cache (re-fetchable)
+data/raw/osm_cache/
+
+# macOS
+.DS_Store

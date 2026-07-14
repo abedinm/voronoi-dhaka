@@ -1,0 +1,16 @@
+# Voronoi Analysis of Utility Services in Dhaka City
+# Python 3.11+
+
+numpy>=1.26
+scipy>=1.11
+matplotlib>=3.8
+shapely>=2.0
+pandas>=2.1
+geopandas>=0.14
+contextily>=1.5
+osmnx>=1.9
+folium>=0.15
+pytest>=7.4
+
+# report table rendering
+tabulate>=0.9
