@@ -111,15 +111,16 @@ SERVICE_EMOJI: dict[str, str] = {
     "fire_station": "🚒",
 }
 
+# Eight main sections, each a maximally-distinct colour.
 ZONES: dict[str, dict] = {
-    "Uttara":      {"center": (90.3975, 23.8745), "color": "#1f77b4"},
-    "Mirpur":      {"center": (90.3654, 23.8060), "color": "#ff7f0e"},
-    "Bashundhara": {"center": (90.4350, 23.8150), "color": "#9467bd"},
-    "Banani":      {"center": (90.4022, 23.7940), "color": "#d62728"},
-    "Gulshan":     {"center": (90.4155, 23.7830), "color": "#2ca02c"},
-    "Dhanmondi":   {"center": (90.3750, 23.7460), "color": "#8c564b"},
-    "Khilgaon":    {"center": (90.4280, 23.7500), "color": "#17becf"},
-    "Motijheel":   {"center": (90.4170, 23.7280), "color": "#e377c2"},
+    "Uttara":      {"center": (90.3975, 23.8745), "color": "#e6194B"},  # red
+    "Mirpur":      {"center": (90.3654, 23.8060), "color": "#f58231"},  # orange
+    "Bashundhara": {"center": (90.4350, 23.8150), "color": "#911eb4"},  # purple
+    "Banani":      {"center": (90.4022, 23.7940), "color": "#4363d8"},  # blue
+    "Gulshan":     {"center": (90.4155, 23.7830), "color": "#3cb44b"},  # green
+    "Dhanmondi":   {"center": (90.3750, 23.7460), "color": "#42d4f4"},  # cyan
+    "Khilgaon":    {"center": (90.4280, 23.7500), "color": "#f032e6"},  # magenta
+    "Motijheel":   {"center": (90.4170, 23.7280), "color": "#ffe119"},  # yellow
 }
 
 BBox = tuple[float, float, float, float]
@@ -1000,24 +1001,55 @@ def folium_service_map(sv: ServiceVoronoi, cov: CoverageResult, rec: RecommendRe
     return str(out)
 
 
+def _sections_legend(ref: ZoneRef) -> folium.Element:
+    rows = "".join(
+        f'<div style="margin:2px 0;"><span style="display:inline-block;width:14px;height:14px;'
+        f'background:{c};border:1px solid #fff;box-shadow:0 0 1px #000;margin-right:6px;'
+        f'vertical-align:middle;"></span>{n}</div>' for n, c in zip(ref.names, ref.colors))
+    html = ('<div style="position:fixed;bottom:22px;left:22px;z-index:9999;background:white;'
+            'padding:10px 13px;border:1px solid #888;border-radius:6px;font:12px/1.35 sans-serif;'
+            'box-shadow:0 1px 5px rgba(0,0,0,.3);">'
+            f'<div style="font-weight:bold;margin-bottom:4px;">Dhaka sections ({len(ref.names)})</div>'
+            + rows + '</div>')
+    return folium.Element(html)
+
+
 def folium_zone_map(sv: ServiceVoronoi, ref: ZoneRef, flagship: bool = False) -> str:
-    """Interactive Google map: Voronoi cells coloured by named Dhaka zone."""
+    """Interactive Google map: the Voronoi split into coloured main sections."""
     svc = SERVICE_TYPES[sv.key]
     zgdf = color_cells_by_zone(sv, ref).to_crs(CRS_GEO)
     m = _google_map(_map_center(sv))
-    folium.GeoJson(zgdf.to_json(), name=f"{svc.label} Voronoi by zone",
+
+    # fine Voronoi cells, filled by their section colour (thin edges = the mesh)
+    folium.GeoJson(zgdf.to_json(), name="Voronoi cells (by section)",
         style_function=lambda f: {"fillColor": f["properties"]["zone_color"],
-                                  "color": "#222222", "weight": 0.7, "fillOpacity": 0.45},
-        highlight_function=lambda f: {"weight": 2, "color": "#000000"},
+                                  "color": "#555555", "weight": 0.3, "fillOpacity": 0.5},
+        highlight_function=lambda f: {"weight": 1.5, "color": "#000000"},
         tooltip=folium.GeoJsonTooltip(fields=["zone_name", "area_km2"],
-                                      aliases=["Zone", "Cell area (km²)"])).add_to(m)
+                                      aliases=["Section", "Cell area (km²)"])).add_to(m)
+
+    # bold section boundaries (the 8-section coarse Voronoi)
     zv = build_zone_voronoi(sv.boundary, ref).to_crs(CRS_GEO)
-    folium.GeoJson(zv.to_json(), name="Zone boundaries",
-        style_function=lambda f: {"fillOpacity": 0, "color": "#000000",
-                                  "weight": 2, "dashArray": "6 4"}).add_to(m)
-    fg = folium.FeatureGroup(name=f"{SERVICE_EMOJI[sv.key]} {svc.label} facilities", show=True)
+    folium.GeoJson(zv.to_json(), name="Section boundaries",
+        style_function=lambda f: {"fillOpacity": 0, "color": "#111111", "weight": 3}).add_to(m)
+
+    # section name labels at each section centre
+    centers = gpd.GeoSeries(gpd.points_from_xy(ref.centers_m[:, 0], ref.centers_m[:, 1]),
+                            crs=CRS_METRIC).to_crs(CRS_GEO)
+    labels = folium.FeatureGroup(name="Section labels", show=True)
+    for name_, pt in zip(ref.names, centers):
+        folium.Marker([pt.y, pt.x], icon=folium.DivIcon(icon_size=(0, 0), html=(
+            '<div style="font:bold 12px sans-serif;color:#111;background:rgba(255,255,255,.82);'
+            'padding:1px 6px;border-radius:4px;border:1px solid #444;white-space:nowrap;'
+            f'transform:translate(-50%,-50%);display:inline-block;">{name_}</div>'))).add_to(labels)
+    labels.add_to(m)
+
+    # facilities off by default so the coloured sections read first
+    fg = folium.FeatureGroup(name=f"{SERVICE_EMOJI[sv.key]} {svc.label} sites", show=False)
     _add_service_markers(fg, sv, cluster=True)
     fg.add_to(m)
+
+    m.get_root().html.add_child(_sections_legend(ref))
     folium.LayerControl(collapsed=False).add_to(m)
     name = "interactive_flagship_zones" if flagship else f"interactive_zones_{sv.key}"
     out = REPORT_DIR / f"{name}.html"
