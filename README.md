@@ -22,7 +22,7 @@ python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 
 python -m src.main     # reproduces all data, figures and the report
-pytest                 # correctness gates (30 tests)
+pytest                 # correctness gates (29 tests)
 ```
 
 The first run fetches POIs from OpenStreetMap and caches them under
