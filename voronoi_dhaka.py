@@ -939,12 +939,29 @@ def _utilities_legend() -> folium.Element:
 
 
 def folium_all_utilities_map(voronois: dict[str, ServiceVoronoi]) -> str:
-    """One interactive Google map with all six utilities, each its own colour+logo."""
+    """Interactive Google map: every utility's Voronoi + logo markers, toggleable.
+
+    Each utility is one layer holding its Voronoi cells (coloured cell edges,
+    light fill) and its clustered logo markers. The densest utility is shown by
+    default so a Voronoi diagram is visible on open; toggle the rest in the
+    layer switcher (top-right) — one utility at a time reads cleanest.
+    """
     center = _map_center(next(iter(voronois.values())))
     m = _google_map(center)
+    flagship_key = max(voronois, key=lambda k: voronois[k].n)
     for key, sv in voronois.items():
         svc = SERVICE_TYPES[key]
-        fg = folium.FeatureGroup(name=f"{SERVICE_EMOJI[key]} {svc.label} ({sv.n})", show=True)
+        fg = folium.FeatureGroup(
+            name=f"{SERVICE_EMOJI[key]} {svc.label} — Voronoi + sites ({sv.n})",
+            show=(key == flagship_key))
+        cells = sv.cells_gdf().to_crs(CRS_GEO)
+        folium.GeoJson(
+            cells.to_json(),
+            style_function=lambda f, c=svc.color: {
+                "color": c, "weight": 1.1, "fillColor": c, "fillOpacity": 0.07},
+            highlight_function=lambda f: {"weight": 2.5, "fillOpacity": 0.2},
+            tooltip=folium.GeoJsonTooltip(fields=["name", "area_km2"],
+                                          aliases=["facility", "cell km²"])).add_to(fg)
         _add_service_markers(fg, sv, cluster=True)
         fg.add_to(m)
     m.get_root().html.add_child(_utilities_legend())
