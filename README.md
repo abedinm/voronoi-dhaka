@@ -21,8 +21,11 @@ POIs from OpenStreetMap and caches them under `data/`; later runs are offline.
 
 - **`outputs/Dhaka_Voronoi_Report.pdf`** — the report, figures embedded inline.
 - `outputs/figures/*.png` — every figure at 300 DPI.
-- `outputs/report/interactive_<service>.html` — folium maps (toggle cells,
-  facilities, underserved heat, proposed sites).
+- `outputs/report/interactive_dhaka_map.html` — **headline** interactive Google
+  map: Dhaka split into 8 coloured sections with all six utilities plotted by
+  colour + emoji logo (toggle each in the layer switcher).
+- `outputs/report/interactive_<service>.html` — per utility: its Voronoi
+  coverage (cells by area) + facilities + proposed new sites, on Google Maps.
 - `outputs/report/coverage_metrics.csv` — the metrics table.
 
 ## What's in the analysis

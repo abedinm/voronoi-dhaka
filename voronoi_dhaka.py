@@ -939,35 +939,47 @@ def _utilities_legend() -> folium.Element:
     return folium.Element(html)
 
 
-def folium_all_utilities_map(voronois: dict[str, ServiceVoronoi]) -> str:
-    """Interactive Google map: every utility's Voronoi + logo markers, toggleable.
+def _section_labels_layer(ref: ZoneRef) -> folium.FeatureGroup:
+    centers = gpd.GeoSeries(gpd.points_from_xy(ref.centers_m[:, 0], ref.centers_m[:, 1]),
+                            crs=CRS_METRIC).to_crs(CRS_GEO)
+    layer = folium.FeatureGroup(name="Section labels", show=True)
+    for name_, pt in zip(ref.names, centers):
+        folium.Marker([pt.y, pt.x], icon=folium.DivIcon(icon_size=(0, 0), html=(
+            '<div style="font:bold 12px sans-serif;color:#111;background:rgba(255,255,255,.82);'
+            'padding:1px 6px;border-radius:4px;border:1px solid #444;white-space:nowrap;'
+            f'transform:translate(-50%,-50%);display:inline-block;">{name_}</div>'))).add_to(layer)
+    return layer
 
-    Each utility is one layer holding its Voronoi cells (coloured cell edges,
-    light fill) and its clustered logo markers. The densest utility is shown by
-    default so a Voronoi diagram is visible on open; toggle the rest in the
-    layer switcher (top-right) — one utility at a time reads cleanest.
+
+def folium_sections_map(voronois: dict[str, ServiceVoronoi], ref: ZoneRef) -> str:
+    """Headline map: Dhaka split into coloured sections, with ALL utilities plotted.
+
+    The sections are the coarse 8-section Voronoi of the zone centres (not tied
+    to any one utility). Every utility is overlaid with its own colour + emoji
+    logo, each toggleable in the layer switcher.
     """
-    center = _map_center(next(iter(voronois.values())))
-    m = _google_map(center)
-    flagship_key = max(voronois, key=lambda k: voronois[k].n)
+    any_sv = next(iter(voronois.values()))
+    m = _google_map(_map_center(any_sv))
+
+    # coloured main sections (the coarse Voronoi of the zone centres)
+    zv = build_zone_voronoi(any_sv.boundary, ref).to_crs(CRS_GEO)
+    folium.GeoJson(zv.to_json(), name="Sections (coloured)",
+        style_function=lambda f: {"fillColor": f["properties"]["zone_color"],
+                                  "color": "#111111", "weight": 2.5, "fillOpacity": 0.28},
+        tooltip=folium.GeoJsonTooltip(fields=["zone_name"], aliases=["Section"])).add_to(m)
+    _section_labels_layer(ref).add_to(m)
+
+    # every utility: own colour + logo, clustered, individually toggleable
     for key, sv in voronois.items():
         svc = SERVICE_TYPES[key]
-        fg = folium.FeatureGroup(
-            name=f"{SERVICE_EMOJI[key]} {svc.label} — Voronoi + sites ({sv.n})",
-            show=(key == flagship_key))
-        cells = sv.cells_gdf().to_crs(CRS_GEO)
-        folium.GeoJson(
-            cells.to_json(),
-            style_function=lambda f, c=svc.color: {
-                "color": c, "weight": 1.1, "fillColor": c, "fillOpacity": 0.07},
-            highlight_function=lambda f: {"weight": 2.5, "fillOpacity": 0.2},
-            tooltip=folium.GeoJsonTooltip(fields=["name", "area_km2"],
-                                          aliases=["facility", "cell km²"])).add_to(fg)
+        fg = folium.FeatureGroup(name=f"{SERVICE_EMOJI[key]} {svc.label} ({sv.n})", show=True)
         _add_service_markers(fg, sv, cluster=True)
         fg.add_to(m)
+
     m.get_root().html.add_child(_utilities_legend())
+    m.get_root().html.add_child(_sections_legend(ref))
     folium.LayerControl(collapsed=False).add_to(m)
-    out = REPORT_DIR / "interactive_all_utilities.html"
+    out = REPORT_DIR / "interactive_dhaka_map.html"
     m.save(str(out))
     return str(out)
 
@@ -1006,55 +1018,12 @@ def _sections_legend(ref: ZoneRef) -> folium.Element:
         f'<div style="margin:2px 0;"><span style="display:inline-block;width:14px;height:14px;'
         f'background:{c};border:1px solid #fff;box-shadow:0 0 1px #000;margin-right:6px;'
         f'vertical-align:middle;"></span>{n}</div>' for n, c in zip(ref.names, ref.colors))
-    html = ('<div style="position:fixed;bottom:22px;left:22px;z-index:9999;background:white;'
+    html = ('<div style="position:fixed;bottom:22px;right:22px;z-index:9999;background:white;'
             'padding:10px 13px;border:1px solid #888;border-radius:6px;font:12px/1.35 sans-serif;'
             'box-shadow:0 1px 5px rgba(0,0,0,.3);">'
             f'<div style="font-weight:bold;margin-bottom:4px;">Dhaka sections ({len(ref.names)})</div>'
             + rows + '</div>')
     return folium.Element(html)
-
-
-def folium_zone_map(sv: ServiceVoronoi, ref: ZoneRef, flagship: bool = False) -> str:
-    """Interactive Google map: the Voronoi split into coloured main sections."""
-    svc = SERVICE_TYPES[sv.key]
-    zgdf = color_cells_by_zone(sv, ref).to_crs(CRS_GEO)
-    m = _google_map(_map_center(sv))
-
-    # fine Voronoi cells, filled by their section colour (thin edges = the mesh)
-    folium.GeoJson(zgdf.to_json(), name="Voronoi cells (by section)",
-        style_function=lambda f: {"fillColor": f["properties"]["zone_color"],
-                                  "color": "#555555", "weight": 0.3, "fillOpacity": 0.5},
-        highlight_function=lambda f: {"weight": 1.5, "color": "#000000"},
-        tooltip=folium.GeoJsonTooltip(fields=["zone_name", "area_km2"],
-                                      aliases=["Section", "Cell area (km²)"])).add_to(m)
-
-    # bold section boundaries (the 8-section coarse Voronoi)
-    zv = build_zone_voronoi(sv.boundary, ref).to_crs(CRS_GEO)
-    folium.GeoJson(zv.to_json(), name="Section boundaries",
-        style_function=lambda f: {"fillOpacity": 0, "color": "#111111", "weight": 3}).add_to(m)
-
-    # section name labels at each section centre
-    centers = gpd.GeoSeries(gpd.points_from_xy(ref.centers_m[:, 0], ref.centers_m[:, 1]),
-                            crs=CRS_METRIC).to_crs(CRS_GEO)
-    labels = folium.FeatureGroup(name="Section labels", show=True)
-    for name_, pt in zip(ref.names, centers):
-        folium.Marker([pt.y, pt.x], icon=folium.DivIcon(icon_size=(0, 0), html=(
-            '<div style="font:bold 12px sans-serif;color:#111;background:rgba(255,255,255,.82);'
-            'padding:1px 6px;border-radius:4px;border:1px solid #444;white-space:nowrap;'
-            f'transform:translate(-50%,-50%);display:inline-block;">{name_}</div>'))).add_to(labels)
-    labels.add_to(m)
-
-    # facilities off by default so the coloured sections read first
-    fg = folium.FeatureGroup(name=f"{SERVICE_EMOJI[sv.key]} {svc.label} sites", show=False)
-    _add_service_markers(fg, sv, cluster=True)
-    fg.add_to(m)
-
-    m.get_root().html.add_child(_sections_legend(ref))
-    folium.LayerControl(collapsed=False).add_to(m)
-    name = "interactive_flagship_zones" if flagship else f"interactive_zones_{sv.key}"
-    out = REPORT_DIR / f"{name}.html"
-    m.save(str(out))
-    return str(out)
 
 
 # =========================================================================== #
@@ -1333,19 +1302,16 @@ def main(force_figures: bool = False) -> None:
             if _need(str(path), force_figures):
                 fn()
         folium_service_map(sv, cov, recs[key])
-        folium_zone_map(sv, ref)
     if _need(str(FIGURES_DIR / "zones_dhaka_flagship.png"), force_figures):
         plot_zone_colored_voronoi(voronois[flagship_key], ref, flagship=True)
-    flagship_html = folium_zone_map(voronois[flagship_key], ref, flagship=True)
-    all_html = folium_all_utilities_map(voronois)
+    headline_html = folium_sections_map(voronois, ref)
 
     print("[6/6] PDF report")
     pdf = build_pdf_report(voronois, coverages, table, recs, flagship_key)
     print("\nDONE")
-    print("  PDF (static)                       ->", pdf)
-    print("  Interactive — all utilities        ->", all_html)
-    print("  Interactive — zone flagship        ->", flagship_html)
-    print("  Interactive — per service          -> outputs/report/interactive_*.html")
+    print("  PDF (static)                                   ->", pdf)
+    print("  Interactive — Dhaka sections + all utilities   ->", headline_html)
+    print("  Interactive — per-utility Voronoi coverage     -> outputs/report/interactive_<service>.html")
 
 
 if __name__ == "__main__":
