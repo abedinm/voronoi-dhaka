@@ -1049,13 +1049,15 @@ def _emoji_div(emoji: str, color: str, size: int = 24) -> folium.DivIcon:
     return folium.DivIcon(html=html, icon_size=(size, size), icon_anchor=(size // 2, size // 2))
 
 
-def _cluster_js(color: str) -> str:
-    """JS to colour a MarkerCluster bubble in the service colour."""
+def _cluster_js(color: str, emoji: str) -> str:
+    """Render a MarkerCluster bubble as a coloured badge showing the utility's
+    emoji logo (top) and the facility count (below) — legible at any zoom."""
     return ("function(cluster){return L.divIcon({html:'<div style=\"background:" + color +
-            ";opacity:.9;width:34px;height:34px;border-radius:50%;border:2px solid white;"
-            "color:white;font:bold 12px sans-serif;display:flex;align-items:center;"
-            "justify-content:center;box-shadow:0 0 4px rgba(0,0,0,.5)\">'+cluster.getChildCount()+"
-            "'</div>',className:'',iconSize:L.point(34,34)});}")
+            ";opacity:.92;width:38px;height:38px;border-radius:50%;border:2px solid white;"
+            "color:white;font:bold 11px sans-serif;display:flex;flex-direction:column;"
+            "align-items:center;justify-content:center;line-height:1.05;"
+            "box-shadow:0 0 4px rgba(0,0,0,.5)\"><span style=\"font-size:14px\">" + emoji +
+            "</span>'+cluster.getChildCount()+'</div>',className:'',iconSize:L.point(38,38)});}")
 
 
 def _add_service_markers(parent, sv: ServiceVoronoi, cluster: bool = True) -> None:
@@ -1063,7 +1065,7 @@ def _add_service_markers(parent, sv: ServiceVoronoi, cluster: bool = True) -> No
     emoji = SERVICE_EMOJI[sv.key]
     target = parent
     if cluster:
-        target = MarkerCluster(icon_create_function=_cluster_js(svc.color))
+        target = MarkerCluster(icon_create_function=_cluster_js(svc.color, emoji))
         target.add_to(parent)
     for _, r in sv.seeds_gdf().to_crs(CRS_GEO).iterrows():
         folium.Marker([r.geometry.y, r.geometry.x], icon=_emoji_div(emoji, svc.color),
@@ -1111,7 +1113,7 @@ def folium_sections_map(voronois: dict[str, ServiceVoronoi], ref: ZoneRef) -> st
     zv = build_zone_voronoi(any_sv.boundary, ref).to_crs(CRS_GEO)
     folium.GeoJson(zv.to_json(), name="Sections (coloured)",
         style_function=lambda f: {"fillColor": f["properties"]["zone_color"],
-                                  "color": "#111111", "weight": 2.5, "fillOpacity": 0.28},
+                                  "color": "#111111", "weight": 2.5, "fillOpacity": 0.16},
         tooltip=folium.GeoJsonTooltip(fields=["zone_name"], aliases=["Section"])).add_to(m)
     _section_labels_layer(ref).add_to(m)
 
