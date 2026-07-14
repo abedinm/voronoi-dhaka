@@ -865,17 +865,34 @@ def _map_center(sv):
     return [c.y, c.x]
 
 
+# Google Maps tile layers (lyrs: m=streets, y=hybrid, s=satellite, p=terrain).
+_GOOGLE_LAYERS = [("Google Streets", "m"), ("Google Hybrid", "y"),
+                  ("Google Satellite", "s"), ("Google Terrain", "p")]
+
+
+def _google_map(center, zoom: int = 12) -> folium.Map:
+    """A folium map whose base layers are live, pan/zoom Google Maps tiles."""
+    m = folium.Map(location=center, zoom_start=zoom, tiles=None, control_scale=True)
+    for name, lyr in _GOOGLE_LAYERS:
+        folium.TileLayer(
+            tiles=f"https://{{s}}.google.com/vt/lyrs={lyr}&x={{x}}&y={{y}}&z={{z}}",
+            attr="Map data © Google", name=name, max_zoom=20,
+            subdomains=["mt0", "mt1", "mt2", "mt3"], overlay=False, control=True,
+        ).add_to(m)
+    return m
+
+
 def folium_service_map(sv: ServiceVoronoi, cov: CoverageResult, rec: RecommendResult) -> str:
     svc = SERVICE_TYPES[sv.key]
-    m = folium.Map(location=_map_center(sv), zoom_start=12, tiles="CartoDB positron")
+    m = _google_map(_map_center(sv))
     cells = sv.cells_gdf().to_crs(CRS_GEO)
     areas = cells["area_km2"]
     cmap = bcm.linear.YlOrRd_09.scale(float(areas.min()), float(areas.max()))
     cmap.caption = "Voronoi cell area (km²)"
     fg = folium.FeatureGroup(name="Voronoi cells (by area)", show=True)
     folium.GeoJson(cells.to_json(), style_function=lambda f: {
-        "fillColor": cmap(f["properties"]["area_km2"]), "color": "#444444",
-        "weight": 0.5, "fillOpacity": 0.55},
+        "fillColor": cmap(f["properties"]["area_km2"]), "color": "#222222",
+        "weight": 0.6, "fillOpacity": 0.35},
         tooltip=folium.GeoJsonTooltip(fields=["name", "area_km2"],
                                       aliases=["facility", "cell km²"])).add_to(fg)
     fg.add_to(m)
@@ -892,6 +909,34 @@ def folium_service_map(sv: ServiceVoronoi, cov: CoverageResult, rec: RecommendRe
     cmap.add_to(m)
     folium.LayerControl(collapsed=False).add_to(m)
     out = REPORT_DIR / f"interactive_{sv.key}.html"
+    m.save(str(out))
+    return str(out)
+
+
+def folium_zone_map(sv: ServiceVoronoi, ref: ZoneRef, flagship: bool = False) -> str:
+    """Interactive Google map: Voronoi cells coloured by named Dhaka zone."""
+    svc = SERVICE_TYPES[sv.key]
+    zgdf = color_cells_by_zone(sv, ref).to_crs(CRS_GEO)
+    m = _google_map(_map_center(sv))
+    folium.GeoJson(zgdf.to_json(), name=f"{svc.label} Voronoi by zone",
+        style_function=lambda f: {"fillColor": f["properties"]["zone_color"],
+                                  "color": "#222222", "weight": 0.7, "fillOpacity": 0.45},
+        highlight_function=lambda f: {"weight": 2, "color": "#000000"},
+        tooltip=folium.GeoJsonTooltip(fields=["zone_name", "area_km2"],
+                                      aliases=["Zone", "Cell area (km²)"])).add_to(m)
+    zv = build_zone_voronoi(sv.boundary, ref).to_crs(CRS_GEO)
+    folium.GeoJson(zv.to_json(), name="Zone boundaries",
+        style_function=lambda f: {"fillOpacity": 0, "color": "#000000",
+                                  "weight": 2, "dashArray": "6 4"}).add_to(m)
+    seeds = sv.seeds_gdf().to_crs(CRS_GEO)
+    fg = folium.FeatureGroup(name=f"{svc.label} facilities", show=True)
+    for _, r in seeds.iterrows():
+        folium.CircleMarker([r.geometry.y, r.geometry.x], radius=2.5, color="#111111",
+                            fill=True, fill_opacity=0.9, popup=str(r["name"])).add_to(fg)
+    fg.add_to(m)
+    folium.LayerControl(collapsed=False).add_to(m)
+    name = "interactive_flagship_zones" if flagship else f"interactive_zones_{sv.key}"
+    out = REPORT_DIR / f"{name}.html"
     m.save(str(out))
     return str(out)
 
@@ -1172,12 +1217,17 @@ def main(force_figures: bool = False) -> None:
             if _need(str(path), force_figures):
                 fn()
         folium_service_map(sv, cov, recs[key])
+        folium_zone_map(sv, ref)
     if _need(str(FIGURES_DIR / "zones_dhaka_flagship.png"), force_figures):
         plot_zone_colored_voronoi(voronois[flagship_key], ref, flagship=True)
+    flagship_html = folium_zone_map(voronois[flagship_key], ref, flagship=True)
 
     print("[6/6] PDF report")
     pdf = build_pdf_report(voronois, coverages, table, recs, flagship_key)
-    print("\nDONE ->", pdf)
+    print("\nDONE")
+    print("  PDF (static)        ->", pdf)
+    print("  Interactive Google map (flagship) ->", flagship_html)
+    print("  Interactive per-service maps      -> outputs/report/interactive_*.html")
 
 
 if __name__ == "__main__":
