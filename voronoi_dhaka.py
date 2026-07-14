@@ -35,6 +35,7 @@ matplotlib.use("Agg")
 import branca.colormap as bcm
 import contextily as cx
 import folium
+from folium.plugins import MarkerCluster
 import geopandas as gpd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -98,6 +99,16 @@ SERVICE_TYPES: dict[str, ServiceType] = {
         {"highway": ["bus_stop"], "public_transport": ["platform"]}, "#9467bd", 30, 800.0),
     "fire_station": ServiceType("fire_station", "Fire station",
         {"amenity": ["fire_station"]}, "#8c564b", 8, 3000.0),
+}
+
+# Emoji "logo" for each utility, used on the interactive maps.
+SERVICE_EMOJI: dict[str, str] = {
+    "metro_station": "🚇",
+    "hospital": "🏥",
+    "water_pump": "🚰",
+    "fuel": "⛽",
+    "bus_stop": "🚌",
+    "fire_station": "🚒",
 }
 
 ZONES: dict[str, dict] = {
@@ -882,6 +893,67 @@ def _google_map(center, zoom: int = 12) -> folium.Map:
     return m
 
 
+def _emoji_div(emoji: str, color: str, size: int = 24) -> folium.DivIcon:
+    """A coloured circular badge with the utility's emoji logo."""
+    html = (f'<div style="background:{color};width:{size}px;height:{size}px;'
+            'border-radius:50%;border:2px solid white;box-shadow:0 0 3px rgba(0,0,0,.55);'
+            'display:flex;align-items:center;justify-content:center;line-height:1;'
+            f'font-size:{int(size*0.6)}px;">{emoji}</div>')
+    return folium.DivIcon(html=html, icon_size=(size, size), icon_anchor=(size // 2, size // 2))
+
+
+def _cluster_js(color: str) -> str:
+    """JS to colour a MarkerCluster bubble in the service colour."""
+    return ("function(cluster){return L.divIcon({html:'<div style=\"background:" + color +
+            ";opacity:.9;width:34px;height:34px;border-radius:50%;border:2px solid white;"
+            "color:white;font:bold 12px sans-serif;display:flex;align-items:center;"
+            "justify-content:center;box-shadow:0 0 4px rgba(0,0,0,.5)\">'+cluster.getChildCount()+"
+            "'</div>',className:'',iconSize:L.point(34,34)});}")
+
+
+def _add_service_markers(parent, sv: ServiceVoronoi, cluster: bool = True) -> None:
+    svc = SERVICE_TYPES[sv.key]
+    emoji = SERVICE_EMOJI[sv.key]
+    target = parent
+    if cluster:
+        target = MarkerCluster(icon_create_function=_cluster_js(svc.color))
+        target.add_to(parent)
+    for _, r in sv.seeds_gdf().to_crs(CRS_GEO).iterrows():
+        folium.Marker([r.geometry.y, r.geometry.x], icon=_emoji_div(emoji, svc.color),
+                      popup=f"{svc.label}: {r['name']}").add_to(target)
+
+
+def _utilities_legend() -> folium.Element:
+    rows = "".join(
+        f'<div style="margin:2px 0;"><span style="display:inline-block;width:13px;height:13px;'
+        f'background:{SERVICE_TYPES[k].color};border-radius:50%;border:1px solid #fff;'
+        f'box-shadow:0 0 1px #000;margin-right:6px;vertical-align:middle;"></span>'
+        f'{SERVICE_EMOJI[k]} {SERVICE_TYPES[k].label}</div>'
+        for k in SERVICE_TYPES)
+    html = ('<div style="position:fixed;bottom:22px;left:22px;z-index:9999;background:white;'
+            'padding:10px 13px;border:1px solid #888;border-radius:6px;'
+            'font:12px/1.35 sans-serif;box-shadow:0 1px 5px rgba(0,0,0,.3);">'
+            '<div style="font-weight:bold;margin-bottom:4px;">Dhaka utilities</div>'
+            + rows + '</div>')
+    return folium.Element(html)
+
+
+def folium_all_utilities_map(voronois: dict[str, ServiceVoronoi]) -> str:
+    """One interactive Google map with all six utilities, each its own colour+logo."""
+    center = _map_center(next(iter(voronois.values())))
+    m = _google_map(center)
+    for key, sv in voronois.items():
+        svc = SERVICE_TYPES[key]
+        fg = folium.FeatureGroup(name=f"{SERVICE_EMOJI[key]} {svc.label} ({sv.n})", show=True)
+        _add_service_markers(fg, sv, cluster=True)
+        fg.add_to(m)
+    m.get_root().html.add_child(_utilities_legend())
+    folium.LayerControl(collapsed=False).add_to(m)
+    out = REPORT_DIR / "interactive_all_utilities.html"
+    m.save(str(out))
+    return str(out)
+
+
 def folium_service_map(sv: ServiceVoronoi, cov: CoverageResult, rec: RecommendResult) -> str:
     svc = SERVICE_TYPES[sv.key]
     m = _google_map(_map_center(sv))
@@ -896,10 +968,8 @@ def folium_service_map(sv: ServiceVoronoi, cov: CoverageResult, rec: RecommendRe
         tooltip=folium.GeoJsonTooltip(fields=["name", "area_km2"],
                                       aliases=["facility", "cell km²"])).add_to(fg)
     fg.add_to(m)
-    fgf = folium.FeatureGroup(name=f"{svc.label} facilities", show=True)
-    for _, r in sv.seeds_gdf().to_crs(CRS_GEO).iterrows():
-        folium.CircleMarker([r.geometry.y, r.geometry.x], radius=3, color=svc.color,
-                            fill=True, fill_opacity=0.9, popup=str(r["name"])).add_to(fgf)
+    fgf = folium.FeatureGroup(name=f"{SERVICE_EMOJI[sv.key]} {svc.label} facilities", show=True)
+    _add_service_markers(fgf, sv, cluster=True)
     fgf.add_to(m)
     fn = folium.FeatureGroup(name="Proposed new sites", show=True)
     for i, (lon, lat) in enumerate(rec.new_points_lonlat):
@@ -928,12 +998,8 @@ def folium_zone_map(sv: ServiceVoronoi, ref: ZoneRef, flagship: bool = False) ->
     folium.GeoJson(zv.to_json(), name="Zone boundaries",
         style_function=lambda f: {"fillOpacity": 0, "color": "#000000",
                                   "weight": 2, "dashArray": "6 4"}).add_to(m)
-    seeds = sv.seeds_gdf().to_crs(CRS_GEO)
-    fg = folium.FeatureGroup(name=f"{svc.label} facilities", show=True)
-    for _, r in seeds.iterrows():
-        folium.CircleMarker([r.geometry.y, r.geometry.x], radius=3.5, weight=1.2,
-                            color="#1a1a1a", fill=True, fill_color=svc.color,
-                            fill_opacity=0.95, popup=str(r["name"])).add_to(fg)
+    fg = folium.FeatureGroup(name=f"{SERVICE_EMOJI[sv.key]} {svc.label} facilities", show=True)
+    _add_service_markers(fg, sv, cluster=True)
     fg.add_to(m)
     folium.LayerControl(collapsed=False).add_to(m)
     name = "interactive_flagship_zones" if flagship else f"interactive_zones_{sv.key}"
@@ -1222,13 +1288,15 @@ def main(force_figures: bool = False) -> None:
     if _need(str(FIGURES_DIR / "zones_dhaka_flagship.png"), force_figures):
         plot_zone_colored_voronoi(voronois[flagship_key], ref, flagship=True)
     flagship_html = folium_zone_map(voronois[flagship_key], ref, flagship=True)
+    all_html = folium_all_utilities_map(voronois)
 
     print("[6/6] PDF report")
     pdf = build_pdf_report(voronois, coverages, table, recs, flagship_key)
     print("\nDONE")
-    print("  PDF (static)        ->", pdf)
-    print("  Interactive Google map (flagship) ->", flagship_html)
-    print("  Interactive per-service maps      -> outputs/report/interactive_*.html")
+    print("  PDF (static)                       ->", pdf)
+    print("  Interactive — all utilities        ->", all_html)
+    print("  Interactive — zone flagship        ->", flagship_html)
+    print("  Interactive — per service          -> outputs/report/interactive_*.html")
 
 
 if __name__ == "__main__":

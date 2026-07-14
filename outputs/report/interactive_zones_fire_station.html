@@ -17,7 +17,7 @@
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <style>
-                #map_83f36d60a06cd6b9209e48bb32e707d5 {
+                #map_3832f4b2370f0816dffa05b968768e89 {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -66,18 +66,21 @@
                         }
                     </style>
             
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/leaflet.markercluster.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/MarkerCluster.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/MarkerCluster.Default.css"/>
 </head>
 <body>
     
     
-            <div class="folium-map" id="map_83f36d60a06cd6b9209e48bb32e707d5" ></div>
+            <div class="folium-map" id="map_3832f4b2370f0816dffa05b968768e89" ></div>
         
 </body>
 <script>
     
     
-            var map_83f36d60a06cd6b9209e48bb32e707d5 = L.map(
-                "map_83f36d60a06cd6b9209e48bb32e707d5",
+            var map_3832f4b2370f0816dffa05b968768e89 = L.map(
+                "map_3832f4b2370f0816dffa05b968768e89",
                 {
                     center: [23.779999999999994, 90.41499999999999],
                     crs: L.CRS.EPSG3857,
@@ -89,13 +92,13 @@
 
                 }
             );
-            L.control.scale().addTo(map_83f36d60a06cd6b9209e48bb32e707d5);
+            L.control.scale().addTo(map_3832f4b2370f0816dffa05b968768e89);
 
             
 
         
     
-            var tile_layer_f788f4900bb9ffe88e01a034e54fe419 = L.tileLayer(
+            var tile_layer_afa068223cf670f4e242a3c16fcd3160 = L.tileLayer(
                 "https://{s}.google.com/vt/lyrs=m\u0026x={x}\u0026y={y}\u0026z={z}",
                 {
   "minZoom": 0,
@@ -117,10 +120,10 @@
             );
         
     
-            tile_layer_f788f4900bb9ffe88e01a034e54fe419.addTo(map_83f36d60a06cd6b9209e48bb32e707d5);
+            tile_layer_afa068223cf670f4e242a3c16fcd3160.addTo(map_3832f4b2370f0816dffa05b968768e89);
         
     
-            var tile_layer_530b9b3b3b49c2a7420e84d3bf2791fe = L.tileLayer(
+            var tile_layer_e99d271fb159bb0e8f6e13e308b0206b = L.tileLayer(
                 "https://{s}.google.com/vt/lyrs=y\u0026x={x}\u0026y={y}\u0026z={z}",
                 {
   "minZoom": 0,
@@ -142,10 +145,10 @@
             );
         
     
-            tile_layer_530b9b3b3b49c2a7420e84d3bf2791fe.addTo(map_83f36d60a06cd6b9209e48bb32e707d5);
+            tile_layer_e99d271fb159bb0e8f6e13e308b0206b.addTo(map_3832f4b2370f0816dffa05b968768e89);
         
     
-            var tile_layer_081dd082876f82edfc157a119aa229f2 = L.tileLayer(
+            var tile_layer_a0b62b78280b41c97e8d5a5fd26d50b4 = L.tileLayer(
                 "https://{s}.google.com/vt/lyrs=s\u0026x={x}\u0026y={y}\u0026z={z}",
                 {
   "minZoom": 0,
@@ -167,10 +170,10 @@
             );
         
     
-            tile_layer_081dd082876f82edfc157a119aa229f2.addTo(map_83f36d60a06cd6b9209e48bb32e707d5);
+            tile_layer_a0b62b78280b41c97e8d5a5fd26d50b4.addTo(map_3832f4b2370f0816dffa05b968768e89);
         
     
-            var tile_layer_8ec5248c33387a3f68a7e6fc58fc6896 = L.tileLayer(
+            var tile_layer_68fc85d523d9a440a781b0cced7b22fa = L.tileLayer(
                 "https://{s}.google.com/vt/lyrs=p\u0026x={x}\u0026y={y}\u0026z={z}",
                 {
   "minZoom": 0,
@@ -192,10 +195,10 @@
             );
         
     
-            tile_layer_8ec5248c33387a3f68a7e6fc58fc6896.addTo(map_83f36d60a06cd6b9209e48bb32e707d5);
+            tile_layer_68fc85d523d9a440a781b0cced7b22fa.addTo(map_3832f4b2370f0816dffa05b968768e89);
         
     
-        function geo_json_492b9e3f57b7e98de5ac5a814ed7b9b8_styler(feature) {
+        function geo_json_6825738eceb9679b511b510df81f6fca_styler(feature) {
             switch(feature.id) {
                 case "0": case "13": case "17": case "18": case "19": 
                     return {"color": "#222222", "fillColor": "#8c564b", "fillOpacity": 0.45, "weight": 0.7};
@@ -213,46 +216,46 @@
                     return {"color": "#222222", "fillColor": "#9467bd", "fillOpacity": 0.45, "weight": 0.7};
             }
         }
-        function geo_json_492b9e3f57b7e98de5ac5a814ed7b9b8_highlighter(feature) {
+        function geo_json_6825738eceb9679b511b510df81f6fca_highlighter(feature) {
             switch(feature.id) {
                 default:
                     return {"color": "#000000", "weight": 2};
             }
         }
 
-        function geo_json_492b9e3f57b7e98de5ac5a814ed7b9b8_onEachFeature(feature, layer) {
+        function geo_json_6825738eceb9679b511b510df81f6fca_onEachFeature(feature, layer) {
 
             layer.on({
                 mouseout: function(e) {
                     if(typeof e.target.setStyle === "function"){
-                            geo_json_492b9e3f57b7e98de5ac5a814ed7b9b8.resetStyle(e.target);
+                            geo_json_6825738eceb9679b511b510df81f6fca.resetStyle(e.target);
                     }
                 },
                 mouseover: function(e) {
                     if(typeof e.target.setStyle === "function"){
-                        const highlightStyle = geo_json_492b9e3f57b7e98de5ac5a814ed7b9b8_highlighter(e.target.feature)
+                        const highlightStyle = geo_json_6825738eceb9679b511b510df81f6fca_highlighter(e.target.feature)
                         e.target.setStyle(highlightStyle);
                     }
                 },
             });
         };
-        var geo_json_492b9e3f57b7e98de5ac5a814ed7b9b8 = L.geoJson(null, {
-                onEachFeature: geo_json_492b9e3f57b7e98de5ac5a814ed7b9b8_onEachFeature,
+        var geo_json_6825738eceb9679b511b510df81f6fca = L.geoJson(null, {
+                onEachFeature: geo_json_6825738eceb9679b511b510df81f6fca_onEachFeature,
             
-                style: geo_json_492b9e3f57b7e98de5ac5a814ed7b9b8_styler,
+                style: geo_json_6825738eceb9679b511b510df81f6fca_styler,
             ...{
 }
         });
 
-        function geo_json_492b9e3f57b7e98de5ac5a814ed7b9b8_add (data) {
-            geo_json_492b9e3f57b7e98de5ac5a814ed7b9b8
+        function geo_json_6825738eceb9679b511b510df81f6fca_add (data) {
+            geo_json_6825738eceb9679b511b510df81f6fca
                 .addData(data);
         }
-            geo_json_492b9e3f57b7e98de5ac5a814ed7b9b8_add({"features": [{"geometry": {"coordinates": [[[90.37519067086606, 23.698380318913927], [90.37890758114318, 23.69252388204442], [90.38431345853597, 23.660020304428727], [90.33, 23.659999999999997], [90.33000490897484, 23.732438492566732], [90.37519067086606, 23.698380318913927]]], "type": "Polygon"}, "id": "0", "properties": {"area_km2": 30.792138417879222, "seed_index": 0, "zone_color": "#8c564b", "zone_name": "Dhanmondi"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.45615254420814, 23.682839354855027], [90.4657867372413, 23.732417588867097], [90.49055179231603, 23.776460645097895], [90.50000545117196, 23.777245444561974], [90.5, 23.659999999999997], [90.45839160508655, 23.660017262781807], [90.45615254420814, 23.682839354855027]]], "type": "Polygon"}, "id": "1", "properties": {"area_km2": 43.816806745919095, "seed_index": 1, "zone_color": "#17becf", "zone_name": "Khilgaon"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.37890758114318, 23.69252388204441], [90.39845977372428, 23.712905412161], [90.41855590001688, 23.716119480448846], [90.45615254420814, 23.682839354855027], [90.45839160508655, 23.660017262781807], [90.38431345853597, 23.660020304428727], [90.37890758114318, 23.69252388204441]]], "type": "Polygon"}, "id": "2", "properties": {"area_km2": 37.890834036888116, "seed_index": 2, "zone_color": "#e377c2", "zone_name": "Motijheel"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.46107250188174, 23.7751024616585], [90.42950494041102, 23.768193866825573], [90.40449215562099, 23.80073630152619], [90.46107250188174, 23.7751024616585]]], "type": "Polygon"}, "id": "3", "properties": {"area_km2": 6.780618646333839, "seed_index": 3, "zone_color": "#2ca02c", "zone_name": "Gulshan"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.44157428392622, 23.867949892315018], [90.40306381944593, 23.84110013915719], [90.37253209181895, 23.836343652579153], [90.3300031480019, 23.861372328718158], [90.33000204582129, 23.876671023220545], [90.44157428392622, 23.867949892315018]]], "type": "Polygon"}, "id": "4", "properties": {"area_km2": 30.585999621719278, "seed_index": 4, "zone_color": "#1f77b4", "zone_name": "Uttara"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.40882415040525, 23.83090637261624], [90.3878594846495, 23.814921924822446], [90.37253209181897, 23.836343652579153], [90.40306381944593, 23.841100139157188], [90.40882415040525, 23.83090637261624]]], "type": "Polygon"}, "id": "5", "properties": {"area_km2": 5.832277246839863, "seed_index": 5, "zone_color": "#9467bd", "zone_name": "Bashundhara"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.40882415040525, 23.83090637261624], [90.42570937572206, 23.81724824098007], [90.4006436637614, 23.803705583571073], [90.39461748855875, 23.802979725381217], [90.3878594846495, 23.814921924822446], [90.40882415040525, 23.83090637261624]]], "type": "Polygon"}, "id": "6", "properties": {"area_km2": 6.141583701739807, "seed_index": 6, "zone_color": "#9467bd", "zone_name": "Bashundhara"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.40890400461535, 23.74587820623404], [90.3872637024182, 23.760438618005303], [90.38117674453598, 23.784199124624354], [90.38332301060339, 23.785585818798424], [90.42306272583414, 23.76543844897969], [90.40890400461535, 23.74587820623404]]], "type": "Polygon"}, "id": "7", "properties": {"area_km2": 9.09055621341786, "seed_index": 7, "zone_color": "#2ca02c", "zone_name": "Gulshan"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.39760516370487, 23.735494136440124], [90.39845977372428, 23.712905412160993], [90.37890758114318, 23.69252388204441], [90.37519067086606, 23.69838031891392], [90.38237925037544, 23.733882881120728], [90.39760516370487, 23.735494136440124]]], "type": "Polygon"}, "id": "8", "properties": {"area_km2": 7.106558020629641, "seed_index": 8, "zone_color": "#e377c2", "zone_name": "Motijheel"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.39461748855875, 23.802979725381217], [90.4006436637614, 23.803705583571073], [90.40449215562099, 23.80073630152619], [90.42950494041102, 23.76819386682558], [90.42306272583414, 23.765438448979697], [90.38332301060339, 23.785585818798424], [90.39461748855875, 23.802979725381217]]], "type": "Polygon"}, "id": "9", "properties": {"area_km2": 8.61476061701814, "seed_index": 9, "zone_color": "#2ca02c", "zone_name": "Gulshan"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.49055179231603, 23.776460645097895], [90.4657867372413, 23.732417588867104], [90.41495223387872, 23.737069346227276], [90.40877158287405, 23.742517535207302], [90.40890400461535, 23.74587820623404], [90.42306272583414, 23.765438448979697], [90.42950494041102, 23.768193866825573], [90.46107250188177, 23.775102461658506], [90.48761631457081, 23.77792935386624], [90.49055179231603, 23.776460645097895]]], "type": "Polygon"}, "id": "10", "properties": {"area_km2": 26.933022809861473, "seed_index": 10, "zone_color": "#17becf", "zone_name": "Khilgaon"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.49055179231603, 23.776460645097895], [90.48761631457081, 23.777929353866238], [90.45084075068387, 23.82332005961706], [90.44714865991351, 23.8689208191229], [90.46949424059457, 23.900013856238935], [90.5, 23.89999999999999], [90.50000545117196, 23.777245444561974], [90.49055179231603, 23.776460645097895]]], "type": "Polygon"}, "id": "11", "properties": {"area_km2": 56.81256916962929, "seed_index": 11, "zone_color": "#9467bd", "zone_name": "Bashundhara"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.41855590001688, 23.716119480448846], [90.39845977372428, 23.712905412161], [90.39760516370487, 23.735494136440124], [90.40877158287405, 23.742517535207302], [90.41495223387872, 23.737069346227273], [90.41855590001688, 23.716119480448846]]], "type": "Polygon"}, "id": "12", "properties": {"area_km2": 5.256343639798527, "seed_index": 12, "zone_color": "#e377c2", "zone_name": "Motijheel"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.37160743224011, 23.7407785809464], [90.38237925037544, 23.733882881120728], [90.37519067086606, 23.698380318913923], [90.33000490897484, 23.732438492566732], [90.33000527617668, 23.743191324397813], [90.37160743224011, 23.7407785809464]]], "type": "Polygon"}, "id": "13", "properties": {"area_km2": 15.107760146496132, "seed_index": 13, "zone_color": "#8c564b", "zone_name": "Dhanmondi"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.41495223387872, 23.737069346227273], [90.4657867372413, 23.732417588867104], [90.45615254420814, 23.682839354855027], [90.41855590001688, 23.716119480448846], [90.41495223387872, 23.737069346227273]]], "type": "Polygon"}, "id": "14", "properties": {"area_km2": 18.271323093868244, "seed_index": 14, "zone_color": "#e377c2", "zone_name": "Motijheel"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.37253209181897, 23.836343652579153], [90.38785948464951, 23.814921924822436], [90.39461748855875, 23.802979725381217], [90.38332301060339, 23.785585818798424], [90.38117674453598, 23.784199124624344], [90.3300058249878, 23.779198815762637], [90.3300031480019, 23.861372328718158], [90.37253209181897, 23.836343652579153]]], "type": "Polygon"}, "id": "15", "properties": {"area_km2": 40.2697580919656, "seed_index": 15, "zone_color": "#ff7f0e", "zone_name": "Mirpur"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.46107250188173, 23.775102461658506], [90.40449215562099, 23.80073630152619], [90.4006436637614, 23.803705583571073], [90.42570937572205, 23.81724824098007], [90.45084075068387, 23.823320059617064], [90.48761631457081, 23.77792935386624], [90.46107250188173, 23.775102461658506]]], "type": "Polygon"}, "id": "16", "properties": {"area_km2": 23.65211952372598, "seed_index": 16, "zone_color": "#2ca02c", "zone_name": "Gulshan"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.38124163687004, 23.754121779867287], [90.3716074322401, 23.7407785809464], [90.33000527617668, 23.743191324397813], [90.33000581517682, 23.775041575508403], [90.38124163687004, 23.754121779867287]]], "type": "Polygon"}, "id": "17", "properties": {"area_km2": 12.490818584850572, "seed_index": 17, "zone_color": "#8c564b", "zone_name": "Dhanmondi"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.38117674453598, 23.784199124624344], [90.3872637024182, 23.760438618005303], [90.38124163687004, 23.754121779867294], [90.33000581517682, 23.775041575508403], [90.3300058249878, 23.779198815762637], [90.38117674453598, 23.784199124624344]]], "type": "Polygon"}, "id": "18", "properties": {"area_km2": 10.926899613437008, "seed_index": 18, "zone_color": "#8c564b", "zone_name": "Dhanmondi"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.38124163687004, 23.7541217798673], [90.3872637024182, 23.760438618005303], [90.40890400461535, 23.745878206234043], [90.40877158287405, 23.742517535207302], [90.39760516370488, 23.735494136440124], [90.38237925037544, 23.733882881120728], [90.3716074322401, 23.740778580946404], [90.38124163687004, 23.7541217798673]]], "type": "Polygon"}, "id": "19", "properties": {"area_km2": 6.564037304778374, "seed_index": 19, "zone_color": "#8c564b", "zone_name": "Dhanmondi"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.40882415040525, 23.830906372616248], [90.40306381944593, 23.841100139157184], [90.44157428392622, 23.867949892315018], [90.44714865991351, 23.8689208191229], [90.45084075068387, 23.823320059617064], [90.42570937572205, 23.81724824098007], [90.40882415040525, 23.830906372616248]]], "type": "Polygon"}, "id": "20", "properties": {"area_km2": 17.25539239352906, "seed_index": 20, "zone_color": "#9467bd", "zone_name": "Bashundhara"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.44714865991351, 23.8689208191229], [90.44157428392622, 23.867949892315018], [90.33000204582129, 23.876671023220545], [90.33, 23.9], [90.46949424059457, 23.900013856238935], [90.44714865991351, 23.8689208191229]]], "type": "Polygon"}, "id": "21", "properties": {"area_km2": 40.803398398180896, "seed_index": 21, "zone_color": "#1f77b4", "zone_name": "Uttara"}, "type": "Feature"}], "type": "FeatureCollection"});
+            geo_json_6825738eceb9679b511b510df81f6fca_add({"features": [{"geometry": {"coordinates": [[[90.37519067086606, 23.698380318913927], [90.37890758114318, 23.69252388204442], [90.38431345853597, 23.660020304428727], [90.33, 23.659999999999997], [90.33000490897484, 23.732438492566732], [90.37519067086606, 23.698380318913927]]], "type": "Polygon"}, "id": "0", "properties": {"area_km2": 30.792138417879222, "seed_index": 0, "zone_color": "#8c564b", "zone_name": "Dhanmondi"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.45615254420814, 23.682839354855027], [90.4657867372413, 23.732417588867097], [90.49055179231603, 23.776460645097895], [90.50000545117196, 23.777245444561974], [90.5, 23.659999999999997], [90.45839160508655, 23.660017262781807], [90.45615254420814, 23.682839354855027]]], "type": "Polygon"}, "id": "1", "properties": {"area_km2": 43.816806745919095, "seed_index": 1, "zone_color": "#17becf", "zone_name": "Khilgaon"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.37890758114318, 23.69252388204441], [90.39845977372428, 23.712905412161], [90.41855590001688, 23.716119480448846], [90.45615254420814, 23.682839354855027], [90.45839160508655, 23.660017262781807], [90.38431345853597, 23.660020304428727], [90.37890758114318, 23.69252388204441]]], "type": "Polygon"}, "id": "2", "properties": {"area_km2": 37.890834036888116, "seed_index": 2, "zone_color": "#e377c2", "zone_name": "Motijheel"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.46107250188174, 23.7751024616585], [90.42950494041102, 23.768193866825573], [90.40449215562099, 23.80073630152619], [90.46107250188174, 23.7751024616585]]], "type": "Polygon"}, "id": "3", "properties": {"area_km2": 6.780618646333839, "seed_index": 3, "zone_color": "#2ca02c", "zone_name": "Gulshan"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.44157428392622, 23.867949892315018], [90.40306381944593, 23.84110013915719], [90.37253209181895, 23.836343652579153], [90.3300031480019, 23.861372328718158], [90.33000204582129, 23.876671023220545], [90.44157428392622, 23.867949892315018]]], "type": "Polygon"}, "id": "4", "properties": {"area_km2": 30.585999621719278, "seed_index": 4, "zone_color": "#1f77b4", "zone_name": "Uttara"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.40882415040525, 23.83090637261624], [90.3878594846495, 23.814921924822446], [90.37253209181897, 23.836343652579153], [90.40306381944593, 23.841100139157188], [90.40882415040525, 23.83090637261624]]], "type": "Polygon"}, "id": "5", "properties": {"area_km2": 5.832277246839863, "seed_index": 5, "zone_color": "#9467bd", "zone_name": "Bashundhara"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.40882415040525, 23.83090637261624], [90.42570937572206, 23.81724824098007], [90.4006436637614, 23.803705583571073], [90.39461748855875, 23.802979725381217], [90.3878594846495, 23.814921924822446], [90.40882415040525, 23.83090637261624]]], "type": "Polygon"}, "id": "6", "properties": {"area_km2": 6.141583701739807, "seed_index": 6, "zone_color": "#9467bd", "zone_name": "Bashundhara"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.40890400461535, 23.74587820623404], [90.3872637024182, 23.760438618005303], [90.38117674453598, 23.784199124624354], [90.38332301060339, 23.785585818798424], [90.42306272583414, 23.76543844897969], [90.40890400461535, 23.74587820623404]]], "type": "Polygon"}, "id": "7", "properties": {"area_km2": 9.09055621341786, "seed_index": 7, "zone_color": "#2ca02c", "zone_name": "Gulshan"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.39760516370487, 23.735494136440124], [90.39845977372428, 23.712905412160993], [90.37890758114318, 23.69252388204441], [90.37519067086606, 23.69838031891392], [90.38237925037544, 23.733882881120728], [90.39760516370487, 23.735494136440124]]], "type": "Polygon"}, "id": "8", "properties": {"area_km2": 7.106558020629641, "seed_index": 8, "zone_color": "#e377c2", "zone_name": "Motijheel"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.39461748855875, 23.802979725381217], [90.4006436637614, 23.803705583571073], [90.40449215562099, 23.80073630152619], [90.42950494041102, 23.76819386682558], [90.42306272583414, 23.765438448979697], [90.38332301060339, 23.785585818798424], [90.39461748855875, 23.802979725381217]]], "type": "Polygon"}, "id": "9", "properties": {"area_km2": 8.61476061701814, "seed_index": 9, "zone_color": "#2ca02c", "zone_name": "Gulshan"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.49055179231603, 23.776460645097895], [90.4657867372413, 23.732417588867104], [90.41495223387872, 23.737069346227276], [90.40877158287405, 23.742517535207302], [90.40890400461535, 23.74587820623404], [90.42306272583414, 23.765438448979697], [90.42950494041102, 23.768193866825573], [90.46107250188177, 23.775102461658506], [90.48761631457081, 23.77792935386624], [90.49055179231603, 23.776460645097895]]], "type": "Polygon"}, "id": "10", "properties": {"area_km2": 26.933022809861473, "seed_index": 10, "zone_color": "#17becf", "zone_name": "Khilgaon"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.49055179231603, 23.776460645097895], [90.48761631457081, 23.777929353866238], [90.45084075068387, 23.82332005961706], [90.44714865991351, 23.8689208191229], [90.46949424059457, 23.900013856238935], [90.5, 23.89999999999999], [90.50000545117196, 23.777245444561974], [90.49055179231603, 23.776460645097895]]], "type": "Polygon"}, "id": "11", "properties": {"area_km2": 56.81256916962929, "seed_index": 11, "zone_color": "#9467bd", "zone_name": "Bashundhara"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.41855590001688, 23.716119480448846], [90.39845977372428, 23.712905412161], [90.39760516370487, 23.735494136440124], [90.40877158287405, 23.742517535207302], [90.41495223387872, 23.737069346227273], [90.41855590001688, 23.716119480448846]]], "type": "Polygon"}, "id": "12", "properties": {"area_km2": 5.256343639798527, "seed_index": 12, "zone_color": "#e377c2", "zone_name": "Motijheel"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.37160743224011, 23.7407785809464], [90.38237925037544, 23.733882881120728], [90.37519067086606, 23.698380318913923], [90.33000490897484, 23.732438492566732], [90.33000527617668, 23.743191324397813], [90.37160743224011, 23.7407785809464]]], "type": "Polygon"}, "id": "13", "properties": {"area_km2": 15.107760146496132, "seed_index": 13, "zone_color": "#8c564b", "zone_name": "Dhanmondi"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.41495223387872, 23.737069346227273], [90.4657867372413, 23.732417588867104], [90.45615254420814, 23.682839354855027], [90.41855590001688, 23.716119480448846], [90.41495223387872, 23.737069346227273]]], "type": "Polygon"}, "id": "14", "properties": {"area_km2": 18.271323093868244, "seed_index": 14, "zone_color": "#e377c2", "zone_name": "Motijheel"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.37253209181897, 23.836343652579153], [90.38785948464951, 23.814921924822436], [90.39461748855875, 23.802979725381217], [90.38332301060339, 23.785585818798424], [90.38117674453598, 23.784199124624344], [90.3300058249878, 23.779198815762637], [90.3300031480019, 23.861372328718158], [90.37253209181897, 23.836343652579153]]], "type": "Polygon"}, "id": "15", "properties": {"area_km2": 40.2697580919656, "seed_index": 15, "zone_color": "#ff7f0e", "zone_name": "Mirpur"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.46107250188173, 23.775102461658506], [90.40449215562099, 23.80073630152619], [90.4006436637614, 23.803705583571073], [90.42570937572205, 23.81724824098007], [90.45084075068387, 23.823320059617064], [90.48761631457081, 23.77792935386624], [90.46107250188173, 23.775102461658506]]], "type": "Polygon"}, "id": "16", "properties": {"area_km2": 23.65211952372598, "seed_index": 16, "zone_color": "#2ca02c", "zone_name": "Gulshan"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.38124163687004, 23.754121779867287], [90.3716074322401, 23.7407785809464], [90.33000527617668, 23.743191324397813], [90.33000581517682, 23.775041575508403], [90.38124163687004, 23.754121779867287]]], "type": "Polygon"}, "id": "17", "properties": {"area_km2": 12.490818584850572, "seed_index": 17, "zone_color": "#8c564b", "zone_name": "Dhanmondi"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.38117674453598, 23.784199124624344], [90.3872637024182, 23.760438618005303], [90.38124163687004, 23.754121779867294], [90.33000581517682, 23.775041575508403], [90.3300058249878, 23.779198815762637], [90.38117674453598, 23.784199124624344]]], "type": "Polygon"}, "id": "18", "properties": {"area_km2": 10.926899613437008, "seed_index": 18, "zone_color": "#8c564b", "zone_name": "Dhanmondi"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.38124163687004, 23.7541217798673], [90.3872637024182, 23.760438618005303], [90.40890400461535, 23.745878206234043], [90.40877158287405, 23.742517535207302], [90.39760516370488, 23.735494136440124], [90.38237925037544, 23.733882881120728], [90.3716074322401, 23.740778580946404], [90.38124163687004, 23.7541217798673]]], "type": "Polygon"}, "id": "19", "properties": {"area_km2": 6.564037304778374, "seed_index": 19, "zone_color": "#8c564b", "zone_name": "Dhanmondi"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.40882415040525, 23.830906372616248], [90.40306381944593, 23.841100139157184], [90.44157428392622, 23.867949892315018], [90.44714865991351, 23.8689208191229], [90.45084075068387, 23.823320059617064], [90.42570937572205, 23.81724824098007], [90.40882415040525, 23.830906372616248]]], "type": "Polygon"}, "id": "20", "properties": {"area_km2": 17.25539239352906, "seed_index": 20, "zone_color": "#9467bd", "zone_name": "Bashundhara"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.44714865991351, 23.8689208191229], [90.44157428392622, 23.867949892315018], [90.33000204582129, 23.876671023220545], [90.33, 23.9], [90.46949424059457, 23.900013856238935], [90.44714865991351, 23.8689208191229]]], "type": "Polygon"}, "id": "21", "properties": {"area_km2": 40.803398398180896, "seed_index": 21, "zone_color": "#1f77b4", "zone_name": "Uttara"}, "type": "Feature"}], "type": "FeatureCollection"});
 
         
     
-    geo_json_492b9e3f57b7e98de5ac5a814ed7b9b8.bindTooltip(
+    geo_json_6825738eceb9679b511b510df81f6fca.bindTooltip(
     function(layer){
     let div = L.DomUtil.create('div');
     
@@ -287,577 +290,852 @@
 });
                      
     
-            geo_json_492b9e3f57b7e98de5ac5a814ed7b9b8.addTo(map_83f36d60a06cd6b9209e48bb32e707d5);
+            geo_json_6825738eceb9679b511b510df81f6fca.addTo(map_3832f4b2370f0816dffa05b968768e89);
         
     
-        function geo_json_492957b1124d179f0d06ba4f0eeb52f6_styler(feature) {
+        function geo_json_9e8b449cb19f8dd633b100582749a4dc_styler(feature) {
             switch(feature.id) {
                 default:
                     return {"color": "#000000", "dashArray": "6 4", "fillOpacity": 0, "weight": 2};
             }
         }
 
-        function geo_json_492957b1124d179f0d06ba4f0eeb52f6_onEachFeature(feature, layer) {
+        function geo_json_9e8b449cb19f8dd633b100582749a4dc_onEachFeature(feature, layer) {
 
             layer.on({
             });
         };
-        var geo_json_492957b1124d179f0d06ba4f0eeb52f6 = L.geoJson(null, {
-                onEachFeature: geo_json_492957b1124d179f0d06ba4f0eeb52f6_onEachFeature,
+        var geo_json_9e8b449cb19f8dd633b100582749a4dc = L.geoJson(null, {
+                onEachFeature: geo_json_9e8b449cb19f8dd633b100582749a4dc_onEachFeature,
             
-                style: geo_json_492957b1124d179f0d06ba4f0eeb52f6_styler,
+                style: geo_json_9e8b449cb19f8dd633b100582749a4dc_styler,
             ...{
 }
         });
 
-        function geo_json_492957b1124d179f0d06ba4f0eeb52f6_add (data) {
-            geo_json_492957b1124d179f0d06ba4f0eeb52f6
+        function geo_json_9e8b449cb19f8dd633b100582749a4dc_add (data) {
+            geo_json_9e8b449cb19f8dd633b100582749a4dc
                 .addData(data);
         }
-            geo_json_492957b1124d179f0d06ba4f0eeb52f6_add({"features": [{"geometry": {"coordinates": [[[90.39656951367547, 23.83425321292193], [90.33000319633703, 23.860634931196113], [90.33, 23.9], [90.5, 23.89999999999999], [90.50000092403357, 23.889369763151873], [90.39656951367547, 23.83425321292193]]], "type": "Polygon"}, "id": "0", "properties": {"zone_color": "#1f77b4", "zone_name": "Uttara"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.39656951367549, 23.834253212921926], [90.39669077151528, 23.833459827211364], [90.37479786508139, 23.77662301518183], [90.33000578884715, 23.770547897848147], [90.33000319633703, 23.860634931196113], [90.39656951367549, 23.834253212921926]]], "type": "Polygon"}, "id": "1", "properties": {"zone_color": "#ff7f0e", "zone_name": "Mirpur"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.46274564795188, 23.779647129800768], [90.42116522380415, 23.801106962697446], [90.39669077151528, 23.833459827211374], [90.39656951367547, 23.83425321292193], [90.50000092403357, 23.889369763151873], [90.50000544865316, 23.776236638678803], [90.46274564795188, 23.779647129800768]]], "type": "Polygon"}, "id": "2", "properties": {"zone_color": "#9467bd", "zone_name": "Bashundhara"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.39008666397041, 23.76928571741394], [90.37479786508139, 23.776623015181816], [90.39669077151528, 23.833459827211364], [90.42116522380415, 23.801106962697446], [90.39008666397041, 23.76928571741394]]], "type": "Polygon"}, "id": "3", "properties": {"zone_color": "#d62728", "zone_name": "Banani"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.40046019519485, 23.759667144733374], [90.39008666397042, 23.769285717413943], [90.42116522380415, 23.801106962697446], [90.46274564795188, 23.779647129800768], [90.40046019519485, 23.759667144733374]]], "type": "Polygon"}, "id": "4", "properties": {"zone_color": "#2ca02c", "zone_name": "Gulshan"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.37479786508139, 23.77662301518183], [90.39008666397042, 23.769285717413933], [90.40046019519484, 23.759667144733374], [90.40150919323663, 23.747891865705842], [90.35708936009276, 23.660012510263787], [90.33, 23.659999999999997], [90.33000578884715, 23.770547897848147], [90.37479786508139, 23.77662301518183]]], "type": "Polygon"}, "id": "5", "properties": {"zone_color": "#8c564b", "zone_name": "Dhanmondi"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.40150919323663, 23.747891865705842], [90.40046019519484, 23.759667144733374], [90.46274564795188, 23.779647129800768], [90.50000544865316, 23.776236638678803], [90.50000338613692, 23.706131860030595], [90.40150919323663, 23.747891865705842]]], "type": "Polygon"}, "id": "6", "properties": {"zone_color": "#17becf", "zone_name": "Khilgaon"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.40150919323663, 23.747891865705842], [90.50000338613692, 23.706131860030595], [90.5, 23.659999999999997], [90.35708936009276, 23.660012510263787], [90.40150919323663, 23.747891865705842]]], "type": "Polygon"}, "id": "7", "properties": {"zone_color": "#e377c2", "zone_name": "Motijheel"}, "type": "Feature"}], "type": "FeatureCollection"});
+            geo_json_9e8b449cb19f8dd633b100582749a4dc_add({"features": [{"geometry": {"coordinates": [[[90.39656951367547, 23.83425321292193], [90.33000319633703, 23.860634931196113], [90.33, 23.9], [90.5, 23.89999999999999], [90.50000092403357, 23.889369763151873], [90.39656951367547, 23.83425321292193]]], "type": "Polygon"}, "id": "0", "properties": {"zone_color": "#1f77b4", "zone_name": "Uttara"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.39656951367549, 23.834253212921926], [90.39669077151528, 23.833459827211364], [90.37479786508139, 23.77662301518183], [90.33000578884715, 23.770547897848147], [90.33000319633703, 23.860634931196113], [90.39656951367549, 23.834253212921926]]], "type": "Polygon"}, "id": "1", "properties": {"zone_color": "#ff7f0e", "zone_name": "Mirpur"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.46274564795188, 23.779647129800768], [90.42116522380415, 23.801106962697446], [90.39669077151528, 23.833459827211374], [90.39656951367547, 23.83425321292193], [90.50000092403357, 23.889369763151873], [90.50000544865316, 23.776236638678803], [90.46274564795188, 23.779647129800768]]], "type": "Polygon"}, "id": "2", "properties": {"zone_color": "#9467bd", "zone_name": "Bashundhara"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.39008666397041, 23.76928571741394], [90.37479786508139, 23.776623015181816], [90.39669077151528, 23.833459827211364], [90.42116522380415, 23.801106962697446], [90.39008666397041, 23.76928571741394]]], "type": "Polygon"}, "id": "3", "properties": {"zone_color": "#d62728", "zone_name": "Banani"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.40046019519485, 23.759667144733374], [90.39008666397042, 23.769285717413943], [90.42116522380415, 23.801106962697446], [90.46274564795188, 23.779647129800768], [90.40046019519485, 23.759667144733374]]], "type": "Polygon"}, "id": "4", "properties": {"zone_color": "#2ca02c", "zone_name": "Gulshan"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.37479786508139, 23.77662301518183], [90.39008666397042, 23.769285717413933], [90.40046019519484, 23.759667144733374], [90.40150919323663, 23.747891865705842], [90.35708936009276, 23.660012510263787], [90.33, 23.659999999999997], [90.33000578884715, 23.770547897848147], [90.37479786508139, 23.77662301518183]]], "type": "Polygon"}, "id": "5", "properties": {"zone_color": "#8c564b", "zone_name": "Dhanmondi"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.40150919323663, 23.747891865705842], [90.40046019519484, 23.759667144733374], [90.46274564795188, 23.779647129800768], [90.50000544865316, 23.776236638678803], [90.50000338613692, 23.706131860030595], [90.40150919323663, 23.747891865705842]]], "type": "Polygon"}, "id": "6", "properties": {"zone_color": "#17becf", "zone_name": "Khilgaon"}, "type": "Feature"}, {"geometry": {"coordinates": [[[90.40150919323663, 23.747891865705842], [90.50000338613692, 23.706131860030595], [90.5, 23.659999999999997], [90.35708936009276, 23.660012510263787], [90.40150919323663, 23.747891865705842]]], "type": "Polygon"}, "id": "7", "properties": {"zone_color": "#e377c2", "zone_name": "Motijheel"}, "type": "Feature"}], "type": "FeatureCollection"});
 
         
     
-            geo_json_492957b1124d179f0d06ba4f0eeb52f6.addTo(map_83f36d60a06cd6b9209e48bb32e707d5);
+            geo_json_9e8b449cb19f8dd633b100582749a4dc.addTo(map_3832f4b2370f0816dffa05b968768e89);
         
     
-            var feature_group_432ad3c47c1fd37146c8014a0d9838c5 = L.featureGroup(
+            var feature_group_d2234788540b4f4d90e83b1ee0763d3c = L.featureGroup(
                 {
 }
             );
         
     
-            var circle_marker_b7a11f3de1df931f64e6428ad1733ee7 = L.circleMarker(
+            var marker_cluster_43f8f236e72ceb1487fe5ab36d8bf7e9 = L.markerClusterGroup(
+                {
+}
+            );
+            marker_cluster_43f8f236e72ceb1487fe5ab36d8bf7e9.options.iconCreateFunction =
+                function(cluster){return L.divIcon({html:'<div style="background:#8c564b;opacity:.9;width:34px;height:34px;border-radius:50%;border:2px solid white;color:white;font:bold 12px sans-serif;display:flex;align-items:center;justify-content:center;box-shadow:0 0 4px rgba(0,0,0,.5)">'+cluster.getChildCount()+'</div>',className:'',iconSize:L.point(34,34)});};
+        
+    
+            var marker_d8622446c733140366ac058e2d2aef5b = L.marker(
                 [23.697644599999993, 90.3457747],
-                {"bubblingMouseEvents": true, "color": "#1a1a1a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#8c564b", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3.5, "stroke": true, "weight": 1.2}
-            ).addTo(feature_group_432ad3c47c1fd37146c8014a0d9838c5);
+                {
+}
+            ).addTo(marker_cluster_43f8f236e72ceb1487fe5ab36d8bf7e9);
         
     
-        var popup_a75b6b9fe92eb45968feb5dd344771f7 = L.popup({
+            var div_icon_a2f1de112d1e119248066893dcb6d4a8 = L.divIcon({
+  "html": "\u003cdiv style=\"background:#8c564b;width:24px;height:24px;border-radius:50%;border:2px solid white;box-shadow:0 0 3px rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;line-height:1;font-size:14px;\"\u003e\ud83d\ude92\u003c/div\u003e",
+  "iconSize": [24, 24],
+  "iconAnchor": [12, 12],
+  "className": "empty",
+});
+        
+    
+        var popup_a7e97cefe0491c889a2abf1647fb8113 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_77995a681d20cc27dc37d71bbbf725e4 = $(`<div id="html_77995a681d20cc27dc37d71bbbf725e4" style="width: 100.0%; height: 100.0%;">Keranigonj Fire Station</div>`)[0];
-                popup_a75b6b9fe92eb45968feb5dd344771f7.setContent(html_77995a681d20cc27dc37d71bbbf725e4);
+                var html_c2719d5216b60a5d8e043d51c5de4868 = $(`<div id="html_c2719d5216b60a5d8e043d51c5de4868" style="width: 100.0%; height: 100.0%;">Fire station: Keranigonj Fire Station</div>`)[0];
+                popup_a7e97cefe0491c889a2abf1647fb8113.setContent(html_c2719d5216b60a5d8e043d51c5de4868);
             
         
 
-        circle_marker_b7a11f3de1df931f64e6428ad1733ee7.bindPopup(popup_a75b6b9fe92eb45968feb5dd344771f7)
+        marker_d8622446c733140366ac058e2d2aef5b.bindPopup(popup_a7e97cefe0491c889a2abf1647fb8113)
         ;
 
         
     
     
-            var circle_marker_3895e5d702128afa7bd065942385f2ab = L.circleMarker(
+                marker_d8622446c733140366ac058e2d2aef5b.setIcon(div_icon_a2f1de112d1e119248066893dcb6d4a8);
+            
+    
+            var marker_6dd56bf39d54b710c9575cef1f564017 = L.marker(
                 [23.713972300000002, 90.49806710000001],
-                {"bubblingMouseEvents": true, "color": "#1a1a1a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#8c564b", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3.5, "stroke": true, "weight": 1.2}
-            ).addTo(feature_group_432ad3c47c1fd37146c8014a0d9838c5);
+                {
+}
+            ).addTo(marker_cluster_43f8f236e72ceb1487fe5ab36d8bf7e9);
         
     
-        var popup_572b14eea75f05c1d593b8174c37f9a7 = L.popup({
+            var div_icon_d872a1839fcd632511e9e8f8460a3292 = L.divIcon({
+  "html": "\u003cdiv style=\"background:#8c564b;width:24px;height:24px;border-radius:50%;border:2px solid white;box-shadow:0 0 3px rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;line-height:1;font-size:14px;\"\u003e\ud83d\ude92\u003c/div\u003e",
+  "iconSize": [24, 24],
+  "iconAnchor": [12, 12],
+  "className": "empty",
+});
+        
+    
+        var popup_30f84de2b3227ff3ce6146d9ee25f526 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_fdf7fbb7367d7b5ee5e578e5fe4a25d8 = $(`<div id="html_fdf7fbb7367d7b5ee5e578e5fe4a25d8" style="width: 100.0%; height: 100.0%;">Unknown</div>`)[0];
-                popup_572b14eea75f05c1d593b8174c37f9a7.setContent(html_fdf7fbb7367d7b5ee5e578e5fe4a25d8);
+                var html_ba85214a440fae14f6086497699beb32 = $(`<div id="html_ba85214a440fae14f6086497699beb32" style="width: 100.0%; height: 100.0%;">Fire station: Unknown</div>`)[0];
+                popup_30f84de2b3227ff3ce6146d9ee25f526.setContent(html_ba85214a440fae14f6086497699beb32);
             
         
 
-        circle_marker_3895e5d702128afa7bd065942385f2ab.bindPopup(popup_572b14eea75f05c1d593b8174c37f9a7)
+        marker_6dd56bf39d54b710c9575cef1f564017.bindPopup(popup_30f84de2b3227ff3ce6146d9ee25f526)
         ;
 
         
     
     
-            var circle_marker_4a5a9a04acccc418ea3c6004edf573cc = L.circleMarker(
+                marker_6dd56bf39d54b710c9575cef1f564017.setIcon(div_icon_d872a1839fcd632511e9e8f8460a3292);
+            
+    
+            var marker_f522a6118bbea38782af83eb96056e6e = L.marker(
                 [23.7065453, 90.4088572],
-                {"bubblingMouseEvents": true, "color": "#1a1a1a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#8c564b", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3.5, "stroke": true, "weight": 1.2}
-            ).addTo(feature_group_432ad3c47c1fd37146c8014a0d9838c5);
+                {
+}
+            ).addTo(marker_cluster_43f8f236e72ceb1487fe5ab36d8bf7e9);
         
     
-        var popup_81686b0126cd6a2a1c656e4afff55261 = L.popup({
+            var div_icon_921cf01f641b5d27210083c0a8eae0ed = L.divIcon({
+  "html": "\u003cdiv style=\"background:#8c564b;width:24px;height:24px;border-radius:50%;border:2px solid white;box-shadow:0 0 3px rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;line-height:1;font-size:14px;\"\u003e\ud83d\ude92\u003c/div\u003e",
+  "iconSize": [24, 24],
+  "iconAnchor": [12, 12],
+  "className": "empty",
+});
+        
+    
+        var popup_2a88919214c5f35d5523e79959f7a2ca = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_c0a7f89e3a0c8d0d5dc78c993f12aeec = $(`<div id="html_c0a7f89e3a0c8d0d5dc78c993f12aeec" style="width: 100.0%; height: 100.0%;">Kotowali Fire Station</div>`)[0];
-                popup_81686b0126cd6a2a1c656e4afff55261.setContent(html_c0a7f89e3a0c8d0d5dc78c993f12aeec);
+                var html_b68e0e490233a77e83a5073ff77cfffe = $(`<div id="html_b68e0e490233a77e83a5073ff77cfffe" style="width: 100.0%; height: 100.0%;">Fire station: Kotowali Fire Station</div>`)[0];
+                popup_2a88919214c5f35d5523e79959f7a2ca.setContent(html_b68e0e490233a77e83a5073ff77cfffe);
             
         
 
-        circle_marker_4a5a9a04acccc418ea3c6004edf573cc.bindPopup(popup_81686b0126cd6a2a1c656e4afff55261)
+        marker_f522a6118bbea38782af83eb96056e6e.bindPopup(popup_2a88919214c5f35d5523e79959f7a2ca)
         ;
 
         
     
     
-            var circle_marker_dd0bce5cd0f6edc94f71a32a3757a101 = L.circleMarker(
+                marker_f522a6118bbea38782af83eb96056e6e.setIcon(div_icon_921cf01f641b5d27210083c0a8eae0ed);
+            
+    
+            var marker_e5524583cabd8da39d6c6f90c5a8788f = L.marker(
                 [23.7885173, 90.41979820000002],
-                {"bubblingMouseEvents": true, "color": "#1a1a1a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#8c564b", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3.5, "stroke": true, "weight": 1.2}
-            ).addTo(feature_group_432ad3c47c1fd37146c8014a0d9838c5);
+                {
+}
+            ).addTo(marker_cluster_43f8f236e72ceb1487fe5ab36d8bf7e9);
         
     
-        var popup_7cb824d0be77077ca11438ef14b28421 = L.popup({
+            var div_icon_e7a21bf60b5d79bf93d43c2ce52aa62d = L.divIcon({
+  "html": "\u003cdiv style=\"background:#8c564b;width:24px;height:24px;border-radius:50%;border:2px solid white;box-shadow:0 0 3px rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;line-height:1;font-size:14px;\"\u003e\ud83d\ude92\u003c/div\u003e",
+  "iconSize": [24, 24],
+  "iconAnchor": [12, 12],
+  "className": "empty",
+});
+        
+    
+        var popup_e179fc4162b1ca1972b0ca6ba167f1f4 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_9356f531112b3809e2540ba1ad4a29a6 = $(`<div id="html_9356f531112b3809e2540ba1ad4a29a6" style="width: 100.0%; height: 100.0%;">Colombo Fire Station Head Office</div>`)[0];
-                popup_7cb824d0be77077ca11438ef14b28421.setContent(html_9356f531112b3809e2540ba1ad4a29a6);
+                var html_8e486bd64246c11292b8d8aba26eb4ae = $(`<div id="html_8e486bd64246c11292b8d8aba26eb4ae" style="width: 100.0%; height: 100.0%;">Fire station: Colombo Fire Station Head Office</div>`)[0];
+                popup_e179fc4162b1ca1972b0ca6ba167f1f4.setContent(html_8e486bd64246c11292b8d8aba26eb4ae);
             
         
 
-        circle_marker_dd0bce5cd0f6edc94f71a32a3757a101.bindPopup(popup_7cb824d0be77077ca11438ef14b28421)
+        marker_e5524583cabd8da39d6c6f90c5a8788f.bindPopup(popup_e179fc4162b1ca1972b0ca6ba167f1f4)
         ;
 
         
     
     
-            var circle_marker_3f193e09d58fb94c0dc47a3c5ad33d72 = L.circleMarker(
+                marker_e5524583cabd8da39d6c6f90c5a8788f.setIcon(div_icon_e7a21bf60b5d79bf93d43c2ce52aa62d);
+            
+    
+            var marker_ec6cc3fbe9efd697ddcc6ad94455257a = L.marker(
                 [23.8523935, 90.3987611],
-                {"bubblingMouseEvents": true, "color": "#1a1a1a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#8c564b", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3.5, "stroke": true, "weight": 1.2}
-            ).addTo(feature_group_432ad3c47c1fd37146c8014a0d9838c5);
+                {
+}
+            ).addTo(marker_cluster_43f8f236e72ceb1487fe5ab36d8bf7e9);
         
     
-        var popup_8e4cc0d9e6a73bb5c845f79f1d3749d9 = L.popup({
+            var div_icon_5ac398ce521c0a30499a5b92f5e86b4e = L.divIcon({
+  "html": "\u003cdiv style=\"background:#8c564b;width:24px;height:24px;border-radius:50%;border:2px solid white;box-shadow:0 0 3px rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;line-height:1;font-size:14px;\"\u003e\ud83d\ude92\u003c/div\u003e",
+  "iconSize": [24, 24],
+  "iconAnchor": [12, 12],
+  "className": "empty",
+});
+        
+    
+        var popup_c7dbeaba04fc5c3da8c9c0226150c2d4 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_1a6fb4c4ecaab26ae8a0e4690f0e545e = $(`<div id="html_1a6fb4c4ecaab26ae8a0e4690f0e545e" style="width: 100.0%; height: 100.0%;">Fire Station HSIA</div>`)[0];
-                popup_8e4cc0d9e6a73bb5c845f79f1d3749d9.setContent(html_1a6fb4c4ecaab26ae8a0e4690f0e545e);
+                var html_04e063ed985e3727c74b29f534b683f2 = $(`<div id="html_04e063ed985e3727c74b29f534b683f2" style="width: 100.0%; height: 100.0%;">Fire station: Fire Station HSIA</div>`)[0];
+                popup_c7dbeaba04fc5c3da8c9c0226150c2d4.setContent(html_04e063ed985e3727c74b29f534b683f2);
             
         
 
-        circle_marker_3f193e09d58fb94c0dc47a3c5ad33d72.bindPopup(popup_8e4cc0d9e6a73bb5c845f79f1d3749d9)
+        marker_ec6cc3fbe9efd697ddcc6ad94455257a.bindPopup(popup_c7dbeaba04fc5c3da8c9c0226150c2d4)
         ;
 
         
     
     
-            var circle_marker_4edfc3d9fde7c33c3cd72d7ed6382e25 = L.circleMarker(
+                marker_ec6cc3fbe9efd697ddcc6ad94455257a.setIcon(div_icon_5ac398ce521c0a30499a5b92f5e86b4e);
+            
+    
+            var marker_163764df813ec89ed051eaf4e03534ec = L.marker(
                 [23.8291334, 90.4030415],
-                {"bubblingMouseEvents": true, "color": "#1a1a1a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#8c564b", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3.5, "stroke": true, "weight": 1.2}
-            ).addTo(feature_group_432ad3c47c1fd37146c8014a0d9838c5);
+                {
+}
+            ).addTo(marker_cluster_43f8f236e72ceb1487fe5ab36d8bf7e9);
         
     
-        var popup_35af579940fc5f9ab89aebaf8990113b = L.popup({
+            var div_icon_16181f3a8d5de4c5b700d0c8c8c720d4 = L.divIcon({
+  "html": "\u003cdiv style=\"background:#8c564b;width:24px;height:24px;border-radius:50%;border:2px solid white;box-shadow:0 0 3px rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;line-height:1;font-size:14px;\"\u003e\ud83d\ude92\u003c/div\u003e",
+  "iconSize": [24, 24],
+  "iconAnchor": [12, 12],
+  "className": "empty",
+});
+        
+    
+        var popup_4cf4bf4a76574fbfedc6f311173864b9 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_eb4eba310e2363499e20c0457d9b8fe6 = $(`<div id="html_eb4eba310e2363499e20c0457d9b8fe6" style="width: 100.0%; height: 100.0%;">Fire Fighting Instruments</div>`)[0];
-                popup_35af579940fc5f9ab89aebaf8990113b.setContent(html_eb4eba310e2363499e20c0457d9b8fe6);
+                var html_9526b3caf480b0a9ee51f343e47f0f7c = $(`<div id="html_9526b3caf480b0a9ee51f343e47f0f7c" style="width: 100.0%; height: 100.0%;">Fire station: Fire Fighting Instruments</div>`)[0];
+                popup_4cf4bf4a76574fbfedc6f311173864b9.setContent(html_9526b3caf480b0a9ee51f343e47f0f7c);
             
         
 
-        circle_marker_4edfc3d9fde7c33c3cd72d7ed6382e25.bindPopup(popup_35af579940fc5f9ab89aebaf8990113b)
+        marker_163764df813ec89ed051eaf4e03534ec.bindPopup(popup_4cf4bf4a76574fbfedc6f311173864b9)
         ;
 
         
     
     
-            var circle_marker_51d716b702ca4c40eaadd69297094f5d = L.circleMarker(
+                marker_163764df813ec89ed051eaf4e03534ec.setIcon(div_icon_16181f3a8d5de4c5b700d0c8c8c720d4);
+            
+    
+            var marker_3d28abd299189b53f7f998b66d1b0d0a = L.marker(
                 [23.826008699999992, 90.4058564],
-                {"bubblingMouseEvents": true, "color": "#1a1a1a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#8c564b", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3.5, "stroke": true, "weight": 1.2}
-            ).addTo(feature_group_432ad3c47c1fd37146c8014a0d9838c5);
+                {
+}
+            ).addTo(marker_cluster_43f8f236e72ceb1487fe5ab36d8bf7e9);
         
     
-        var popup_3d0433ee60b8ad2983a5624db48251b8 = L.popup({
+            var div_icon_7593a8e0232724e7b3cb412a4600ff8c = L.divIcon({
+  "html": "\u003cdiv style=\"background:#8c564b;width:24px;height:24px;border-radius:50%;border:2px solid white;box-shadow:0 0 3px rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;line-height:1;font-size:14px;\"\u003e\ud83d\ude92\u003c/div\u003e",
+  "iconSize": [24, 24],
+  "iconAnchor": [12, 12],
+  "className": "empty",
+});
+        
+    
+        var popup_0e62c644dab66bcc54e2208f4426352b = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_46c15f08a6eb53eaeb81f2dc25dbaaf5 = $(`<div id="html_46c15f08a6eb53eaeb81f2dc25dbaaf5" style="width: 100.0%; height: 100.0%;">Kurmitola Fire Station</div>`)[0];
-                popup_3d0433ee60b8ad2983a5624db48251b8.setContent(html_46c15f08a6eb53eaeb81f2dc25dbaaf5);
+                var html_29af131fda596cbfcd6c688b37ad7782 = $(`<div id="html_29af131fda596cbfcd6c688b37ad7782" style="width: 100.0%; height: 100.0%;">Fire station: Kurmitola Fire Station</div>`)[0];
+                popup_0e62c644dab66bcc54e2208f4426352b.setContent(html_29af131fda596cbfcd6c688b37ad7782);
             
         
 
-        circle_marker_51d716b702ca4c40eaadd69297094f5d.bindPopup(popup_3d0433ee60b8ad2983a5624db48251b8)
+        marker_3d28abd299189b53f7f998b66d1b0d0a.bindPopup(popup_0e62c644dab66bcc54e2208f4426352b)
         ;
 
         
     
     
-            var circle_marker_bc4e22e9db97db8cf99f58c74669e5d1 = L.circleMarker(
+                marker_3d28abd299189b53f7f998b66d1b0d0a.setIcon(div_icon_7593a8e0232724e7b3cb412a4600ff8c);
+            
+    
+            var marker_5f710525c89df1b8ea28a531c92ea997 = L.marker(
                 [23.764521199999997, 90.4006231],
-                {"bubblingMouseEvents": true, "color": "#1a1a1a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#8c564b", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3.5, "stroke": true, "weight": 1.2}
-            ).addTo(feature_group_432ad3c47c1fd37146c8014a0d9838c5);
+                {
+}
+            ).addTo(marker_cluster_43f8f236e72ceb1487fe5ab36d8bf7e9);
         
     
-        var popup_b7ef342dcd615c4f3763eec27c70277e = L.popup({
+            var div_icon_e1b10b45a4ae322fab7b6238f64560f4 = L.divIcon({
+  "html": "\u003cdiv style=\"background:#8c564b;width:24px;height:24px;border-radius:50%;border:2px solid white;box-shadow:0 0 3px rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;line-height:1;font-size:14px;\"\u003e\ud83d\ude92\u003c/div\u003e",
+  "iconSize": [24, 24],
+  "iconAnchor": [12, 12],
+  "className": "empty",
+});
+        
+    
+        var popup_db576d59a55a9746d058df1ac63ec5a9 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_d7ee263dea3f8144166713c1941c603f = $(`<div id="html_d7ee263dea3f8144166713c1941c603f" style="width: 100.0%; height: 100.0%;">fire_station #8</div>`)[0];
-                popup_b7ef342dcd615c4f3763eec27c70277e.setContent(html_d7ee263dea3f8144166713c1941c603f);
+                var html_72f64e669cb29f534a6e4eeba2a536ac = $(`<div id="html_72f64e669cb29f534a6e4eeba2a536ac" style="width: 100.0%; height: 100.0%;">Fire station: fire_station #8</div>`)[0];
+                popup_db576d59a55a9746d058df1ac63ec5a9.setContent(html_72f64e669cb29f534a6e4eeba2a536ac);
             
         
 
-        circle_marker_bc4e22e9db97db8cf99f58c74669e5d1.bindPopup(popup_b7ef342dcd615c4f3763eec27c70277e)
+        marker_5f710525c89df1b8ea28a531c92ea997.bindPopup(popup_db576d59a55a9746d058df1ac63ec5a9)
         ;
 
         
     
     
-            var circle_marker_70bc33b474bf45cc48111a06a5c6f9ae = L.circleMarker(
+                marker_5f710525c89df1b8ea28a531c92ea997.setIcon(div_icon_e1b10b45a4ae322fab7b6238f64560f4);
+            
+    
+            var marker_6048587721c70896df6230e4ac995cc8 = L.marker(
                 [23.721621900000002, 90.3903229],
-                {"bubblingMouseEvents": true, "color": "#1a1a1a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#8c564b", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3.5, "stroke": true, "weight": 1.2}
-            ).addTo(feature_group_432ad3c47c1fd37146c8014a0d9838c5);
+                {
+}
+            ).addTo(marker_cluster_43f8f236e72ceb1487fe5ab36d8bf7e9);
         
     
-        var popup_36c2e2b52c8deb2ad0e6d388e8848c23 = L.popup({
+            var div_icon_7dbc7dfa8dadbd2a8b364cba21a028a3 = L.divIcon({
+  "html": "\u003cdiv style=\"background:#8c564b;width:24px;height:24px;border-radius:50%;border:2px solid white;box-shadow:0 0 3px rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;line-height:1;font-size:14px;\"\u003e\ud83d\ude92\u003c/div\u003e",
+  "iconSize": [24, 24],
+  "iconAnchor": [12, 12],
+  "className": "empty",
+});
+        
+    
+        var popup_9b752bdc2248c04539652cff49608dd2 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_52dbe27df7a1e160472ce6619da242e4 = $(`<div id="html_52dbe27df7a1e160472ce6619da242e4" style="width: 100.0%; height: 100.0%;">fire_station #9</div>`)[0];
-                popup_36c2e2b52c8deb2ad0e6d388e8848c23.setContent(html_52dbe27df7a1e160472ce6619da242e4);
+                var html_bb75da98d3b5f3902853ec88935d6d5f = $(`<div id="html_bb75da98d3b5f3902853ec88935d6d5f" style="width: 100.0%; height: 100.0%;">Fire station: fire_station #9</div>`)[0];
+                popup_9b752bdc2248c04539652cff49608dd2.setContent(html_bb75da98d3b5f3902853ec88935d6d5f);
             
         
 
-        circle_marker_70bc33b474bf45cc48111a06a5c6f9ae.bindPopup(popup_36c2e2b52c8deb2ad0e6d388e8848c23)
+        marker_6048587721c70896df6230e4ac995cc8.bindPopup(popup_9b752bdc2248c04539652cff49608dd2)
         ;
 
         
     
     
-            var circle_marker_68057b8d8b3f92427387ebcbc0f6904d = L.circleMarker(
+                marker_6048587721c70896df6230e4ac995cc8.setIcon(div_icon_7dbc7dfa8dadbd2a8b364cba21a028a3);
+            
+    
+            var marker_f9fbb424502c36853e141ff8e8f7c734 = L.marker(
                 [23.783387399999995, 90.4119169],
-                {"bubblingMouseEvents": true, "color": "#1a1a1a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#8c564b", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3.5, "stroke": true, "weight": 1.2}
-            ).addTo(feature_group_432ad3c47c1fd37146c8014a0d9838c5);
+                {
+}
+            ).addTo(marker_cluster_43f8f236e72ceb1487fe5ab36d8bf7e9);
         
     
-        var popup_fdebe966724d611e5fd3b48f9cbf0560 = L.popup({
+            var div_icon_e94814029e9c4eb001fc5c90217be0d0 = L.divIcon({
+  "html": "\u003cdiv style=\"background:#8c564b;width:24px;height:24px;border-radius:50%;border:2px solid white;box-shadow:0 0 3px rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;line-height:1;font-size:14px;\"\u003e\ud83d\ude92\u003c/div\u003e",
+  "iconSize": [24, 24],
+  "iconAnchor": [12, 12],
+  "className": "empty",
+});
+        
+    
+        var popup_14cfd7d74f0596496ca11cdf2938cc2d = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_88fb5cabb5b0186c1e00695be9a9ae07 = $(`<div id="html_88fb5cabb5b0186c1e00695be9a9ae07" style="width: 100.0%; height: 100.0%;">Community Fire Response Team and Development Community</div>`)[0];
-                popup_fdebe966724d611e5fd3b48f9cbf0560.setContent(html_88fb5cabb5b0186c1e00695be9a9ae07);
+                var html_869f0b95905e250cceaf356b8c77e8e3 = $(`<div id="html_869f0b95905e250cceaf356b8c77e8e3" style="width: 100.0%; height: 100.0%;">Fire station: Community Fire Response Team and Development Community</div>`)[0];
+                popup_14cfd7d74f0596496ca11cdf2938cc2d.setContent(html_869f0b95905e250cceaf356b8c77e8e3);
             
         
 
-        circle_marker_68057b8d8b3f92427387ebcbc0f6904d.bindPopup(popup_fdebe966724d611e5fd3b48f9cbf0560)
+        marker_f9fbb424502c36853e141ff8e8f7c734.bindPopup(popup_14cfd7d74f0596496ca11cdf2938cc2d)
         ;
 
         
     
     
-            var circle_marker_f0d3c3c377891a1e33da0f46d82bd37a = L.circleMarker(
+                marker_f9fbb424502c36853e141ff8e8f7c734.setIcon(div_icon_e94814029e9c4eb001fc5c90217be0d0);
+            
+    
+            var marker_af0dc1a21b4119a3e129bf89ab3fe311 = L.marker(
                 [23.746025, 90.4307839],
-                {"bubblingMouseEvents": true, "color": "#1a1a1a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#8c564b", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3.5, "stroke": true, "weight": 1.2}
-            ).addTo(feature_group_432ad3c47c1fd37146c8014a0d9838c5);
+                {
+}
+            ).addTo(marker_cluster_43f8f236e72ceb1487fe5ab36d8bf7e9);
         
     
-        var popup_5b09b07bb817f990af859f94be27e33b = L.popup({
+            var div_icon_fae404484b8c67611e9ce55c0a943d7d = L.divIcon({
+  "html": "\u003cdiv style=\"background:#8c564b;width:24px;height:24px;border-radius:50%;border:2px solid white;box-shadow:0 0 3px rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;line-height:1;font-size:14px;\"\u003e\ud83d\ude92\u003c/div\u003e",
+  "iconSize": [24, 24],
+  "iconAnchor": [12, 12],
+  "className": "empty",
+});
+        
+    
+        var popup_7cfa89711f5b63b7a38a3244bb9a0527 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_4dc01435bb35766937df88c6208af0f2 = $(`<div id="html_4dc01435bb35766937df88c6208af0f2" style="width: 100.0%; height: 100.0%;">ফায়ার সার্ভিস ও সিভিল ডিফেন্স খিলগাঁও</div>`)[0];
-                popup_5b09b07bb817f990af859f94be27e33b.setContent(html_4dc01435bb35766937df88c6208af0f2);
+                var html_7d23b517ad2e2c8eb14a544e5867ad20 = $(`<div id="html_7d23b517ad2e2c8eb14a544e5867ad20" style="width: 100.0%; height: 100.0%;">Fire station: ফায়ার সার্ভিস ও সিভিল ডিফেন্স খিলগাঁও</div>`)[0];
+                popup_7cfa89711f5b63b7a38a3244bb9a0527.setContent(html_7d23b517ad2e2c8eb14a544e5867ad20);
             
         
 
-        circle_marker_f0d3c3c377891a1e33da0f46d82bd37a.bindPopup(popup_5b09b07bb817f990af859f94be27e33b)
+        marker_af0dc1a21b4119a3e129bf89ab3fe311.bindPopup(popup_7cfa89711f5b63b7a38a3244bb9a0527)
         ;
 
         
     
     
-            var circle_marker_25aaa8e029d129eb2d46729c9a02334d = L.circleMarker(
+                marker_af0dc1a21b4119a3e129bf89ab3fe311.setIcon(div_icon_fae404484b8c67611e9ce55c0a943d7d);
+            
+    
+            var marker_34b3b9f5437c9d5b6f0f99f41a76f334 = L.marker(
                 [23.839177299999996, 90.4857914],
-                {"bubblingMouseEvents": true, "color": "#1a1a1a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#8c564b", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3.5, "stroke": true, "weight": 1.2}
-            ).addTo(feature_group_432ad3c47c1fd37146c8014a0d9838c5);
+                {
+}
+            ).addTo(marker_cluster_43f8f236e72ceb1487fe5ab36d8bf7e9);
         
     
-        var popup_0635475c43c3ed7c4aa0b921f9a87a44 = L.popup({
+            var div_icon_03e0bd8338fc57043ff7fcd9bfc27fc7 = L.divIcon({
+  "html": "\u003cdiv style=\"background:#8c564b;width:24px;height:24px;border-radius:50%;border:2px solid white;box-shadow:0 0 3px rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;line-height:1;font-size:14px;\"\u003e\ud83d\ude92\u003c/div\u003e",
+  "iconSize": [24, 24],
+  "iconAnchor": [12, 12],
+  "className": "empty",
+});
+        
+    
+        var popup_4836cabc827ee7d58a4dcc2cd6296c89 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_ca6ec25d3859eca05556ea86d079a552 = $(`<div id="html_ca6ec25d3859eca05556ea86d079a552" style="width: 100.0%; height: 100.0%;">Purbachal Fire Service & Civil Defence</div>`)[0];
-                popup_0635475c43c3ed7c4aa0b921f9a87a44.setContent(html_ca6ec25d3859eca05556ea86d079a552);
+                var html_0dc2960569231cee7e06afd589b48518 = $(`<div id="html_0dc2960569231cee7e06afd589b48518" style="width: 100.0%; height: 100.0%;">Fire station: Purbachal Fire Service & Civil Defence</div>`)[0];
+                popup_4836cabc827ee7d58a4dcc2cd6296c89.setContent(html_0dc2960569231cee7e06afd589b48518);
             
         
 
-        circle_marker_25aaa8e029d129eb2d46729c9a02334d.bindPopup(popup_0635475c43c3ed7c4aa0b921f9a87a44)
+        marker_34b3b9f5437c9d5b6f0f99f41a76f334.bindPopup(popup_4836cabc827ee7d58a4dcc2cd6296c89)
         ;
 
         
     
     
-            var circle_marker_4c5e0f3479551ae21a149084fece3d18 = L.circleMarker(
+                marker_34b3b9f5437c9d5b6f0f99f41a76f334.setIcon(div_icon_03e0bd8338fc57043ff7fcd9bfc27fc7);
+            
+    
+            var marker_42652fa4f2e9b465680cf6dda5eb2dad = L.marker(
                 [23.722121999999995, 90.4059184],
-                {"bubblingMouseEvents": true, "color": "#1a1a1a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#8c564b", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3.5, "stroke": true, "weight": 1.2}
-            ).addTo(feature_group_432ad3c47c1fd37146c8014a0d9838c5);
+                {
+}
+            ).addTo(marker_cluster_43f8f236e72ceb1487fe5ab36d8bf7e9);
         
     
-        var popup_12a22c94033e596b3b9ae49b6e89da1d = L.popup({
+            var div_icon_65eca5fbe577e9d8d85bed6cdd4302f1 = L.divIcon({
+  "html": "\u003cdiv style=\"background:#8c564b;width:24px;height:24px;border-radius:50%;border:2px solid white;box-shadow:0 0 3px rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;line-height:1;font-size:14px;\"\u003e\ud83d\ude92\u003c/div\u003e",
+  "iconSize": [24, 24],
+  "iconAnchor": [12, 12],
+  "className": "empty",
+});
+        
+    
+        var popup_a4ce5d826f2fe5db561d26e1cba363fb = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_f2151a36343a4daf496a41978ff5f2f1 = $(`<div id="html_f2151a36343a4daf496a41978ff5f2f1" style="width: 100.0%; height: 100.0%;">Mosque of Bangladesh Fire Service & Civil Defence Headquarter, Kazi Alauddin Rd, Dhaka</div>`)[0];
-                popup_12a22c94033e596b3b9ae49b6e89da1d.setContent(html_f2151a36343a4daf496a41978ff5f2f1);
+                var html_b31a8f3711a6f25d0bbe012723627333 = $(`<div id="html_b31a8f3711a6f25d0bbe012723627333" style="width: 100.0%; height: 100.0%;">Fire station: Mosque of Bangladesh Fire Service & Civil Defence Headquarter, Kazi Alauddin Rd, Dhaka</div>`)[0];
+                popup_a4ce5d826f2fe5db561d26e1cba363fb.setContent(html_b31a8f3711a6f25d0bbe012723627333);
             
         
 
-        circle_marker_4c5e0f3479551ae21a149084fece3d18.bindPopup(popup_12a22c94033e596b3b9ae49b6e89da1d)
+        marker_42652fa4f2e9b465680cf6dda5eb2dad.bindPopup(popup_a4ce5d826f2fe5db561d26e1cba363fb)
         ;
 
         
     
     
-            var circle_marker_4e15e711ad1698ae8e7cc1a5779d538d = L.circleMarker(
+                marker_42652fa4f2e9b465680cf6dda5eb2dad.setIcon(div_icon_65eca5fbe577e9d8d85bed6cdd4302f1);
+            
+    
+            var marker_9c572a1f1f0acf2819fec87e8008314e = L.marker(
                 [23.725080999999992, 90.3701701],
-                {"bubblingMouseEvents": true, "color": "#1a1a1a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#8c564b", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3.5, "stroke": true, "weight": 1.2}
-            ).addTo(feature_group_432ad3c47c1fd37146c8014a0d9838c5);
+                {
+}
+            ).addTo(marker_cluster_43f8f236e72ceb1487fe5ab36d8bf7e9);
         
     
-        var popup_67c3decace648d24f12b759243559bc3 = L.popup({
+            var div_icon_a98ab396e622ec644ce2cd5ffe079679 = L.divIcon({
+  "html": "\u003cdiv style=\"background:#8c564b;width:24px;height:24px;border-radius:50%;border:2px solid white;box-shadow:0 0 3px rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;line-height:1;font-size:14px;\"\u003e\ud83d\ude92\u003c/div\u003e",
+  "iconSize": [24, 24],
+  "iconAnchor": [12, 12],
+  "className": "empty",
+});
+        
+    
+        var popup_31ea89e24988bd9f67642f21c7cd05f5 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_b1df93c0682728641d33d16dd4aeea8d = $(`<div id="html_b1df93c0682728641d33d16dd4aeea8d" style="width: 100.0%; height: 100.0%;">Fire Service & Civil Defence Station</div>`)[0];
-                popup_67c3decace648d24f12b759243559bc3.setContent(html_b1df93c0682728641d33d16dd4aeea8d);
+                var html_25be466d6e04926434bfa835fef6142e = $(`<div id="html_25be466d6e04926434bfa835fef6142e" style="width: 100.0%; height: 100.0%;">Fire station: Fire Service & Civil Defence Station</div>`)[0];
+                popup_31ea89e24988bd9f67642f21c7cd05f5.setContent(html_25be466d6e04926434bfa835fef6142e);
             
         
 
-        circle_marker_4e15e711ad1698ae8e7cc1a5779d538d.bindPopup(popup_67c3decace648d24f12b759243559bc3)
+        marker_9c572a1f1f0acf2819fec87e8008314e.bindPopup(popup_31ea89e24988bd9f67642f21c7cd05f5)
         ;
 
         
     
     
-            var circle_marker_047586220e75f448cc9f2da04e2056d6 = L.circleMarker(
+                marker_9c572a1f1f0acf2819fec87e8008314e.setIcon(div_icon_a98ab396e622ec644ce2cd5ffe079679);
+            
+    
+            var marker_9cdd1405acfca22bb9e1a00a32b1d4a8 = L.marker(
                 [23.725423200000012, 90.4285611],
-                {"bubblingMouseEvents": true, "color": "#1a1a1a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#8c564b", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3.5, "stroke": true, "weight": 1.2}
-            ).addTo(feature_group_432ad3c47c1fd37146c8014a0d9838c5);
+                {
+}
+            ).addTo(marker_cluster_43f8f236e72ceb1487fe5ab36d8bf7e9);
         
     
-        var popup_23ddf019fced1415d21a7e2da90c0ea4 = L.popup({
+            var div_icon_c8dadf177a8f30b832dad80ad4be74bc = L.divIcon({
+  "html": "\u003cdiv style=\"background:#8c564b;width:24px;height:24px;border-radius:50%;border:2px solid white;box-shadow:0 0 3px rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;line-height:1;font-size:14px;\"\u003e\ud83d\ude92\u003c/div\u003e",
+  "iconSize": [24, 24],
+  "iconAnchor": [12, 12],
+  "className": "empty",
+});
+        
+    
+        var popup_d6db5c6607d26b2fc9f90891d8a44509 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_ffdbe6f52bf6e41f4125d59a30e97ec2 = $(`<div id="html_ffdbe6f52bf6e41f4125d59a30e97ec2" style="width: 100.0%; height: 100.0%;">Dhaka Inland Container Depot (ICD) Fire Station</div>`)[0];
-                popup_23ddf019fced1415d21a7e2da90c0ea4.setContent(html_ffdbe6f52bf6e41f4125d59a30e97ec2);
+                var html_f7f40c44ea3621d3ce8f6ef1fbf6fc32 = $(`<div id="html_f7f40c44ea3621d3ce8f6ef1fbf6fc32" style="width: 100.0%; height: 100.0%;">Fire station: Dhaka Inland Container Depot (ICD) Fire Station</div>`)[0];
+                popup_d6db5c6607d26b2fc9f90891d8a44509.setContent(html_f7f40c44ea3621d3ce8f6ef1fbf6fc32);
             
         
 
-        circle_marker_047586220e75f448cc9f2da04e2056d6.bindPopup(popup_23ddf019fced1415d21a7e2da90c0ea4)
+        marker_9cdd1405acfca22bb9e1a00a32b1d4a8.bindPopup(popup_d6db5c6607d26b2fc9f90891d8a44509)
         ;
 
         
     
     
-            var circle_marker_cc6ebb62c9a14bccdcf38ba5dd4f0d23 = L.circleMarker(
+                marker_9cdd1405acfca22bb9e1a00a32b1d4a8.setIcon(div_icon_c8dadf177a8f30b832dad80ad4be74bc);
+            
+    
+            var marker_a36ccb3a2c8b9358b829ddd61cb6bc81 = L.marker(
                 [23.80771489619884, 90.36766839994951],
-                {"bubblingMouseEvents": true, "color": "#1a1a1a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#8c564b", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3.5, "stroke": true, "weight": 1.2}
-            ).addTo(feature_group_432ad3c47c1fd37146c8014a0d9838c5);
+                {
+}
+            ).addTo(marker_cluster_43f8f236e72ceb1487fe5ab36d8bf7e9);
         
     
-        var popup_fde0e4881b28595f4636a0496ca9bef9 = L.popup({
+            var div_icon_5cb7bbb090ffda42d4262ade85b9452a = L.divIcon({
+  "html": "\u003cdiv style=\"background:#8c564b;width:24px;height:24px;border-radius:50%;border:2px solid white;box-shadow:0 0 3px rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;line-height:1;font-size:14px;\"\u003e\ud83d\ude92\u003c/div\u003e",
+  "iconSize": [24, 24],
+  "iconAnchor": [12, 12],
+  "className": "empty",
+});
+        
+    
+        var popup_93a1c651741c509ec45258de7ee5d902 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_8e776512ea6c3c7d4adbe2cc5b76a399 = $(`<div id="html_8e776512ea6c3c7d4adbe2cc5b76a399" style="width: 100.0%; height: 100.0%;">Fire Service and Civil Defence Training Complex</div>`)[0];
-                popup_fde0e4881b28595f4636a0496ca9bef9.setContent(html_8e776512ea6c3c7d4adbe2cc5b76a399);
+                var html_a27cf313224cc40e6ec9d6e0d59c3fed = $(`<div id="html_a27cf313224cc40e6ec9d6e0d59c3fed" style="width: 100.0%; height: 100.0%;">Fire station: Fire Service and Civil Defence Training Complex</div>`)[0];
+                popup_93a1c651741c509ec45258de7ee5d902.setContent(html_a27cf313224cc40e6ec9d6e0d59c3fed);
             
         
 
-        circle_marker_cc6ebb62c9a14bccdcf38ba5dd4f0d23.bindPopup(popup_fde0e4881b28595f4636a0496ca9bef9)
+        marker_a36ccb3a2c8b9358b829ddd61cb6bc81.bindPopup(popup_93a1c651741c509ec45258de7ee5d902)
         ;
 
         
     
     
-            var circle_marker_6d3653477a321a38697c3243053f0347 = L.circleMarker(
+                marker_a36ccb3a2c8b9358b829ddd61cb6bc81.setIcon(div_icon_5cb7bbb090ffda42d4262ade85b9452a);
+            
+    
+            var marker_9519227939acd577d58c9bb3c76e8e34 = L.marker(
                 [23.797030199980718, 90.42435209607748],
-                {"bubblingMouseEvents": true, "color": "#1a1a1a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#8c564b", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3.5, "stroke": true, "weight": 1.2}
-            ).addTo(feature_group_432ad3c47c1fd37146c8014a0d9838c5);
+                {
+}
+            ).addTo(marker_cluster_43f8f236e72ceb1487fe5ab36d8bf7e9);
         
     
-        var popup_59859f05d1cf86835121011b88e40a23 = L.popup({
+            var div_icon_4b6d54256d0025ba0cfb626731b9953b = L.divIcon({
+  "html": "\u003cdiv style=\"background:#8c564b;width:24px;height:24px;border-radius:50%;border:2px solid white;box-shadow:0 0 3px rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;line-height:1;font-size:14px;\"\u003e\ud83d\ude92\u003c/div\u003e",
+  "iconSize": [24, 24],
+  "iconAnchor": [12, 12],
+  "className": "empty",
+});
+        
+    
+        var popup_669ca45c9298f9e106630e86cef79b89 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_5801cb142f3dc658468a306982d0a7d3 = $(`<div id="html_5801cb142f3dc658468a306982d0a7d3" style="width: 100.0%; height: 100.0%;">Fire Service and Civil Defence Station Baridhara</div>`)[0];
-                popup_59859f05d1cf86835121011b88e40a23.setContent(html_5801cb142f3dc658468a306982d0a7d3);
+                var html_216d61e471a53bd659d708d5d0a38826 = $(`<div id="html_216d61e471a53bd659d708d5d0a38826" style="width: 100.0%; height: 100.0%;">Fire station: Fire Service and Civil Defence Station Baridhara</div>`)[0];
+                popup_669ca45c9298f9e106630e86cef79b89.setContent(html_216d61e471a53bd659d708d5d0a38826);
             
         
 
-        circle_marker_6d3653477a321a38697c3243053f0347.bindPopup(popup_59859f05d1cf86835121011b88e40a23)
+        marker_9519227939acd577d58c9bb3c76e8e34.bindPopup(popup_669ca45c9298f9e106630e86cef79b89)
         ;
 
         
     
     
-            var circle_marker_ab5044e5d64709cf51ebabcb64c16bbd = L.circleMarker(
+                marker_9519227939acd577d58c9bb3c76e8e34.setIcon(div_icon_4b6d54256d0025ba0cfb626731b9953b);
+            
+    
+            var marker_ac195c476aa9c7f6aef4794efd4b4618 = L.marker(
                 [23.75651790007894, 90.37232660000257],
-                {"bubblingMouseEvents": true, "color": "#1a1a1a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#8c564b", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3.5, "stroke": true, "weight": 1.2}
-            ).addTo(feature_group_432ad3c47c1fd37146c8014a0d9838c5);
+                {
+}
+            ).addTo(marker_cluster_43f8f236e72ceb1487fe5ab36d8bf7e9);
         
     
-        var popup_041c0ccea4d00bd3adf0c9130af65137 = L.popup({
+            var div_icon_1b32b20a96030d6c55980c1f31272f20 = L.divIcon({
+  "html": "\u003cdiv style=\"background:#8c564b;width:24px;height:24px;border-radius:50%;border:2px solid white;box-shadow:0 0 3px rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;line-height:1;font-size:14px;\"\u003e\ud83d\ude92\u003c/div\u003e",
+  "iconSize": [24, 24],
+  "iconAnchor": [12, 12],
+  "className": "empty",
+});
+        
+    
+        var popup_2c16091b608edd9442930c1d92fb906b = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_a9c0257e0adf662f7de041df7e4d38b1 = $(`<div id="html_a9c0257e0adf662f7de041df7e4d38b1" style="width: 100.0%; height: 100.0%;">Bangladesh Fire Service and Civil Defence</div>`)[0];
-                popup_041c0ccea4d00bd3adf0c9130af65137.setContent(html_a9c0257e0adf662f7de041df7e4d38b1);
+                var html_d5e6b50062e84dc251bb09745f3cc039 = $(`<div id="html_d5e6b50062e84dc251bb09745f3cc039" style="width: 100.0%; height: 100.0%;">Fire station: Bangladesh Fire Service and Civil Defence</div>`)[0];
+                popup_2c16091b608edd9442930c1d92fb906b.setContent(html_d5e6b50062e84dc251bb09745f3cc039);
             
         
 
-        circle_marker_ab5044e5d64709cf51ebabcb64c16bbd.bindPopup(popup_041c0ccea4d00bd3adf0c9130af65137)
+        marker_ac195c476aa9c7f6aef4794efd4b4618.bindPopup(popup_2c16091b608edd9442930c1d92fb906b)
         ;
 
         
     
     
-            var circle_marker_6cf2bb6bb884e1f23d79703e4fd81a1e = L.circleMarker(
+                marker_ac195c476aa9c7f6aef4794efd4b4618.setIcon(div_icon_1b32b20a96030d6c55980c1f31272f20);
+            
+    
+            var marker_0d09619f80f14c0b2def59f44e0012b7 = L.marker(
                 [23.7585993729547, 90.37333017284288],
-                {"bubblingMouseEvents": true, "color": "#1a1a1a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#8c564b", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3.5, "stroke": true, "weight": 1.2}
-            ).addTo(feature_group_432ad3c47c1fd37146c8014a0d9838c5);
+                {
+}
+            ).addTo(marker_cluster_43f8f236e72ceb1487fe5ab36d8bf7e9);
         
     
-        var popup_509a7ee566b4e9b1799437dc9c46a89e = L.popup({
+            var div_icon_fc2d918deafc7a1327bf4ea799466c71 = L.divIcon({
+  "html": "\u003cdiv style=\"background:#8c564b;width:24px;height:24px;border-radius:50%;border:2px solid white;box-shadow:0 0 3px rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;line-height:1;font-size:14px;\"\u003e\ud83d\ude92\u003c/div\u003e",
+  "iconSize": [24, 24],
+  "iconAnchor": [12, 12],
+  "className": "empty",
+});
+        
+    
+        var popup_07844bfa8cc14e03bcc37574aef6149d = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_97763029b6eabedd3cde0a51a2455414 = $(`<div id="html_97763029b6eabedd3cde0a51a2455414" style="width: 100.0%; height: 100.0%;">fire_station #20</div>`)[0];
-                popup_509a7ee566b4e9b1799437dc9c46a89e.setContent(html_97763029b6eabedd3cde0a51a2455414);
+                var html_c18f75bf302f92b604ddb3ec82ab221d = $(`<div id="html_c18f75bf302f92b604ddb3ec82ab221d" style="width: 100.0%; height: 100.0%;">Fire station: fire_station #20</div>`)[0];
+                popup_07844bfa8cc14e03bcc37574aef6149d.setContent(html_c18f75bf302f92b604ddb3ec82ab221d);
             
         
 
-        circle_marker_6cf2bb6bb884e1f23d79703e4fd81a1e.bindPopup(popup_509a7ee566b4e9b1799437dc9c46a89e)
+        marker_0d09619f80f14c0b2def59f44e0012b7.bindPopup(popup_07844bfa8cc14e03bcc37574aef6149d)
         ;
 
         
     
     
-            var circle_marker_9668f4c8ac516a28ba29554d78cce43b = L.circleMarker(
+                marker_0d09619f80f14c0b2def59f44e0012b7.setIcon(div_icon_fc2d918deafc7a1327bf4ea799466c71);
+            
+    
+            var marker_abbadf674017d970dfb1cf8f19e948ec = L.marker(
                 [23.747483700021753, 90.38709335061816],
-                {"bubblingMouseEvents": true, "color": "#1a1a1a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#8c564b", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3.5, "stroke": true, "weight": 1.2}
-            ).addTo(feature_group_432ad3c47c1fd37146c8014a0d9838c5);
+                {
+}
+            ).addTo(marker_cluster_43f8f236e72ceb1487fe5ab36d8bf7e9);
         
     
-        var popup_b8ad22ef7476c090a8106991339eac1e = L.popup({
+            var div_icon_b5f22de06fbd02fe30ba89597ab01dc2 = L.divIcon({
+  "html": "\u003cdiv style=\"background:#8c564b;width:24px;height:24px;border-radius:50%;border:2px solid white;box-shadow:0 0 3px rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;line-height:1;font-size:14px;\"\u003e\ud83d\ude92\u003c/div\u003e",
+  "iconSize": [24, 24],
+  "iconAnchor": [12, 12],
+  "className": "empty",
+});
+        
+    
+        var popup_888ba18bb895a5640d13adebf01375ef = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_6f33116210eb2c37365c77044f67b96e = $(`<div id="html_6f33116210eb2c37365c77044f67b96e" style="width: 100.0%; height: 100.0%;">Hazaribag Fire Station</div>`)[0];
-                popup_b8ad22ef7476c090a8106991339eac1e.setContent(html_6f33116210eb2c37365c77044f67b96e);
+                var html_85cbfc2b134edb0e2f492ec2e9085c50 = $(`<div id="html_85cbfc2b134edb0e2f492ec2e9085c50" style="width: 100.0%; height: 100.0%;">Fire station: Hazaribag Fire Station</div>`)[0];
+                popup_888ba18bb895a5640d13adebf01375ef.setContent(html_85cbfc2b134edb0e2f492ec2e9085c50);
             
         
 
-        circle_marker_9668f4c8ac516a28ba29554d78cce43b.bindPopup(popup_b8ad22ef7476c090a8106991339eac1e)
+        marker_abbadf674017d970dfb1cf8f19e948ec.bindPopup(popup_888ba18bb895a5640d13adebf01375ef)
         ;
 
         
     
     
-            var circle_marker_1a95da8231914f620164c9c661d16a49 = L.circleMarker(
+                marker_abbadf674017d970dfb1cf8f19e948ec.setIcon(div_icon_b5f22de06fbd02fe30ba89597ab01dc2);
+            
+    
+            var marker_19c905e13d41ab485cc3f3398f1b2e8c = L.marker(
                 [23.834241286618763, 90.41372438191004],
-                {"bubblingMouseEvents": true, "color": "#1a1a1a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#8c564b", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3.5, "stroke": true, "weight": 1.2}
-            ).addTo(feature_group_432ad3c47c1fd37146c8014a0d9838c5);
+                {
+}
+            ).addTo(marker_cluster_43f8f236e72ceb1487fe5ab36d8bf7e9);
         
     
-        var popup_71f6f56d9c1618e5aff2bafb85c08432 = L.popup({
+            var div_icon_81ee4ac92e0be2f670e0a8c60312fb1a = L.divIcon({
+  "html": "\u003cdiv style=\"background:#8c564b;width:24px;height:24px;border-radius:50%;border:2px solid white;box-shadow:0 0 3px rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;line-height:1;font-size:14px;\"\u003e\ud83d\ude92\u003c/div\u003e",
+  "iconSize": [24, 24],
+  "iconAnchor": [12, 12],
+  "className": "empty",
+});
+        
+    
+        var popup_b3d345c68f65c556a1080621609b4971 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_bb1e9a67b7963444e6d6e32a34ce7d9c = $(`<div id="html_bb1e9a67b7963444e6d6e32a34ce7d9c" style="width: 100.0%; height: 100.0%;">Rescue Fire Fighting Stationq</div>`)[0];
-                popup_71f6f56d9c1618e5aff2bafb85c08432.setContent(html_bb1e9a67b7963444e6d6e32a34ce7d9c);
+                var html_984bc94df57d7f72f5beca34cee546f4 = $(`<div id="html_984bc94df57d7f72f5beca34cee546f4" style="width: 100.0%; height: 100.0%;">Fire station: Rescue Fire Fighting Stationq</div>`)[0];
+                popup_b3d345c68f65c556a1080621609b4971.setContent(html_984bc94df57d7f72f5beca34cee546f4);
             
         
 
-        circle_marker_1a95da8231914f620164c9c661d16a49.bindPopup(popup_71f6f56d9c1618e5aff2bafb85c08432)
+        marker_19c905e13d41ab485cc3f3398f1b2e8c.bindPopup(popup_b3d345c68f65c556a1080621609b4971)
         ;
 
         
     
     
-            var circle_marker_ea23d0fad899c62fb6ad7c5c56b1159e = L.circleMarker(
+                marker_19c905e13d41ab485cc3f3398f1b2e8c.setIcon(div_icon_81ee4ac92e0be2f670e0a8c60312fb1a);
+            
+    
+            var marker_3a6fd8860f91a1d04b76bb28f152da23 = L.marker(
                 [23.889946950517327, 90.40223647329282],
-                {"bubblingMouseEvents": true, "color": "#1a1a1a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#8c564b", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3.5, "stroke": true, "weight": 1.2}
-            ).addTo(feature_group_432ad3c47c1fd37146c8014a0d9838c5);
+                {
+}
+            ).addTo(marker_cluster_43f8f236e72ceb1487fe5ab36d8bf7e9);
         
     
-        var popup_93671a6eba88260349998011b9d2b4d8 = L.popup({
+            var div_icon_b73f33ae45ecd1e4e6418cc0732b040e = L.divIcon({
+  "html": "\u003cdiv style=\"background:#8c564b;width:24px;height:24px;border-radius:50%;border:2px solid white;box-shadow:0 0 3px rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;line-height:1;font-size:14px;\"\u003e\ud83d\ude92\u003c/div\u003e",
+  "iconSize": [24, 24],
+  "iconAnchor": [12, 12],
+  "className": "empty",
+});
+        
+    
+        var popup_0adae4b8435be66a899fcfe6bd3c25c8 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_6405f196752847579ab8d86136956e33 = $(`<div id="html_6405f196752847579ab8d86136956e33" style="width: 100.0%; height: 100.0%;">Tongi Fire Service and Civil Defence Stationq</div>`)[0];
-                popup_93671a6eba88260349998011b9d2b4d8.setContent(html_6405f196752847579ab8d86136956e33);
+                var html_6b485951771f9059d3e29674f2b04c33 = $(`<div id="html_6b485951771f9059d3e29674f2b04c33" style="width: 100.0%; height: 100.0%;">Fire station: Tongi Fire Service and Civil Defence Stationq</div>`)[0];
+                popup_0adae4b8435be66a899fcfe6bd3c25c8.setContent(html_6b485951771f9059d3e29674f2b04c33);
             
         
 
-        circle_marker_ea23d0fad899c62fb6ad7c5c56b1159e.bindPopup(popup_93671a6eba88260349998011b9d2b4d8)
+        marker_3a6fd8860f91a1d04b76bb28f152da23.bindPopup(popup_0adae4b8435be66a899fcfe6bd3c25c8)
         ;
 
         
     
     
-            feature_group_432ad3c47c1fd37146c8014a0d9838c5.addTo(map_83f36d60a06cd6b9209e48bb32e707d5);
+                marker_3a6fd8860f91a1d04b76bb28f152da23.setIcon(div_icon_b73f33ae45ecd1e4e6418cc0732b040e);
+            
+    
+            marker_cluster_43f8f236e72ceb1487fe5ab36d8bf7e9.addTo(feature_group_d2234788540b4f4d90e83b1ee0763d3c);
         
     
-            var layer_control_2361d90e55ff351ac9a2408ac0a95ced_layers = {
+            feature_group_d2234788540b4f4d90e83b1ee0763d3c.addTo(map_3832f4b2370f0816dffa05b968768e89);
+        
+    
+            var layer_control_91052f2ab567920e9b24139d0270b0a2_layers = {
                 base_layers : {
-                    "Google Streets" : tile_layer_f788f4900bb9ffe88e01a034e54fe419,
-                    "Google Hybrid" : tile_layer_530b9b3b3b49c2a7420e84d3bf2791fe,
-                    "Google Satellite" : tile_layer_081dd082876f82edfc157a119aa229f2,
-                    "Google Terrain" : tile_layer_8ec5248c33387a3f68a7e6fc58fc6896,
+                    "Google Streets" : tile_layer_afa068223cf670f4e242a3c16fcd3160,
+                    "Google Hybrid" : tile_layer_e99d271fb159bb0e8f6e13e308b0206b,
+                    "Google Satellite" : tile_layer_a0b62b78280b41c97e8d5a5fd26d50b4,
+                    "Google Terrain" : tile_layer_68fc85d523d9a440a781b0cced7b22fa,
                 },
                 overlays :  {
-                    "Fire station Voronoi by zone" : geo_json_492b9e3f57b7e98de5ac5a814ed7b9b8,
-                    "Zone boundaries" : geo_json_492957b1124d179f0d06ba4f0eeb52f6,
-                    "Fire station facilities" : feature_group_432ad3c47c1fd37146c8014a0d9838c5,
+                    "Fire station Voronoi by zone" : geo_json_6825738eceb9679b511b510df81f6fca,
+                    "Zone boundaries" : geo_json_9e8b449cb19f8dd633b100582749a4dc,
+                    "\ud83d\ude92 Fire station facilities" : feature_group_d2234788540b4f4d90e83b1ee0763d3c,
                 },
             };
-            let layer_control_2361d90e55ff351ac9a2408ac0a95ced = L.control.layers(
-                layer_control_2361d90e55ff351ac9a2408ac0a95ced_layers.base_layers,
-                layer_control_2361d90e55ff351ac9a2408ac0a95ced_layers.overlays,
+            let layer_control_91052f2ab567920e9b24139d0270b0a2 = L.control.layers(
+                layer_control_91052f2ab567920e9b24139d0270b0a2_layers.base_layers,
+                layer_control_91052f2ab567920e9b24139d0270b0a2_layers.overlays,
                 {
   "position": "topright",
   "collapsed": false,
   "autoZIndex": true,
 }
-            ).addTo(map_83f36d60a06cd6b9209e48bb32e707d5);
+            ).addTo(map_3832f4b2370f0816dffa05b968768e89);
 
         
 </script>
