@@ -6,6 +6,7 @@ __pycache__/
 
 # OSM tile / query cache (re-fetchable)
 data/raw/osm_cache/
+cache/
 
 # macOS
 .DS_Store
