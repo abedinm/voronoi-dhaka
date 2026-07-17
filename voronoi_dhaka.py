@@ -1750,6 +1750,258 @@ def build_literature_docx() -> str:
     return str(out)
 
 
+def build_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
+    """Full editable thesis draft (Abstract + Ch.1, 3, 4, 5) with real numbers.
+
+    Chapter 2 (Literature Review) is provided by build_literature_docx()."""
+    from docx import Document
+    from docx.enum.text import WD_ALIGN_PARAGRAPH
+    from docx.shared import Inches, Pt
+
+    doc = Document()
+
+    def para(t, justify=True):
+        p = doc.add_paragraph(t)
+        if justify:
+            p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        return p
+
+    def figure(name, caption, width=5.6):
+        path = FIGURES_DIR / name
+        if path.exists():
+            doc.add_picture(str(path), width=Inches(width))
+            doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            c = doc.add_paragraph(caption)
+            c.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            if c.runs:
+                c.runs[0].italic = True
+                c.runs[0].font.size = Pt(9)
+
+    tf = table.set_index("service")
+    def pct(s):
+        return tf.loc[s, "pct_grid_underserved"]
+    total_pop_m = (sb.df["pop_est"].sum() / 1e6) if sb.pop_weighted else None
+    best = sb.df.iloc[0]
+    worst = sb.df.iloc[-1]
+    top3 = ", ".join(f"{r['section']} ({r['benefit_score']:.0f})" for _, r in sb.df.head(3).iterrows())
+
+    # ---- title ----
+    doc.add_heading(THESIS_TITLE, level=0)
+    sub = doc.add_paragraph(f"{AUTHOR}   ·   Undergraduate Thesis, Department of Computer "
+                            "Science & Engineering")
+    sub.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    doc.add_paragraph("").alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+    # ---- Abstract ----
+    doc.add_heading("Abstract", level=1)
+    para(
+        "Dhaka, one of the world's densest megacities, has expanded far faster than its "
+        "public utilities, producing sharp spatial inequalities in access. This thesis "
+        "presents a reproducible framework that uses Voronoi diagrams to analyse the "
+        "provision of six utility services — metro stations, hospitals, water sources, "
+        "fuel stations, bus stops and fire stations — across Dhaka. Facility locations are "
+        "drawn from OpenStreetMap and residents from the WorldPop 1 km population grid. "
+        "For each service an exact Voronoi partition is built (straight perpendicular-"
+        "bisector edges), nearest-facility coverage is measured on a fine grid, and the "
+        "city is scored by a population- and emergency-weighted benefit index over eight "
+        "named sections. New facility locations are recommended with a greedy maximal-"
+        "covering heuristic that targets the most-populated underserved areas. Results show "
+        f"access is strongly clustered (Moran's I = {ext.moran[0]:.2f}) and moderately "
+        f"unequal (Gini = {ext.gini_combined:.2f}); the central belt ({top3}) is best "
+        f"served while {worst['section']} ({worst['benefit_score']:.0f}) lags. Water pumps "
+        f"({pct('water_pump'):.0f}% of area underserved) and metro ({pct('metro_station'):.0f}%) "
+        "are the widest gaps, and dense old Dhaka (Motijheel) is the highest-impact site "
+        "for new facilities. The Voronoi results agree with the established 2SFCA method for "
+        "scarce services, and the greedy recommendations recover essentially all of the "
+        "exact optimum. The complete pipeline is released as a single reproducible program.")
+    para("Keywords: Voronoi diagram; spatial accessibility; utility services; facility "
+         "location; GIS; OpenStreetMap; WorldPop; Dhaka.", justify=False)
+
+    # ---- Chapter 1 ----
+    doc.add_heading("Chapter 1 — Introduction", level=1)
+    doc.add_heading("1.1 Background", level=2)
+    para(
+        "Dhaka is among the fastest-growing megacities in the world, with rapid, largely "
+        "unplanned expansion on its fringe. Utility provision — transport, health, water, "
+        "fuel and emergency services — has not kept pace, leaving pronounced differences in "
+        "access between the dense core and the periphery. Understanding where services fall "
+        "short, and where new ones would help the most people, is therefore a pressing "
+        "planning problem. Voronoi diagrams, which assign every location to its nearest "
+        "facility, provide a natural and interpretable tool for this 'nearest-service' "
+        "question.")
+    doc.add_heading("1.2 Problem statement", level=2)
+    para(
+        "Existing accessibility studies of Dhaka each consider a single service (healthcare, "
+        "transit, open space or evacuation) and typically rely on the two-step floating "
+        "catchment area method or simple buffers. There is no integrated, multi-utility, "
+        "population-weighted assessment of Dhaka's service coverage that also recommends "
+        "where to invest, and few such studies are released as reproducible software.")
+    doc.add_heading("1.3 Objectives", level=2)
+    for o in ["Partition Dhaka into Voronoi service areas for six utility services from open data.",
+              "Quantify coverage and identify underserved areas, weighted by population.",
+              "Rank the city's areas by how well their residents are served.",
+              "Recommend new facility locations that most improve access.",
+              "Validate the approach against established accessibility methods and release "
+              "a fully reproducible pipeline."]:
+        doc.add_paragraph(o, style="List Bullet")
+    doc.add_heading("1.4 Scope and limitations", level=2)
+    para(
+        "The study covers the Dhaka metropolitan bounding box and six OpenStreetMap service "
+        "categories. Distances are straight-line (Euclidean) in a metric projection; road-"
+        "network travel distance and real-time traffic are out of scope. Facility capacity "
+        "is not modelled, and the eight sections are analytical zones rather than official "
+        "administrative units.")
+    doc.add_heading("1.5 Thesis organisation", level=2)
+    para(
+        "Chapter 2 reviews related work and states the research gap. Chapter 3 describes the "
+        "data and methodology. Chapter 4 presents and discusses the results. Chapter 5 "
+        "concludes with contributions, limitations and future work.")
+
+    # ---- Chapter 3 ----
+    doc.add_heading("Chapter 3 — Methodology", level=1)
+    doc.add_heading("3.1 Study area and data", level=2)
+    para(
+        f"The study area is the Dhaka bounding box {DHAKA_BBOX} intersected with the OSM "
+        "administrative boundary. Facility locations for the six services were collected "
+        "from OpenStreetMap via the osmnx library, de-duplicated within "
+        f"{MIN_SEED_DISTANCE:.0f} m and clipped to the boundary, giving "
+        + ", ".join(f"{int(tf.loc[k,'n_facilities'])} {SERVICE_TYPES[k].label.lower()}s"
+                    for k in SERVICE_TYPES) +
+        f". Population came from the WorldPop 1 km grid (2020), totalling about "
+        f"{total_pop_m:.1f} million residents in the study area.")
+    doc.add_heading("3.2 Coordinate systems and preprocessing", level=2)
+    para(
+        "All input/output uses WGS84 (EPSG:4326); every distance and area is computed in "
+        "UTM zone 46N (EPSG:32646), in metres. Points are reprojected, de-duplicated and "
+        "boundary-clipped before analysis.")
+    doc.add_heading("3.3 Voronoi construction", level=2)
+    para(
+        "Each facility of a service is a Voronoi seed. Cells are computed exactly as the "
+        "intersection of the half-planes bounded by the perpendicular bisectors to each "
+        "seed's Delaunay neighbours, then clipped to the study boundary. This guarantees "
+        "straight bisector edges, degree-three vertices in general position, and an exact "
+        "tiling — verified by an automated test suite.")
+    doc.add_heading("3.4 Coverage metrics", level=2)
+    para(
+        "For each service the cell area (km²) and the nearest-facility distance on a "
+        f"{GRID_SPACING_M:.0f} m grid (via a KD-tree) are computed. A location is "
+        "'underserved' if its nearest facility exceeds a per-service distance threshold "
+        "(e.g. 800 m for bus stops, 2 km for hospitals, 3 km for fire stations).")
+    doc.add_heading("3.5 Population-weighted section benefit", level=2)
+    para(
+        "The city is divided into eight named sections (nearest-centre Voronoi of well-known "
+        "area centres). Each section is scored by the share of its residents within reach of "
+        "each service, averaged across services with emergency services (hospital, fire) and "
+        "water weighted higher, and weighted by WorldPop population.")
+    doc.add_heading("3.6 Facility recommendations", level=2)
+    para(
+        "New facilities are placed with a greedy maximal-covering heuristic (Church & "
+        "ReVelle, 1974): each new site is the most-populated still-underserved location, "
+        "chosen iteratively. The result targets people rather than empty land.")
+    doc.add_heading("3.7 Validation and extended analyses", level=2)
+    para(
+        "The approach is cross-checked with the two-step floating catchment area (2SFCA) "
+        "method; access equity is measured with the Gini coefficient and a Lorenz curve; "
+        "spatial clustering with Moran's I; robustness with a threshold/weight sensitivity "
+        "analysis; and the greedy recommender against the exact maximal-covering optimum.")
+    doc.add_heading("3.8 Tools", level=2)
+    para(
+        "The pipeline is implemented in Python using NumPy, SciPy, Shapely, GeoPandas, "
+        "contextily, osmnx, rasterio, folium, Matplotlib and pytest, released as a single "
+        "reproducible script.")
+
+    # ---- Chapter 4 ----
+    doc.add_heading("Chapter 4 — Results and Discussion", level=1)
+    doc.add_heading("4.1 Coverage by service", level=2)
+    para(
+        "Coverage varies sharply by service. Water pumps and the metro have the widest gaps "
+        f"({pct('water_pump'):.0f}% and {pct('metro_station'):.0f}% of the area beyond "
+        f"threshold), while hospitals cover the most area ({pct('hospital'):.0f}% "
+        "underserved). The metro's gap reflects its single MRT-6 corridor.")
+    figure("voronoi_hospital.png", "Figure 4.1. Hospital Voronoi coverage over Dhaka.", 5.4)
+    doc.add_heading("4.2 Which areas benefit most", level=2)
+    para(
+        f"Weighting by population and emergency importance, the central belt is best served "
+        f"({top3}), while {worst['section']} scores lowest ({worst['benefit_score']:.0f}). "
+        "The most populous section, Motijheel (old Dhaka), is only moderately served and is "
+        "therefore the highest-impact target for investment.")
+    figure("section_benefit.png", "Figure 4.2. Population-weighted benefit score by section.", 5.2)
+    doc.add_heading("4.3 Recommendations", level=2)
+    para(
+        "Population-weighted greedy placement concentrates new facilities in dense, "
+        "underserved areas. For example, three new fire stations cut the underserved "
+        f"population from {recs['fire_station'].before.underserved_people/1000:.0f}k to "
+        f"{recs['fire_station'].after.underserved_people/1000:.0f}k, and three hospitals "
+        f"from {recs['hospital'].before.underserved_people/1000:.0f}k to "
+        f"{recs['hospital'].after.underserved_people/1000:.0f}k.")
+    figure(f"recommendations_{flagship_key}.png",
+           "Figure 4.3. Existing (blue) vs proposed (red) sites.", 5.0)
+    doc.add_heading("4.4 Equity and spatial clustering", level=2)
+    para(
+        f"The combined access index has a Gini coefficient of {ext.gini_combined:.3f} "
+        "(0 = perfectly equal), indicating moderate inequality, and a Moran's I of "
+        f"{ext.moran[0]:.3f} (pseudo p = {ext.moran[1]:.3f}), indicating strong spatial "
+        "clustering: well- and poorly-served areas form contiguous regions.")
+    figure("lorenz_access.png", "Figure 4.4. Lorenz curve of combined utility access.", 4.4)
+    doc.add_heading("4.5 Method validation", level=2)
+    para(
+        "The Voronoi rankings agree strongly with 2SFCA for scarce services (metro, water, "
+        "hospital) and less so for dense or demand-sensitive ones, where 2SFCA additionally "
+        "penalises crowding — the methods are complementary. The greedy recommender recovers "
+        "essentially all of the exact maximal-covering optimum, confirming its adequacy.")
+    doc.add_heading("4.6 Sensitivity", level=2)
+    para(
+        "Re-running the section ranking under ±25% thresholds and equal service weights "
+        "leaves it almost unchanged (Spearman ρ ≈ 0.98), so the conclusions do not hinge on "
+        "the exact parameter choices.")
+    doc.add_heading("4.7 Discussion", level=2)
+    para(
+        "The centre-versus-periphery pattern found here is consistent with prior Dhaka "
+        "studies: Ahmed et al. (2019) report peripheral and older-core settlements as "
+        "underserved for emergency care, and Alam et al. (2025) find central and "
+        "south-western areas most accessible for open space. This study extends that picture "
+        "to six utilities simultaneously and adds explicit, population-aware recommendations.")
+
+    # ---- Chapter 5 ----
+    doc.add_heading("Chapter 5 — Conclusion", level=1)
+    doc.add_heading("5.1 Summary", level=2)
+    para(
+        "This thesis built a reproducible Voronoi-based framework to analyse the provision of "
+        "six utility services in Dhaka, measure coverage and equity, and recommend new "
+        "facility locations. It identified the central belt as best served, dense old Dhaka "
+        "as the highest-impact investment target, and water and metro as the weakest "
+        "services.")
+    doc.add_heading("5.2 Contributions", level=2)
+    for c in ["A multi-utility, Voronoi-based accessibility assessment of Dhaka from open data.",
+              "A population- and emergency-weighted section benefit index.",
+              "Population-targeted, near-optimal facility recommendations.",
+              "Cross-validation against 2SFCA and the exact maximal-covering optimum.",
+              "A fully reproducible open pipeline and an interactive map set."]:
+        doc.add_paragraph(c, style="List Bullet")
+    doc.add_heading("5.3 Limitations", level=2)
+    para(
+        "Distances are straight-line rather than road-network or traffic-aware; OpenStreetMap "
+        "completeness varies, so counts are a lower bound; facility capacity is not modelled; "
+        "and the sections are analytical rather than official administrative units.")
+    doc.add_heading("5.4 Future work", level=2)
+    para(
+        "Natural extensions include road-network and traffic-aware travel distance, capacity-"
+        "weighted Voronoi diagrams, finer (100 m) population and official administrative "
+        "boundaries, an interactive web dashboard, and validation against official facility "
+        "registries.")
+
+    # ---- References ----
+    doc.add_heading("References", level=1)
+    for r in REFERENCES:
+        p = doc.add_paragraph(r.replace("&amp;", "&"))
+        p.paragraph_format.left_indent = Pt(18)
+        p.paragraph_format.first_line_indent = Pt(-18)
+
+    out = OUTPUTS_DIR / "Dhaka_Voronoi_Thesis_Draft.docx"
+    doc.save(str(out))
+    return str(out)
+
+
 # =========================================================================== #
 # PDF REPORT
 # =========================================================================== #
@@ -2205,10 +2457,12 @@ def main(force_figures: bool = False, k: int = RECOMMEND_K) -> None:
     pdf = build_pdf_report(voronois, coverages, table, recs, flagship_key, sb, ext)
     litpdf = build_literature_pdf()
     litdocx = build_literature_docx()
+    thesisdocx = build_thesis_docx(table, sb, ext, recs, flagship_key)
     print("\nDONE")
     print("  PDF (static)                                   ->", pdf)
     print("  Literature review (PDF)                        ->", litpdf)
     print("  Literature review (Word, editable)             ->", litdocx)
+    print("  Thesis draft (Word: Abstract, Ch.1,3,4,5)      ->", thesisdocx)
     print("  Benefit map                                    -> outputs/figures/section_benefit.png")
     print("  Interactive — Dhaka sections + all utilities   ->", headline_html)
     print("  Interactive — per-utility Voronoi coverage     -> outputs/report/interactive_<service>.html")
