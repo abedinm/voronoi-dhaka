@@ -1181,75 +1181,135 @@ def _sections_legend(ref: ZoneRef) -> folium.Element:
 # LITERATURE REVIEW  (content shared by the report section and the standalone)
 # =========================================================================== #
 LIT_REVIEW = [
-    ("Voronoi diagrams and spatial accessibility",
-     "Measuring how well a population can reach services is a long-standing problem "
-     "in spatial analysis. The Voronoi diagram — which partitions space so every "
-     "location is assigned to its nearest seed — is a foundational tool for this "
-     "nearest-facility question (Okabe et al., 2000). Because each Voronoi cell is "
-     "exactly the catchment of one facility under a straight-line nearest-distance "
-     "rule, the diagram visualises service areas directly and exposes gaps where "
-     "cells grow large; recent work extends it to weighted and dynamic forms that "
-     "reflect facility capacity and demand (Cui et al., 2021). The approach is "
-     "closely related to the widely used two-step floating catchment area (2SFCA) "
-     "family of accessibility measures introduced by Luo and Wang (2003) and "
-     "enhanced by Luo and Qi (2009), which combine supply, demand and distance "
-     "impedance. This project adopts the Voronoi nearest-facility partition as its "
-     "core method and, like the 2SFCA literature, adds a population weighting so "
-     "that access is measured for people rather than land."),
-    ("Service coverage standards and thresholds",
-     "The distance thresholds used to flag “underserved” locations are grounded in "
-     "transport- and emergency-planning norms. For public transport, a 400 m walk "
-     "to a bus stop and 800 m to rail are long-standing default planning catchments, "
-     "and empirical work supports this range: El-Geneidy et al. (2014) report an "
-     "85th-percentile walking distance of roughly 524 m to bus service, motivating "
-     "the ~800 m bus threshold. For emergency services, NFPA 1710 (NFPA, 2020) "
-     "frames fire coverage around a four-minute response objective, with grading "
-     "practice placing jurisdictions within a few kilometres of a station — "
-     "consistent with the multi-kilometre fire threshold here. Hospital access is "
-     "commonly assessed with 2SFCA-style catchments (Luo and Wang, 2003), supporting "
-     "the ~2 km hospital threshold. These thresholds remain planning conventions, "
-     "not universal laws, and the analysis is explicit about that."),
-    ("Data sources: OpenStreetMap and WorldPop",
-     "Facility locations come from OpenStreetMap (OSM), now a standard source of "
-     "point-of-interest data in accessibility research. Its completeness varies, "
-     "however: validating OSM points of interest against large-scale ground truth, "
-     "Klinkhardt et al. (2023) — and global assessments — find high completeness in "
-     "wealthy regions and lower, uneven coverage elsewhere, so OSM-derived counts "
-     "should be read as a lower bound. Population weights come from WorldPop's 1 km "
-     "gridded estimates, produced by top-down disaggregation of census counts using "
-     "satellite-derived covariates (Tatem, 2017; Lloyd et al., 2017). WorldPop is "
-     "widely used precisely because it offers open, high-resolution population "
-     "surfaces where detailed census microdata are unavailable, as in Dhaka."),
-    ("Dhaka's urban services in context",
-     "Dhaka is a fast-growing megacity where service provision has struggled to keep "
-     "pace, with rapid fringe expansion producing pronounced centre–periphery "
-     "disparities in infrastructure. GIS accessibility studies of Dhaka remain "
-     "relatively few but are consistent with this project's findings. Most directly, "
-     "Ahmed et al. (2019) apply the 2SFCA method to emergency healthcare in Dhaka, "
-     "identify peripheral and older-core settlements — including Mirpur and the "
-     "Bashundhara area — as underserved, and show that ignoring traffic congestion "
-     "overstates coverage roughly threefold. The population-weighted results here "
-     "echo that centre-versus-periphery pattern while adding a multi-utility, "
-     "section-level view."),
-    ("How the literature grounds this study",
-     "Taken together, the literature supports (i) the Voronoi nearest-facility "
-     "partition as a legitimate accessibility method, (ii) the chosen distance "
-     "thresholds as recognised planning conventions, (iii) OpenStreetMap and "
-     "WorldPop as accepted — though imperfect — open data sources, and (iv) the "
-     "empirical expectation that access in Dhaka is spatially unequal. The main "
-     "caveats raised in that literature — OSM incompleteness, threshold arbitrariness, "
-     "and the gap between straight-line and network/traffic distance — are carried "
-     "into this report's Limitations."),
+    ("Introduction",
+     "This chapter reviews the body of work on which the present study builds. It "
+     "proceeds thematically: the concepts and methods used to measure spatial "
+     "accessibility and to site public facilities are examined first, followed by "
+     "the open geospatial datasets and planning standards such studies rely on, and "
+     "then accessibility research specific to Dhaka. A comparison of the most "
+     "closely related studies leads to a statement of the research gap and the "
+     "positioning of the present work against it."),
+    ("Spatial accessibility: concepts and methods",
+     "Measuring how easily a population can reach services is a classical problem in "
+     "location science, tracing back to Weber's least-cost siting and Hakimi's "
+     "p-median formulation, and formalised for coverage by the maximal covering "
+     "location problem (MCLP) of Church and ReVelle (1974), which places a fixed "
+     "number of facilities so as to maximise the demand served within a distance "
+     "threshold. The geometric backbone for the nearest-facility question is the "
+     "Voronoi diagram, whose theory and applications are consolidated by Okabe et "
+     "al. (2000): partitioning space so every location is assigned to its closest "
+     "facility yields service areas directly, and large cells expose coverage gaps. "
+     "Distance-decay refinements led to the two-step floating catchment area (2SFCA) "
+     "method of Luo and Wang (2003) and its enhanced variant (E2SFCA) by Luo and Qi "
+     "(2009), which jointly account for supply, demand and impedance and remain the "
+     "dominant accessibility framework. More recent work generalises these ideas: "
+     "Cui et al. (2021) use a dynamic Voronoi diagram to balance facility service "
+     "capacity, and Deliry and Uygucgil (2023) combine GIS network analysis with "
+     "location-allocation to site new facilities. The present study combines the "
+     "geometric clarity of the Voronoi partition with population weighting (in the "
+     "spirit of 2SFCA) and an MCLP-style greedy siting step for its recommendations."),
+    ("Data sources and planning standards",
+     "Accessibility studies increasingly rely on open, volunteered and modelled "
+     "geospatial data. OpenStreetMap (OSM) has become a standard source of "
+     "point-of-interest data, though Klinkhardt et al. (2023), validating OSM POIs "
+     "against large-scale ground truth, caution that completeness is uneven and "
+     "counts should be treated as a lower bound. Population exposure is commonly "
+     "derived from WorldPop's gridded estimates, produced by disaggregating census "
+     "counts with satellite-derived covariates (Tatem, 2017; Lloyd et al., 2017), "
+     "which provide open high-resolution population surfaces where detailed census "
+     "microdata are unavailable. The distance thresholds that define underserved "
+     "locations draw on planning norms: El-Geneidy et al. (2014) report an "
+     "85th-percentile walking distance of roughly 524 m to bus service, and NFPA "
+     "1710 (NFPA, 2020) frames fire coverage around a four-minute response objective. "
+     "These standards inform, but do not uniquely determine, the thresholds adopted "
+     "here."),
+    ("Accessibility studies in Dhaka",
+     "Empirical accessibility research on Dhaka has grown but remains largely "
+     "single-service. Ahmed et al. (2019) apply 2SFCA to emergency healthcare and "
+     "show that ignoring traffic congestion overstates coverage roughly threefold, "
+     "identifying peripheral and older-core settlements as underserved. Rahman, "
+     "Ashik and Mouli (2022) measure spatial accessibility to urban facilities around "
+     "transit-oriented developments, finding better access near mass-transit nodes. "
+     "Bhuiya, Shao and Jones (2023) use participatory GIS to assess evacuation "
+     "accessibility for movement-challenged residents, and Alam, Nur and Mitra (2025) "
+     "construct an Accessibility Index for public open space, reporting that central "
+     "and south-western areas — including Old Dhaka, Dhanmondi, Banani and Gulshan — "
+     "enjoy the best access. This last finding independently mirrors the central-belt "
+     "advantage reported in the present study, lending external validity to the "
+     "section-level results here, but like the others it addresses a single service "
+     "class."),
+    ("Comparative analysis of related work",
+     "Table 1 compares the most closely related accessibility studies by method, "
+     "data and principal limitation. Foundational methods (2SFCA, dynamic Voronoi) "
+     "are typically demonstrated on a single service; the Dhaka studies are "
+     "single-service by design; and the multi-facility studies that do exist are "
+     "set in other cities and seldom pair population weighting with automated "
+     "facility siting."),
+    ("Research gap",
+     "Three gaps emerge from the reviewed literature. First, Dhaka-specific studies "
+     "each consider a single service type — healthcare, transit, evacuation or open "
+     "space — leaving no integrated, multi-utility picture of the city's service "
+     "coverage. Second, multi-facility studies that do exist (e.g., Deliry and "
+     "Uygucgil, 2023) are set in other cities and seldom combine population weighting "
+     "with automated facility siting. Third, few studies release a fully "
+     "reproducible, open pipeline. No prior work provides a multi-utility, "
+     "Voronoi-based, population-weighted, section-level accessibility assessment of "
+     "Dhaka coupled with data-driven facility-placement recommendations."),
+    ("Positioning of this study",
+     "The present work addresses these gaps by analysing six utility services — "
+     "metro stations, hospitals, water sources, fuel stations, bus stops and fire "
+     "stations — within a single reproducible pipeline. It builds an exact Voronoi "
+     "partition for each service, computes nearest-facility coverage on a fine grid, "
+     "scores eight named sections by a population- and emergency-weighted benefit "
+     "index, and proposes new facility locations using a greedy maximal-coverage "
+     "heuristic (Church and ReVelle, 1974) that targets the most-populated "
+     "underserved areas. In doing so it integrates the geometric, data and "
+     "optimisation strands reviewed above into a Dhaka-specific, multi-utility "
+     "accessibility study."),
 ]
+
+# Comparison table: Author | Year | Methodology | Dataset | Key limitation (gap).
+COMPARISON_TABLE = {
+    "header": ["Study", "Year", "Methodology", "Dataset", "Key limitation / gap"],
+    "rows": [
+        ["Luo & Wang", "2003", "2SFCA", "US census; physicians",
+         "Single service; no facility siting"],
+        ["Ahmed et al.", "2019", "2SFCA + traffic variability", "Dhaka emergency care (OSM)",
+         "Single service; slum-focused"],
+        ["Cui et al.", "2021", "Dynamic Voronoi diagram", "Education facilities, China",
+         "Capacity focus, not population access"],
+        ["Rahman et al.", "2022", "Accessibility index", "Dhaka facilities near transit",
+         "Transit-centric; not multi-utility"],
+        ["Deliry & Uygucgil", "2023", "Network analysis + location-allocation",
+         "Eskisehir fire/EMS/parks", "Not Dhaka; not population-weighted"],
+        ["Alam et al.", "2025", "Accessibility Index (network)", "Dhaka public open space",
+         "Single service (open space)"],
+        ["This study", "2026", "Voronoi + KDTree + pop-weighted benefit + greedy MCLP",
+         "6 OSM utilities + WorldPop, Dhaka",
+         "Multi-utility, population-weighted, reproducible, with recommendations"],
+    ],
+}
 
 REFERENCES = [
     "Ahmed, S., Adams, A. M., Islam, R., Hasan, S. M., &amp; Panciera, R. (2019). Impact "
     "of traffic variability on geographic accessibility to 24/7 emergency healthcare for "
     "the urban poor: A GIS study in Dhaka, Bangladesh. PLOS ONE, 14(9), e0222488. "
     "https://doi.org/10.1371/journal.pone.0222488",
+    "Alam, I., Nur, S. M. S., &amp; Mitra, C. (2025). Accessibility to Public Open Space of "
+    "a densely populated city: a case study of Dhaka, Bangladesh. Computational Urban "
+    "Science, 5(1), 23. https://doi.org/10.1007/s43762-025-00187-9",
+    "Bhuiya, M. M. R., Shao, W., &amp; Jones, S. L. (2023). Measuring accessibility of "
+    "movement challenged persons during earthquake evacuation of Dhaka City, Bangladesh: A "
+    "participatory GIS-based approach. Applied Geography [confirm volume/article no.]. "
+    "https://www.sciencedirect.com/science/article/abs/pii/S0143622823001054",
+    "Church, R. L., &amp; ReVelle, C. S. (1974). The maximal covering location problem. "
+    "Papers in Regional Science, 32(1), 101–118. https://doi.org/10.1007/BF01942293",
     "Cui, H., Wu, L., Hu, S., &amp; Lu, R. (2021). Measuring the Service Capacity of Public "
     "Facilities Based on a Dynamic Voronoi Diagram. Remote Sensing, 13(5), 1027. "
     "https://doi.org/10.3390/rs13051027",
+    "Deliry, S. I., &amp; Uygucgil, H. (2023). Accessibility assessment of urban public "
+    "services using GIS-based network analysis: a case study in Eskisehir, Turkiye. "
+    "GeoJournal, 88, 4805–4825. https://doi.org/10.1007/s10708-023-10900-y",
     "El-Geneidy, A., Grimsrud, M., Wasfi, R., Tétreault, P., &amp; Surprenant-Legault, J. "
     "(2014). New evidence on walking distances to transit stops: identifying redundancies "
     "and gaps using variable service areas. Transportation, 41(1), 193–210. "
@@ -1272,17 +1332,51 @@ REFERENCES = [
     "Special Operations to the Public by Career Fire Departments. NFPA.",
     "Okabe, A., Boots, B., Sugihara, K., &amp; Chiu, S. N. (2000). Spatial Tessellations: "
     "Concepts and Applications of Voronoi Diagrams (2nd ed.). Wiley.",
+    "Rahman, M. H., Ashik, F. R., &amp; Mouli, M. J. (2022). Investigating spatial "
+    "accessibility to urban facility outcome of transit-oriented development in Dhaka. "
+    "Transportation Research Interdisciplinary Perspectives, 15, 100607. "
+    "https://doi.org/10.1016/j.trip.2022.100607",
     "Tatem, A. J. (2017). WorldPop, open data for spatial demography. Scientific Data, 4, "
     "170004. https://doi.org/10.1038/sdata.2017.4",
 ]
 
 
-def _literature_flowables(h1, h2, body, lit_title, ref_title):
-    from reportlab.platypus import PageBreak, Paragraph
+def _comparison_table_flowable(body):
+    from reportlab.lib import colors
+    from reportlab.lib.styles import ParagraphStyle
+    from reportlab.lib.units import cm
+    from reportlab.platypus import Paragraph, Table, TableStyle
+
+    cell = ParagraphStyle("cell", parent=body, fontSize=7.5, leading=9.5, spaceAfter=0)
+    hdr = ParagraphStyle("hcell", parent=cell, textColor=colors.white)
+    esc = lambda s: s.replace("&", "&amp;")
+    data = [[Paragraph("<b>" + esc(c) + "</b>", hdr) for c in COMPARISON_TABLE["header"]]]
+    for row in COMPARISON_TABLE["rows"]:
+        data.append([Paragraph(esc(c), cell) for c in row])
+    t = Table(data, colWidths=[2.5 * cm, 1.0 * cm, 4.2 * cm, 3.9 * cm, 5.0 * cm], repeatRows=1)
+    t.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#2c3e50")),
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f2f4f6")]),
+        ("BACKGROUND", (0, -1), (-1, -1), colors.HexColor("#e6efe6")),
+        ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#cccccc")),
+        ("TOPPADDING", (0, 0), (-1, -1), 3), ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+        ("LEFTPADDING", (0, 0), (-1, -1), 4), ("RIGHTPADDING", (0, 0), (-1, -1), 4)]))
+    return t
+
+
+def _literature_flowables(h1, h2, body, cap, lit_title, ref_title):
+    from reportlab.platypus import PageBreak, Paragraph, Spacer
+    from reportlab.lib.units import cm
     flow = [PageBreak(), Paragraph(lit_title, h1)]
     for head, txt in LIT_REVIEW:
         flow.append(Paragraph(head, h2))
         flow.append(Paragraph(txt, body))
+        if head.startswith("Comparative"):
+            flow.append(Spacer(1, 0.15 * cm))
+            flow.append(_comparison_table_flowable(body))
+            flow.append(Paragraph("Table 1. Comparison of related accessibility studies "
+                                  "(this study, last row).", cap))
     flow.append(PageBreak())
     flow.append(Paragraph(ref_title, h1))
     for r in REFERENCES:
@@ -1313,7 +1407,9 @@ def build_literature_pdf() -> str:
                           alignment=4)
     ref = ParagraphStyle("Ref", parent=body, fontSize=9.5, leading=13, spaceAfter=7,
                          leftIndent=14, firstLineIndent=-14)
-    story = [Paragraph("Literature Review", ss["Title"]),
+    cap = ParagraphStyle("Cap", parent=body, fontSize=8.5, textColor=colors.HexColor("#666666"),
+                         spaceBefore=3, spaceAfter=10)
+    story = [Paragraph("Chapter 2 — Literature Review", ss["Title"]),
              Paragraph("Voronoi Analysis of Utility Services in Dhaka City &nbsp;·&nbsp; "
                        "Minhazul Abedin", ParagraphStyle("sub", parent=body, fontSize=11,
                        textColor=colors.HexColor("#555555"))),
@@ -1321,10 +1417,56 @@ def build_literature_pdf() -> str:
     for head, txt in LIT_REVIEW:
         story.append(Paragraph(head, h2))
         story.append(Paragraph(txt, body))
+        if head.startswith("Comparative"):
+            story.append(Spacer(1, 0.15 * cm))
+            story.append(_comparison_table_flowable(body))
+            story.append(Paragraph("Table 1. Comparison of related accessibility studies "
+                                   "(this study, last row).", cap))
     story.append(Paragraph("References", h1))
     for r in REFERENCES:
         story.append(Paragraph(r, ref))
     doc.build(story)
+    return str(out)
+
+
+def build_literature_docx() -> str:
+    """Editable Word version of the literature-review chapter (for the AIUB template)."""
+    from docx import Document
+    from docx.shared import Pt
+
+    doc = Document()
+    doc.add_heading("Chapter 2 — Literature Review", level=0)
+    doc.add_paragraph("Voronoi Analysis of Utility Services in Dhaka City — Minhazul Abedin")
+    for head, txt in LIT_REVIEW:
+        doc.add_heading(head, level=1)
+        doc.add_paragraph(txt)
+        if head.startswith("Comparative"):
+            hdr = COMPARISON_TABLE["header"]
+            t = doc.add_table(rows=1, cols=len(hdr))
+            try:
+                t.style = "Light Grid Accent 1"
+            except KeyError:
+                t.style = "Table Grid"
+            for j, c in enumerate(hdr):
+                cell = t.rows[0].cells[j]
+                cell.text = c
+                for r in cell.paragraphs[0].runs:
+                    r.bold = True
+            for row in COMPARISON_TABLE["rows"]:
+                cells = t.add_row().cells
+                for j, c in enumerate(row):
+                    cells[j].text = c
+            capp = doc.add_paragraph("Table 1. Comparison of related accessibility studies "
+                                     "(this study, last row).")
+            capp.runs[0].italic = True
+    doc.add_heading("References", level=1)
+    for r in REFERENCES:
+        p = doc.add_paragraph(r.replace("&amp;", "&"))
+        pf = p.paragraph_format
+        pf.left_indent = Pt(18)
+        pf.first_line_indent = Pt(-18)
+    out = OUTPUTS_DIR / "Dhaka_Voronoi_Literature_Review.docx"
+    doc.save(str(out))
     return str(out)
 
 
@@ -1604,7 +1746,7 @@ def build_pdf_report(voronois, coverages, table, recs, flagship_key, sb) -> str:
         "Data source: © OpenStreetMap contributors. Basemap: © CartoDB. "
         "Geometry with SciPy / Shapely; maps with GeoPandas / contextily / folium.", cap)]
 
-    story += _literature_flowables(h1, h2, body, "11. Literature review", "12. References")
+    story += _literature_flowables(h1, h2, body, cap, "11. Literature review", "12. References")
 
     doc.build(story)
     return str(out)
@@ -1676,9 +1818,11 @@ def main(force_figures: bool = False) -> None:
     print("[7/7] PDF report + literature review")
     pdf = build_pdf_report(voronois, coverages, table, recs, flagship_key, sb)
     litpdf = build_literature_pdf()
+    litdocx = build_literature_docx()
     print("\nDONE")
     print("  PDF (static)                                   ->", pdf)
-    print("  Literature review (standalone)                 ->", litpdf)
+    print("  Literature review (PDF)                        ->", litpdf)
+    print("  Literature review (Word, editable)             ->", litdocx)
     print("  Benefit map                                    -> outputs/figures/section_benefit.png")
     print("  Interactive — Dhaka sections + all utilities   ->", headline_html)
     print("  Interactive — per-utility Voronoi coverage     -> outputs/report/interactive_<service>.html")
