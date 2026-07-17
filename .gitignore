@@ -20,3 +20,4 @@ THESIS/*.pdf
 THESIS/*.docx
 THESIS/*.pptx
 THESIS/interactive/
+data/raw/dhaka_drive.graphml

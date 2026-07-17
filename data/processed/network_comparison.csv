@@ -1,0 +1,7 @@
+service,median_detour,pct_under_euclid,pct_under_network
+Metro station,1.57,46.8,73.6
+Hospital,1.51,10.0,18.5
+Water pump / source,1.49,44.3,68.2
+Fuel station,1.58,18.1,46.3
+Bus stop,1.48,28.0,51.7
+Fire station,1.45,15.7,36.7

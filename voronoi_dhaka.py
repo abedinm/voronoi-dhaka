@@ -1102,6 +1102,74 @@ def extended_analysis(voronois, ref, pop) -> ExtendedAnalysis:
 
 
 # =========================================================================== #
+# NETWORK (road) DISTANCE  (opt-in: python voronoi_dhaka.py --network)
+# =========================================================================== #
+_ROAD_GRAPH_PATH = RAW_DIR / "dhaka_drive.graphml"
+
+
+def get_road_graph():
+    """Load/cache the Dhaka drive network, projected to the metric CRS.
+
+    Returns (G, node_list, node_xy, KDTree) or None if the download fails."""
+    import networkx as nx  # noqa: F401 (imported for callers / clarity)
+    try:
+        if _ROAD_GRAPH_PATH.exists():
+            G = ox.load_graphml(_ROAD_GRAPH_PATH)
+        else:
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                G = ox.graph_from_bbox(DHAKA_BBOX, network_type="drive", simplify=True)
+                G = ox.project_graph(G, to_crs=CRS_METRIC)
+            ox.save_graphml(G, _ROAD_GRAPH_PATH)
+    except Exception as exc:
+        print(f"    [network] road graph unavailable ({type(exc).__name__})")
+        return None
+    nodes = list(G.nodes)
+    xy = np.array([[float(G.nodes[n]["x"]), float(G.nodes[n]["y"])] for n in nodes])
+    return G, nodes, xy, KDTree(xy)
+
+
+def network_nearest_distance(bundle, grid, facilities) -> np.ndarray:
+    """Road-network distance (m) from each grid point to the nearest facility."""
+    import networkx as nx
+    G, nodes, xy, tree = bundle
+    fac_nodes = {nodes[i] for i in tree.query(facilities)[1]}
+    dist = nx.multi_source_dijkstra_path_length(G, fac_nodes, weight="length")
+    snap_d, gi = tree.query(grid)
+    out = np.array([dist.get(nodes[i], np.inf) for i in gi], dtype=float)
+    return out + snap_d
+
+
+def network_analysis(voronois, pop):
+    """Compare road-network vs straight-line access; writes a table + figure."""
+    print("[network] building road network + shortest paths (this takes a minute)")
+    bundle = get_road_graph()
+    if bundle is None:
+        return None
+    boundary = next(iter(voronois.values())).boundary
+    grid = make_grid(boundary)
+    weights = pop if pop is not None else np.ones(len(grid))
+    rows = []
+    for key, sv in voronois.items():
+        euc = nearest_distance(grid, sv.seeds)
+        net = network_nearest_distance(bundle, grid, sv.seeds)
+        ok = np.isfinite(net)
+        thr = SERVICE_TYPES[key].underserved_m
+        rows.append({
+            "service": SERVICE_TYPES[key].label,
+            "median_detour": round(float(np.median(net[ok] / np.maximum(euc[ok], 1.0))), 2),
+            "pct_under_euclid": round(100 * float((weights * (euc > thr)).sum() / weights.sum()), 1),
+            "pct_under_network": round(100 * float((weights * ((net > thr) | ~ok)).sum()
+                                                   / weights.sum()), 1)})
+        print(f"    {SERVICE_TYPES[key].label:20s} detour x{rows[-1]['median_detour']}  "
+              f"underserved {rows[-1]['pct_under_euclid']}% -> {rows[-1]['pct_under_network']}%")
+    df = pd.DataFrame(rows)
+    df.to_csv(PROCESSED_DIR / "network_comparison.csv", index=False)
+    plot_network_comparison(df)
+    return df
+
+
+# =========================================================================== #
 # VIZ
 # =========================================================================== #
 def _add_basemap(ax) -> None:
@@ -1296,6 +1364,29 @@ def plot_2sfca(voronois, ref, ext: ExtendedAnalysis, service_key: str) -> str:
     ax.set_title(f"2SFCA accessibility to {svc.label.lower()}s (Luo & Wang, 2003)", fontsize=13)
     ax.set_axis_off()
     out = FIGURES_DIR / f"tsfca_{service_key}.png"
+    fig.savefig(out, dpi=FIGURE_DPI, bbox_inches="tight")
+    plt.close(fig)
+    return str(out)
+
+
+def plot_network_comparison(df) -> str:
+    """Grouped bars: underserved population under straight-line vs road-network distance."""
+    labels = df["service"].tolist()
+    x = np.arange(len(labels))
+    w = 0.38
+    fig, ax = plt.subplots(figsize=(11, 6))
+    b1 = ax.bar(x - w / 2, df["pct_under_euclid"], w, label="straight-line", color="#1C7293")
+    b2 = ax.bar(x + w / 2, df["pct_under_network"], w, label="road network", color="#C0392B")
+    ax.bar_label(b1, fmt="%.0f", fontsize=8, padding=2)
+    ax.bar_label(b2, fmt="%.0f", fontsize=8, padding=2)
+    ax.set_ylabel("% of population underserved")
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels, rotation=18, ha="right")
+    ax.set_title("Underserved population: straight-line vs road-network distance")
+    ax.legend()
+    ax.grid(axis="y", alpha=0.25)
+    out = FIGURES_DIR / "network_vs_euclid.png"
+    fig.tight_layout()
     fig.savefig(out, dpi=FIGURE_DPI, bbox_inches="tight")
     plt.close(fig)
     return str(out)
@@ -2343,6 +2434,22 @@ def build_pdf_report(voronois, coverages, table, recs, flagship_key, sb, ext) ->
         "The greedy heuristic recovers most of the optimal coverage at a fraction of the "
         "cost, justifying its use for the recommendations.", cap)]
 
+    _net_csv = PROCESSED_DIR / "network_comparison.csv"
+    if _net_csv.exists() and (FIGURES_DIR / "network_vs_euclid.png").exists():
+        ndf = pd.read_csv(_net_csv)
+        story += [Paragraph("8.6 Road-network vs straight-line distance", h2),
+                  Paragraph(
+            "Repeating the coverage analysis with shortest-path distance on the Dhaka road "
+            "network (43k nodes, 108k edges) instead of straight-line distance confirms that "
+            "Euclidean distance understates real travel. The median detour factor and the "
+            "resulting increase in underserved population are:", body),
+                  fig(str(FIGURES_DIR / "network_vs_euclid.png"), max_h=9 * cm,
+                      caption="Underserved population: straight-line vs road-network distance."),
+                  _simple_table(["Service", "Median detour", "Underserved (line)", "Underserved (road)"],
+                                [[r["service"], f"×{r['median_detour']}", f"{r['pct_under_euclid']}%",
+                                  f"{r['pct_under_network']}%"] for _, r in ndf.iterrows()],
+                                [3.6 * cm, 2.9 * cm, 3.1 * cm, 3.1 * cm])]
+
     # --- 9. flagship ---
     story += [PageBreak(), Paragraph("9. Zone-coloured flagship map", h1),
               Paragraph(
@@ -2390,7 +2497,7 @@ def _need(path: str, force: bool) -> bool:
     return force or not Path(path).exists()
 
 
-def main(force_figures: bool = False, k: int = RECOMMEND_K) -> None:
+def main(force_figures: bool = False, k: int = RECOMMEND_K, network: bool = False) -> None:
     print("=" * 60)
     print("Voronoi analysis of Dhaka utility services")
     print("=" * 60)
@@ -2437,6 +2544,8 @@ def main(force_figures: bool = False, k: int = RECOMMEND_K) -> None:
     print(f"      combined-access Gini = {ext.gini_combined:.3f}  "
           f"(rank stability vs baseline: "
           f"{', '.join(f'{r.scenario}={r.rank_corr_vs_baseline}' for r in ext.sensitivity.itertuples() if r.scenario!='baseline')})")
+    if network:
+        network_analysis(voronois, grid_pop)
 
     print("[6/7] figures")
     for key, sv in voronois.items():
@@ -2475,5 +2584,7 @@ if __name__ == "__main__":
     p.add_argument("--force", action="store_true", help="regenerate every figure from scratch")
     p.add_argument("--k", type=int, default=RECOMMEND_K,
                    help="number of new facilities proposed per service (default 3)")
+    p.add_argument("--network", action="store_true",
+                   help="also run road-network distance analysis (downloads the Dhaka graph)")
     args = p.parse_args()
-    main(force_figures=args.force, k=args.k)
+    main(force_figures=args.force, k=args.k, network=args.network)
