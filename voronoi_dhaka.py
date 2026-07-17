@@ -898,6 +898,111 @@ def section_benefit(voronois: dict[str, ServiceVoronoi], ref: ZoneRef,
 
 
 # =========================================================================== #
+# EXTENDED ANALYSES (equity, combined access, sensitivity, density)
+# =========================================================================== #
+def _proximity(nn_m: np.ndarray, thr_m: float) -> np.ndarray:
+    """Access score in [0, 1]: 1 at a facility, 0 at or beyond twice the threshold."""
+    return np.clip(1.0 - nn_m / (2.0 * thr_m), 0.0, 1.0)
+
+
+def weighted_gini(x: np.ndarray, w: np.ndarray) -> float:
+    """Population-weighted Gini coefficient of a non-negative 'good' (0 = equal)."""
+    x = np.asarray(x, float)
+    w = np.asarray(w, float)
+    order = np.argsort(x)
+    x, w = x[order], w[order]
+    cw = np.cumsum(w)
+    cxw = np.cumsum(x * w)
+    if cxw[-1] <= 0:
+        return 0.0
+    lx = np.concatenate([[0.0], cw / cw[-1]])
+    ly = np.concatenate([[0.0], cxw / cxw[-1]])
+    return float(1.0 - 2.0 * np.trapezoid(ly, lx))
+
+
+def _benefit_scores(voronois, ref, weights, sec, grid, thr_mult=1.0, svc_weights=None):
+    """Per-section pop-weighted, critical-weighted benefit score (for sensitivity)."""
+    svc_weights = svc_weights or SERVICE_WEIGHT
+    nsec = len(ref.names)
+    comp = np.zeros(nsec)
+    wsum = sum(svc_weights.values())
+    for key, sv in voronois.items():
+        thr = SERVICE_TYPES[key].underserved_m * thr_mult
+        well = (nearest_distance(grid, sv.seeds) <= thr).astype(float)
+        for i in range(nsec):
+            m = sec == i
+            W = weights[m].sum()
+            frac = (weights[m] * well[m]).sum() / W if W > 0 else 0.0
+            comp[i] += svc_weights[key] * frac
+    return comp / wsum * 100.0
+
+
+@dataclass
+class ExtendedAnalysis:
+    combined_by_section: dict         # section -> mean composite access [0,1]
+    gini_by_service: dict             # service -> Gini of access
+    gini_combined: float
+    lorenz: tuple                     # (Lx, Ly) for the combined index
+    density: pd.DataFrame             # per-service counts and densities
+    sensitivity: pd.DataFrame         # ranking stability under scenarios
+
+
+def extended_analysis(voronois, ref, pop) -> ExtendedAnalysis:
+    boundary = next(iter(voronois.values())).boundary
+    grid = make_grid(boundary)
+    sec = KDTree(ref.centers_m).query(grid)[1]
+    weights = pop if pop is not None else np.ones(len(grid))
+    total_pop = float(weights.sum())
+    area_km2 = boundary.area / 1e6
+
+    # combined "any-service" access index + per-service equity (Gini)
+    comb = np.zeros(len(grid))
+    wsum = sum(SERVICE_WEIGHT.values())
+    gini_svc = {}
+    for key, sv in voronois.items():
+        thr = SERVICE_TYPES[key].underserved_m
+        px = _proximity(nearest_distance(grid, sv.seeds), thr)
+        gini_svc[key] = weighted_gini(px, weights)
+        comb += SERVICE_WEIGHT[key] * px
+    comb /= wsum
+    gini_comb = weighted_gini(comb, weights)
+
+    order = np.argsort(comb)
+    w_ord, y_ord = weights[order], comb[order]
+    lx = np.concatenate([[0.0], np.cumsum(w_ord) / w_ord.sum()])
+    ly = np.concatenate([[0.0], np.cumsum(y_ord * w_ord) / (y_ord * w_ord).sum()])
+    comb_sec = {ref.names[i]: float((weights[sec == i] * comb[sec == i]).sum()
+                                    / max(weights[sec == i].sum(), 1e-9))
+                for i in range(len(ref.names))}
+
+    # data density / completeness
+    rows = []
+    for key, sv in voronois.items():
+        rows.append({"service": SERVICE_TYPES[key].label, "facilities": sv.n,
+                     "min_expected": SERVICE_TYPES[key].min_count,
+                     "per_100k_people": round(sv.n / (total_pop / 1e5), 2),
+                     "km2_per_facility": round(area_km2 / sv.n, 2)})
+    density = pd.DataFrame(rows)
+
+    # sensitivity: how stable is the section ranking to thresholds / weights?
+    from scipy.stats import spearmanr
+    base = _benefit_scores(voronois, ref, weights, sec, grid)
+    scenarios = {"thresholds -25%": dict(thr_mult=0.75),
+                 "thresholds +25%": dict(thr_mult=1.25),
+                 "equal weights": dict(svc_weights={k: 1.0 for k in SERVICE_TYPES})}
+    srows = [{"scenario": "baseline", "rank_corr_vs_baseline": 1.0,
+              "best": ref.names[int(np.argmax(base))], "worst": ref.names[int(np.argmin(base))]}]
+    for name, kw in scenarios.items():
+        sc = _benefit_scores(voronois, ref, weights, sec, grid, **kw)
+        rho = float(spearmanr(base, sc).correlation)
+        srows.append({"scenario": name, "rank_corr_vs_baseline": round(rho, 3),
+                      "best": ref.names[int(np.argmax(sc))], "worst": ref.names[int(np.argmin(sc))]})
+    sensitivity = pd.DataFrame(srows)
+
+    return ExtendedAnalysis(comb_sec, gini_svc, gini_comb, (lx, ly), density, sensitivity)
+
+
+# =========================================================================== #
 # VIZ
 # =========================================================================== #
 def _add_basemap(ax) -> None:
@@ -1021,6 +1126,53 @@ def plot_section_benefit(voronois: dict[str, ServiceVoronoi], ref: ZoneRef,
     ax.set_title(f"Which Dhaka areas benefit most from utilities\n({weighting})", fontsize=13)
     ax.set_axis_off()
     out = FIGURES_DIR / "section_benefit.png"
+    fig.savefig(out, dpi=FIGURE_DPI, bbox_inches="tight")
+    plt.close(fig)
+    return str(out)
+
+
+def plot_combined_access(voronois, ref, ext: ExtendedAnalysis) -> str:
+    """Choropleth: sections coloured by the combined 'any-service' access index."""
+    boundary = next(iter(voronois.values())).boundary
+    zv = build_zone_voronoi(boundary, ref).to_crs(WEB)
+    zv["access"] = zv["zone_name"].map(ext.combined_by_section)
+    fig, ax = plt.subplots(figsize=(11, 12))
+    zv.plot(ax=ax, column="access", cmap="RdYlGn", vmin=0.3, vmax=0.85, alpha=0.6,
+            edgecolor="#222222", linewidth=1.6, legend=True,
+            legend_kwds={"label": "combined access index (0–1, all 6 utilities)", "shrink": 0.5})
+    centers = gpd.GeoSeries(gpd.points_from_xy(ref.centers_m[:, 0], ref.centers_m[:, 1]),
+                            crs=CRS_METRIC).to_crs(WEB)
+    for name, pt in zip(ref.names, centers):
+        ax.annotate(f"{name}\n{ext.combined_by_section.get(name, 0):.2f}", (pt.x, pt.y),
+                    ha="center", va="center", fontsize=10, fontweight="bold",
+                    bbox=dict(boxstyle="round,pad=0.2", fc="white", ec="#333", alpha=0.82))
+    _add_basemap(ax)
+    ax.set_title("Combined utility access across all six services\n"
+                 f"(population-weighted; overall Gini = {ext.gini_combined:.3f})", fontsize=13)
+    ax.set_axis_off()
+    out = FIGURES_DIR / "combined_access.png"
+    fig.savefig(out, dpi=FIGURE_DPI, bbox_inches="tight")
+    plt.close(fig)
+    return str(out)
+
+
+def plot_lorenz(ext: ExtendedAnalysis) -> str:
+    """Lorenz curve of the combined access index (equity of access)."""
+    lx, ly = ext.lorenz
+    fig, ax = plt.subplots(figsize=(7, 7))
+    ax.plot([0, 1], [0, 1], color="#888888", ls="--", lw=1.2, label="perfect equality")
+    ax.plot(lx, ly, color="#0B5394", lw=2.2, label="access distribution")
+    ax.fill_between(lx, ly, lx, color="#0B5394", alpha=0.12)
+    ax.set_xlabel("cumulative share of population")
+    ax.set_ylabel("cumulative share of utility access")
+    ax.set_title(f"Lorenz curve of combined utility access\nGini = {ext.gini_combined:.3f} "
+                 "(0 = perfectly equal)", fontsize=12)
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    ax.set_aspect("equal")
+    ax.legend(loc="upper left", fontsize=10)
+    ax.grid(alpha=0.25)
+    out = FIGURES_DIR / "lorenz_access.png"
     fig.savefig(out, dpi=FIGURE_DPI, bbox_inches="tight")
     plt.close(fig)
     return str(out)
@@ -1478,7 +1630,7 @@ def build_literature_docx() -> str:
 # =========================================================================== #
 # PDF REPORT
 # =========================================================================== #
-def build_pdf_report(voronois, coverages, table, recs, flagship_key, sb) -> str:
+def build_pdf_report(voronois, coverages, table, recs, flagship_key, sb, ext) -> str:
     from PIL import Image as PILImage
     from reportlab.lib import colors
     from reportlab.lib.enums import TA_CENTER
@@ -1717,8 +1869,63 @@ def build_pdf_report(voronois, coverages, table, recs, flagship_key, sb) -> str:
             parts = ", ".join(f"{sb.names[i]}" for i in order)
         story.append(Paragraph(f"<b>{SERVICE_TYPES[key].label}:</b> {parts}", body))
 
-    # --- 8. flagship ---
-    story += [PageBreak(), Paragraph("8. Zone-coloured flagship map", h1),
+    # --- 8. extended analyses ---
+    def _simple_table(header, rows, widths):
+        d = [header] + rows
+        tb = Table(d, colWidths=widths, repeatRows=1)
+        tb.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#2c3e50")),
+            ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+            ("FONTSIZE", (0, 0), (-1, -1), 8),
+            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+            ("ALIGN", (1, 0), (-1, -1), "CENTER"),
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f2f4f6")]),
+            ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#cccccc")),
+            ("TOPPADDING", (0, 0), (-1, -1), 3), ("BOTTOMPADDING", (0, 0), (-1, -1), 3)]))
+        return tb
+
+    gini_line = ", ".join(f"{SERVICE_TYPES[k].label} {v:.2f}" for k, v in ext.gini_by_service.items())
+    story += [PageBreak(), Paragraph("8. Extended analyses", h1),
+              Paragraph(
+        "Three analyses summarise the results beyond per-service coverage: a combined "
+        "access index across all six utilities, the equity of that access, and a "
+        "sensitivity check of the thresholds and weights.", body),
+              Paragraph("8.1 Combined access and equity", h2),
+              fig(str(FIGURES_DIR / "combined_access.png"), max_h=11 * cm,
+                  caption="Combined access index (population-weighted mean over all utilities)."),
+              Paragraph(
+        f"Access is uneven across the population: the combined-access Gini coefficient "
+        f"is <b>{ext.gini_combined:.3f}</b> (0 = perfectly equal, 1 = maximally unequal). "
+        f"Per-service Gini of access: {gini_line}. The Lorenz curve below shows how far "
+        "the access distribution departs from equality.", body),
+              fig(str(FIGURES_DIR / "lorenz_access.png"), max_h=9 * cm,
+                  caption="Lorenz curve of combined utility access."),
+              Paragraph("8.2 Facility density (data completeness)", h2),
+              Paragraph(
+        "OpenStreetMap coverage is a lower bound; the densities below contextualise the "
+        "counts against area and population.", body),
+              _simple_table(["Service", "Facilities", "per 100k people", "km² / facility"],
+                            [[r["service"], str(int(r["facilities"])), f"{r['per_100k_people']}",
+                              f"{r['km2_per_facility']}"] for _, r in ext.density.iterrows()],
+                            [4.2 * cm, 2.6 * cm, 3.4 * cm, 3.4 * cm]),
+              Spacer(1, 0.2 * cm),
+              Paragraph("8.3 Sensitivity of the section ranking", h2),
+              Paragraph(
+        "Re-running the section benefit score under altered thresholds and weights and "
+        "correlating the section ranking against the baseline (Spearman ρ) tests how much "
+        "the conclusions depend on those choices:", body),
+              _simple_table(["Scenario", "Rank corr. (ρ)", "Best", "Worst"],
+                            [[r["scenario"], f"{r['rank_corr_vs_baseline']}", r["best"], r["worst"]]
+                             for _, r in ext.sensitivity.iterrows()],
+                            [4.6 * cm, 3.0 * cm, 3.0 * cm, 3.0 * cm]),
+              Spacer(1, 0.2 * cm),
+              Paragraph(
+        "High correlations indicate the best- and worst-served sections are robust to the "
+        "exact thresholds and weights chosen.", cap)]
+
+    # --- 9. flagship ---
+    story += [PageBreak(), Paragraph("9. Zone-coloured flagship map", h1),
               Paragraph(
         "The real service Voronoi with every cell coloured by the named Dhaka zone "
         "its seed falls in (nearest zone centre). Dashed lines are the coarse "
@@ -1727,8 +1934,8 @@ def build_pdf_report(voronois, coverages, table, recs, flagship_key, sb) -> str:
               fig(str(FIGURES_DIR / "zones_dhaka_flagship.png"), max_h=18 * cm,
                   caption="Figure. Dhaka Voronoi coloured by named zone (densest service).")]
 
-    # --- 9. limitations & repro ---
-    story += [PageBreak(), Paragraph("9. Limitations", h1),
+    # --- 10. limitations & repro ---
+    story += [PageBreak(), Paragraph("10. Limitations", h1),
               Paragraph(
         "• OpenStreetMap completeness varies by category, so facility counts are a "
         "lower bound.<br/>"
@@ -1741,7 +1948,7 @@ def build_pdf_report(voronois, coverages, table, recs, flagship_key, sb) -> str:
         "polygon; peripheral cells extend to that boundary.<br/>"
         "• Any synthetic fallback points would be flagged in <i>data/SOURCE.md</i> "
         "and the <i>source</i> column (none were needed here).", body),
-              Paragraph("10. Reproducibility", h1),
+              Paragraph("11. Reproducibility", h1),
               Paragraph(
         "The entire analysis and this report are produced by a single script:", body),
               Paragraph(
@@ -1751,7 +1958,7 @@ def build_pdf_report(voronois, coverages, table, recs, flagship_key, sb) -> str:
         "Data source: © OpenStreetMap contributors. Basemap: © CartoDB. "
         "Geometry with SciPy / Shapely; maps with GeoPandas / contextily / folium.", cap)]
 
-    story += _literature_flowables(h1, h2, body, cap, "11. Literature review", "12. References")
+    story += _literature_flowables(h1, h2, body, cap, "12. Literature review", "13. References")
 
     doc.build(story)
     return str(out)
@@ -1764,7 +1971,7 @@ def _need(path: str, force: bool) -> bool:
     return force or not Path(path).exists()
 
 
-def main(force_figures: bool = False) -> None:
+def main(force_figures: bool = False, k: int = RECOMMEND_K) -> None:
     print("=" * 60)
     print("Voronoi analysis of Dhaka utility services")
     print("=" * 60)
@@ -1794,16 +2001,22 @@ def main(force_figures: bool = False) -> None:
 
     print("[4/7] recommendations (population-targeted)")
     grid_pop = sample_population(make_grid(boundary))
-    recs = {key: greedy_new_facilities(sv, coverages[key], ref, pop=grid_pop)
+    recs = {key: greedy_new_facilities(sv, coverages[key], ref, k=k, pop=grid_pop)
             for key, sv in voronois.items()}
 
-    print("[5/7] section benefit (population + critical-service weighted)")
+    print("[5/7] section benefit + extended analyses (equity, combined access, sensitivity)")
     sb = section_benefit(voronois, ref, pop=grid_pop)
     plot_section_benefit(voronois, ref, sb)
     for _, r in sb.df.iterrows():
         pop = f"{r['pop_est']/1e6:.2f}M" if sb.pop_weighted else "n/a"
         print(f"      {r['section']:12s} benefit={r['benefit_score']:5.1f}  pop={pop:>7s}  "
               f"weakest={r['weakest_service']}")
+    ext = extended_analysis(voronois, ref, grid_pop)
+    plot_combined_access(voronois, ref, ext)
+    plot_lorenz(ext)
+    print(f"      combined-access Gini = {ext.gini_combined:.3f}  "
+          f"(rank stability vs baseline: "
+          f"{', '.join(f'{r.scenario}={r.rank_corr_vs_baseline}' for r in ext.sensitivity.itertuples() if r.scenario!='baseline')})")
 
     print("[6/7] figures")
     for key, sv in voronois.items():
@@ -1821,7 +2034,7 @@ def main(force_figures: bool = False) -> None:
     headline_html = folium_sections_map(voronois, ref)
 
     print("[7/7] PDF report + literature review")
-    pdf = build_pdf_report(voronois, coverages, table, recs, flagship_key, sb)
+    pdf = build_pdf_report(voronois, coverages, table, recs, flagship_key, sb, ext)
     litpdf = build_literature_pdf()
     litdocx = build_literature_docx()
     print("\nDONE")
@@ -1834,5 +2047,11 @@ def main(force_figures: bool = False) -> None:
 
 
 if __name__ == "__main__":
-    import sys
-    main(force_figures="--force" in sys.argv)
+    import argparse
+
+    p = argparse.ArgumentParser(description="Voronoi utility-services analysis for Dhaka City.")
+    p.add_argument("--force", action="store_true", help="regenerate every figure from scratch")
+    p.add_argument("--k", type=int, default=RECOMMEND_K,
+                   help="number of new facilities proposed per service (default 3)")
+    args = p.parse_args()
+    main(force_figures=args.force, k=args.k)
