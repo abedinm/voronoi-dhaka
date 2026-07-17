@@ -4,39 +4,29 @@
 Recommendations, along with a Case Study for Dhaka City**
 Minhazul Abedin
 
-This folder collects the submission-ready documents. They are generated from
-`../voronoi_dhaka.py` (run `python voronoi_dhaka.py` to rebuild everything).
+Submission-ready documents, all generated from `../voronoi_dhaka.py`
+(`python voronoi_dhaka.py` rebuilds everything).
 
 | File | What it is |
 |---|---|
-| `Dhaka_Voronoi_Report.pdf` | Full 17-page report (method → analyses → recommendations → literature review §11–12) |
-| `Dhaka_Voronoi_Literature_Review.docx` | Editable **Chapter 2 — Literature Review** for the AIUB template |
-| `Dhaka_Voronoi_Literature_Review.pdf` | Same chapter as PDF |
+| `Dhaka_Voronoi_Report.pdf` | Full report (method → analyses → recommendations → extended analyses → literature review) |
+| `Dhaka_Voronoi_Report_light.pdf` | Same report, compressed to ~3.5 MB for size-capped upload portals |
+| `Dhaka_Voronoi_Thesis_Draft.docx` | Editable thesis draft — Abstract, Ch. 1 Introduction, Ch. 3 Methodology, Ch. 4 Results, Ch. 5 Conclusion |
+| `Dhaka_Voronoi_Literature_Review.docx` | Editable **Chapter 2 — Literature Review** (gap analysis + comparison table) |
+| `Dhaka_Voronoi_Literature_Review.pdf` | Chapter 2 as PDF |
 | `Dhaka_Voronoi_Slides.pptx` | 9-slide presentation deck |
+| `Dhaka_Voronoi_Poster.pdf` | A1 defense poster |
+| `interactive/` | 7 interactive Google-map HTML files (open in a browser, online) |
 
-### Interactive maps (`interactive/`)
-Seven interactive Google-map HTML files — open any in a web browser:
-
-| File | What it shows |
-|---|---|
-| `interactive_dhaka_map.html` | **Headline** — 8 coloured sections + all six utilities (colour + emoji), toggleable |
-| `interactive_<service>.html` (×6) | Per-utility Voronoi coverage + facilities + proposed new sites |
-
-> These load the **Google Maps basemap from the internet**, so open them online;
-> the Voronoi cells, section colours and markers still display without a
-> connection (on a blank background).
-
-A single-file bundle of everything (documents + interactive maps) is at
-`../Dhaka_Voronoi_Thesis_Bundle.zip`.
+A single-file bundle of everything is at `../Dhaka_Voronoi_Thesis_Bundle.zip`.
 
 ## Also in the repository
-- `../voronoi_dhaka.py` — the whole program (Voronoi geometry, coverage,
-  population-weighted benefit, recommendations, figure/report/deck generation)
-- `../outputs/figures/` — 24 figures (300 DPI)
-- `../outputs/report/` — 7 interactive Google maps + `coverage_metrics.csv`
-- `../data/` — OpenStreetMap POIs, Dhaka boundary, WorldPop raster, `SOURCE.md`
-- `../tests/` — 29 tests
+- `../voronoi_dhaka.py` — the whole program
+- `../dashboard.py` — interactive Streamlit dashboard (`streamlit run dashboard.py`)
+- `../outputs/figures/` — figures (300 DPI) · `../outputs/report/` — interactive maps + metrics
+- `../data/` — OpenStreetMap POIs, boundary, WorldPop raster, `SOURCE.md`
+- `../tests/` — 29 tests · `../.github/workflows/` — CI
 
-> The document copies in this folder and the `.zip` are build artifacts and are
-> not tracked in git (they live under `../outputs/`); only this index is
-> committed. Rebuild them any time with `python voronoi_dhaka.py`.
+> The document copies here and the `.zip` are build artifacts (not tracked in
+> git; the originals live under `../outputs/`). Rebuild any time with
+> `python voronoi_dhaka.py`.
