@@ -14,8 +14,31 @@ python voronoi_dhaka.py     # does everything, writes outputs/Dhaka_Voronoi_Repo
 pytest                      # 29 correctness tests
 ```
 
-Add `--force` to regenerate every figure from scratch. The first run fetches
-POIs from OpenStreetMap and caches them under `data/`; later runs are offline.
+Flags: `--force` regenerates every figure; `--k N` sets facilities proposed per
+service; `--network` adds the road-network distance analysis (downloads the
+Dhaka drive graph). The first run fetches POIs from OpenStreetMap and caches them
+under `data/`; later runs are offline.
+
+### Interactive dashboard
+
+```bash
+streamlit run dashboard.py     # Overview / Per-service / Interactive-map tabs
+```
+
+### Extended analyses & deliverables
+Beyond the core report, one run also produces: an editable **thesis draft**
+(`Dhaka_Voronoi_Thesis_Draft.docx`), a **literature review** (PDF + Word), a
+**slide deck**, an **A1 poster**, and a **lightweight PDF** (`_light`, ~3.5 MB)
+for size-capped portals. Analyses include a population- and emergency-weighted
+section benefit index, equity (Gini + Lorenz), spatial clustering (Moran's I),
+a 2SFCA cross-check, greedy-vs-optimal (MCLP) placement, sensitivity analysis,
+and (opt-in) road-network distance.
+
+**Notes / future work.** The interactive maps use live Google tiles, so the
+basemap needs internet (the Voronoi overlay still renders offline). Population
+is WorldPop 1 km (a 100 m raster can be swapped in — see `config`). Capacity-
+weighted Voronoi and official administrative boundaries are documented as future
+work (OSM lacks reliable capacity tags and clean Dhaka admin polygons).
 
 ## What it produces
 

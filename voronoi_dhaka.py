@@ -84,6 +84,8 @@ AUTHOR = "Minhazul Abedin"
 POP_RASTER_URL = ("https://data.worldpop.org/GIS/Population/Global_2000_2020_1km_UNadj/"
                   "2020/BGD/bgd_ppp_2020_1km_Aggregated_UNadj.tif")
 POP_RASTER_PATH = RAW_DIR / "bgd_pop_1km.tif"
+# For a finer study, swap in the 100 m raster (larger download, same pipeline):
+#   .../Global_2000_2020/2020/BGD/bgd_ppp_2020_UNadj.tif
 
 # Critical-service weights: emergencies (hospital, fire) and water count more
 # than fuel/bus when scoring how well a section is served.
@@ -1841,6 +1843,112 @@ def build_literature_docx() -> str:
     return str(out)
 
 
+def build_poster(table, sb, ext, recs, flagship_key) -> str:
+    """A1 landscape conference/defense poster (reportlab canvas)."""
+    from reportlab.lib.pagesizes import A1, landscape
+    from reportlab.lib.utils import ImageReader
+    from reportlab.pdfgen import canvas as rcanvas
+    from PIL import Image as PILImage
+
+    W, H = landscape(A1)                      # ~2384 x 1684 pt
+    out = OUTPUTS_DIR / "Dhaka_Voronoi_Poster.pdf"
+    c = rcanvas.Canvas(str(out), pagesize=(W, H))
+    NAVY, TEAL, INK, MUT = "#0E2A47", "#1C7293", "#1C2B39", "#5B6B7A"
+
+    # header band
+    c.setFillColor(NAVY)
+    c.rect(0, H - 150, W, 150, fill=1, stroke=0)
+    c.setFillColor("#FFFFFF")
+    c.setFont("Helvetica-Bold", 40)
+    c.drawString(60, H - 78, "Providing Utility Services using Voronoi Diagrams")
+    c.setFont("Helvetica", 24)
+    c.setFillColor("#CADCFC")
+    c.drawString(60, H - 116, "Some Analyses, Recommendations, and a Case Study for Dhaka City "
+                             "·  Minhazul Abedin  ·  CSE Thesis")
+
+    def wrap(txt, font, size, maxw):
+        c.setFont(font, size)
+        words, line, out_lines = txt.split(), "", []
+        for w in words:
+            if c.stringWidth(line + " " + w, font, size) < maxw:
+                line = (line + " " + w).strip()
+            else:
+                out_lines.append(line)
+                line = w
+        out_lines.append(line)
+        return out_lines
+
+    def text_block(x, y, title, body, colw):
+        c.setFillColor(TEAL)
+        c.setFont("Helvetica-Bold", 22)
+        c.drawString(x, y, title)
+        yy = y - 30
+        c.setFillColor(INK)
+        for ln in wrap(body, "Helvetica", 15, colw):
+            c.drawString(x, yy, ln)
+            yy -= 20
+        return yy
+
+    def image(x, y, path, w):
+        p = FIGURES_DIR / path
+        if not p.exists():
+            return y
+        iw, ih = PILImage.open(p).size
+        h = w * ih / iw
+        c.drawImage(ImageReader(str(p)), x, y - h, w, h, preserveAspectRatio=True, mask="auto")
+        return y - h - 14
+
+    m, gap = 60, 40
+    colw = (W - 2 * m - 2 * gap) / 3
+    x1, x2, x3 = m, m + colw + gap, m + 2 * (colw + gap)
+    top = H - 190
+    best = ", ".join(f"{r['section']} ({r['benefit_score']:.0f})" for _, r in sb.df.head(3).iterrows())
+
+    # left column: text + the wide network figure
+    y = text_block(x1, top, "Objective",
+        "Evaluate how well six utility services — metro, hospitals, water, fuel, bus stops and "
+        "fire stations — serve Dhaka's residents, and recommend where new facilities would help "
+        "most, using Voronoi diagrams and open data.", colw)
+    y = text_block(x1, y - 22, "Method",
+        "Real OpenStreetMap facilities seed an exact Voronoi partition per service (straight "
+        "perpendicular-bisector edges). Coverage is measured on a fine grid; eight sections are "
+        "scored by a WorldPop population- and emergency-weighted benefit index; new sites are "
+        "placed with a greedy maximal-covering heuristic, validated against 2SFCA and the exact "
+        "optimum.", colw)
+    y = text_block(x1, y - 22, "Data",
+        f"OpenStreetMap ({int(table['n_facilities'].sum())} facilities) + WorldPop 1 km "
+        "(~10.7M residents); metric CRS (UTM 46N).", colw)
+    c.setFillColor(TEAL)
+    c.setFont("Helvetica-Bold", 22)
+    c.drawString(x1, y - 26, "Straight-line vs road-network")
+    image(x1, y - 56, "network_vs_euclid.png", colw)
+
+    # centre column: the flagship map
+    c.setFillColor(TEAL)
+    c.setFont("Helvetica-Bold", 22)
+    c.drawString(x2, top, "Dhaka in eight coloured sections")
+    image(x2, top - 30, "zones_dhaka_flagship.png", colw)
+
+    # right column: benefit map + findings
+    c.setFillColor(TEAL)
+    c.setFont("Helvetica-Bold", 22)
+    c.drawString(x3, top, "Benefit by section & findings")
+    yy = image(x3, top - 30, "section_benefit.png", colw)
+    yy = text_block(x3, yy - 6, "Key findings",
+        f"Central belt best served ({best}); {sb.df.iloc[-1]['section']} lags. Access is strongly "
+        f"clustered (Moran's I = {ext.moran[0]:.2f}) and moderately unequal (Gini = "
+        f"{ext.gini_combined:.2f}). Road-network distance roughly doubles the underserved share. "
+        "Water and metro are the widest gaps; dense old Dhaka (Motijheel) is the top investment "
+        "target for new hospitals and fire stations.", colw)
+    text_block(x3, yy - 18, "Reproducible",
+        "python voronoi_dhaka.py  ·  github.com/abedinm/voronoi-dhaka  ·  29 tests, interactive "
+        "Google maps + full report.", colw)
+
+    c.showPage()
+    c.save()
+    return str(out)
+
+
 def build_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
     """Full editable thesis draft (Abstract + Ch.1, 3, 4, 5) with real numbers.
 
@@ -2579,12 +2687,14 @@ def main(force_figures: bool = False, k: int = RECOMMEND_K, network: bool = Fals
     litpdf = build_literature_pdf()
     litdocx = build_literature_docx()
     thesisdocx = build_thesis_docx(table, sb, ext, recs, flagship_key)
+    poster = build_poster(table, sb, ext, recs, flagship_key)
     print("\nDONE")
     print("  PDF (static, full)                             ->", pdf)
     print("  PDF (static, lightweight)                      ->", pdf_light)
     print("  Literature review (PDF)                        ->", litpdf)
     print("  Literature review (Word, editable)             ->", litdocx)
     print("  Thesis draft (Word: Abstract, Ch.1,3,4,5)      ->", thesisdocx)
+    print("  Defense poster (A1)                            ->", poster)
     print("  Benefit map                                    -> outputs/figures/section_benefit.png")
     print("  Interactive — Dhaka sections + all utilities   ->", headline_html)
     print("  Interactive — per-utility Voronoi coverage     -> outputs/report/interactive_<service>.html")
