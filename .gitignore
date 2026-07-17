@@ -13,3 +13,9 @@ cache/
 
 # Office lock files
 ~$*
+
+# Thesis bundle (build artifacts; rebuildable from voronoi_dhaka.py)
+*.zip
+THESIS/*.pdf
+THESIS/*.docx
+THESIS/*.pptx
