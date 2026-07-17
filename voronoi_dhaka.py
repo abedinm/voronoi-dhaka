@@ -2096,7 +2096,10 @@ def build_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
 # =========================================================================== #
 # PDF REPORT
 # =========================================================================== #
-def build_pdf_report(voronois, coverages, table, recs, flagship_key, sb, ext) -> str:
+def build_pdf_report(voronois, coverages, table, recs, flagship_key, sb, ext, light=False) -> str:
+    import os
+    import tempfile
+
     from PIL import Image as PILImage
     from reportlab.lib import colors
     from reportlab.lib.enums import TA_CENTER
@@ -2106,7 +2109,8 @@ def build_pdf_report(voronois, coverages, table, recs, flagship_key, sb, ext) ->
     from reportlab.platypus import (Image as RLImage, KeepTogether, PageBreak,
                                      Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle)
 
-    out = OUTPUTS_DIR / "Dhaka_Voronoi_Report.pdf"
+    out = OUTPUTS_DIR / ("Dhaka_Voronoi_Report_light.pdf" if light else "Dhaka_Voronoi_Report.pdf")
+    _tmp = tempfile.mkdtemp(prefix="litefig_") if light else None
     margin = 1.8 * cm
     content_w = A4[0] - 2 * margin
     doc = SimpleDocTemplate(str(out), pagesize=A4, leftMargin=margin, rightMargin=margin,
@@ -2126,12 +2130,19 @@ def build_pdf_report(voronois, coverages, table, recs, flagship_key, sb, ext) ->
                                textColor=colors.HexColor("#555555"))
 
     def fig(path, max_w=content_w, max_h=20 * cm, caption=None):
-        iw, ih = PILImage.open(path).size
+        src = path
+        if light:                                    # downscale to a compact JPEG
+            im = PILImage.open(path).convert("RGB")
+            if im.width > 1200:
+                im = im.resize((1200, round(im.height * 1200 / im.width)))
+            src = os.path.join(_tmp, os.path.basename(str(path)).rsplit(".", 1)[0] + ".jpg")
+            im.save(src, "JPEG", quality=80)
+        iw, ih = PILImage.open(src).size
         w = max_w
         h = w * ih / iw
         if h > max_h:
             h, w = max_h, max_h * iw / ih
-        elems = [RLImage(path, width=w, height=h)]
+        elems = [RLImage(src, width=w, height=h)]
         if caption:
             elems.append(Paragraph(caption, cap))
         return KeepTogether(elems)
@@ -2564,11 +2575,13 @@ def main(force_figures: bool = False, k: int = RECOMMEND_K, network: bool = Fals
 
     print("[7/7] PDF report + literature review")
     pdf = build_pdf_report(voronois, coverages, table, recs, flagship_key, sb, ext)
+    pdf_light = build_pdf_report(voronois, coverages, table, recs, flagship_key, sb, ext, light=True)
     litpdf = build_literature_pdf()
     litdocx = build_literature_docx()
     thesisdocx = build_thesis_docx(table, sb, ext, recs, flagship_key)
     print("\nDONE")
-    print("  PDF (static)                                   ->", pdf)
+    print("  PDF (static, full)                             ->", pdf)
+    print("  PDF (static, lightweight)                      ->", pdf_light)
     print("  Literature review (PDF)                        ->", litpdf)
     print("  Literature review (Word, editable)             ->", litdocx)
     print("  Thesis draft (Word: Abstract, Ch.1,3,4,5)      ->", thesisdocx)
