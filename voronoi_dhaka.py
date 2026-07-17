@@ -740,6 +740,7 @@ class Snapshot:
     max_nn_m: float
     mean_nn_m: float
     n_underserved: int
+    underserved_people: float = 0.0
 
 
 @dataclass
@@ -758,22 +759,36 @@ class RecommendResult:
         return self.before.max_nn_m - self.after.max_nn_m
 
 
-def _snapshot(grid, seeds, thr) -> Snapshot:
+def _snapshot(grid, seeds, thr, pop) -> Snapshot:
     d = KDTree(seeds).query(grid)[0]
-    return Snapshot(float(d.max()), float(d.mean()), int((d > thr).sum()))
+    under = d > thr
+    return Snapshot(float(d.max()), float(d.mean()), int(under.sum()),
+                    float(pop[under].sum()))
 
 
 def greedy_new_facilities(sv: ServiceVoronoi, cov: CoverageResult,
-                          ref: ZoneRef | None = None, k: int = RECOMMEND_K) -> RecommendResult:
+                          ref: ZoneRef | None = None, k: int = RECOMMEND_K,
+                          pop: np.ndarray | None = None) -> RecommendResult:
+    """Greedy new-facility placement.
+
+    With a ``pop`` weight per grid point, each new site is the most-populated
+    still-underserved location (targets people); without it, the farthest-point
+    heuristic (targets the worst-case distance)."""
     ref = ref or zone_reference()
     grid, thr = cov.grid_xy, cov.threshold_m
-    before = _snapshot(grid, sv.seeds, thr)
+    snap_pop = pop if pop is not None else np.ones(len(grid))
+    before = _snapshot(grid, sv.seeds, thr, snap_pop)
     current, new_pts = sv.seeds.copy(), []
     for _ in range(k):
-        worst = grid[int(np.argmax(KDTree(current).query(grid)[0]))]
-        new_pts.append(worst)
-        current = np.vstack([current, worst])
-    after = _snapshot(grid, current, thr)
+        d = KDTree(current).query(grid)[0]
+        if pop is None:
+            idx = int(np.argmax(d))                       # farthest-point
+        else:
+            score = np.where(d > thr, pop, 0.0)           # most underserved people
+            idx = int(np.argmax(score)) if score.max() > 0 else int(np.argmax(d))
+        new_pts.append(grid[idx])
+        current = np.vstack([current, grid[idx]])
+    after = _snapshot(grid, current, thr, snap_pop)
     new_m = np.array(new_pts)
     ll = gpd.GeoSeries(gpd.points_from_xy(new_m[:, 0], new_m[:, 1]),
                        crs=CRS_METRIC).to_crs(CRS_GEO)
@@ -806,34 +821,19 @@ def _grid_lonlat(grid: np.ndarray):
 
 
 def sample_population(grid: np.ndarray):
-    """Population density at each metric grid point (0 where nodata/negative)."""
+    """People per grid cell at each metric grid point (0 where nodata).
+
+    WorldPop values are people per ~1 km pixel; each grid cell covers
+    ``(GRID_SPACING_M/1000)**2`` of a pixel, so we scale to real per-cell counts
+    (their sum then approximates the true population)."""
     import rasterio
     path = get_population_raster()
     if path is None:
         return None
     with rasterio.open(path) as src:
         vals = np.array([float(v[0]) for v in src.sample(_grid_lonlat(grid))])
-    return np.where(vals < 0, 0.0, vals)
-
-
-def section_population(boundary, ref: ZoneRef):
-    """Real population per section (each raster pixel counted once)."""
-    import rasterio
-    path = get_population_raster()
-    if path is None:
-        return None
-    with rasterio.open(path) as src:
-        band = src.read(1).astype(float)
-        band = np.where(band < 0, 0.0, band)
-        rows, cols = np.nonzero(band > 0)
-        xs, ys = rasterio.transform.xy(src.transform, list(rows), list(cols))
-    gs = gpd.GeoSeries(gpd.points_from_xy(xs, ys), crs=CRS_GEO).to_crs(CRS_METRIC)
-    pts = np.column_stack([gs.x.to_numpy(), gs.y.to_numpy()])
-    vals = band[rows, cols]
-    inside = shapely.contains_xy(boundary, pts[:, 0], pts[:, 1])
-    pts, vals = pts[inside], vals[inside]
-    sidx = KDTree(ref.centers_m).query(pts)[1]
-    return np.array([vals[sidx == i].sum() for i in range(len(ref.names))])
+    vals = np.where(vals < 0, 0.0, vals)
+    return vals * (GRID_SPACING_M / 1000.0) ** 2
 
 
 @dataclass
@@ -846,7 +846,8 @@ class SectionBenefit:
     pop_weighted: bool
 
 
-def section_benefit(voronois: dict[str, ServiceVoronoi], ref: ZoneRef) -> SectionBenefit:
+def section_benefit(voronois: dict[str, ServiceVoronoi], ref: ZoneRef,
+                    pop: np.ndarray | None = None) -> SectionBenefit:
     """Score each section by how well its people are served, weighting critical
     services higher and (if available) weighting locations by population."""
     boundary = next(iter(voronois.values())).boundary
@@ -854,10 +855,12 @@ def section_benefit(voronois: dict[str, ServiceVoronoi], ref: ZoneRef) -> Sectio
     sec = KDTree(ref.centers_m).query(grid)[1]
     nsec = len(ref.names)
 
-    pop = sample_population(grid)
+    if pop is None:
+        pop = sample_population(grid)
     pop_weighted = pop is not None
     weights = pop if pop_weighted else np.ones(len(grid))
-    sec_pop = section_population(boundary, ref) if pop_weighted else None
+    sec_pop = (np.array([weights[sec == i].sum() for i in range(nsec)])
+               if pop_weighted else None)
     grid_count = np.array([(sec == i).sum() for i in range(nsec)], dtype=float)
 
     comp = np.zeros(nsec)
@@ -947,9 +950,9 @@ def plot_recommendations(sv: ServiceVoronoi, rec: RecommendResult) -> str:
     _boundary_web(sv).boundary.plot(ax=ax, color="black", linewidth=1.3)
     _add_basemap(ax)
     ax.legend(loc="upper right", fontsize=9)
-    ax.set_title(f"Dhaka {svc.label} — {rec.k} proposed new sites\n"
-                 f"max access {rec.before.max_nn_m/1000:.2f} km → "
-                 f"{rec.after.max_nn_m/1000:.2f} km", fontsize=12)
+    ax.set_title(f"Dhaka {svc.label} — {rec.k} proposed new sites (population-targeted)\n"
+                 f"underserved people {rec.before.underserved_people/1000:.0f}k → "
+                 f"{rec.after.underserved_people/1000:.0f}k", fontsize=12)
     ax.set_axis_off()
     out = FIGURES_DIR / f"recommendations_{sv.key}.png"
     fig.savefig(out, dpi=FIGURE_DPI, bbox_inches="tight")
@@ -1333,17 +1336,20 @@ def build_pdf_report(voronois, coverages, table, recs, flagship_key, sb) -> str:
     # --- 6. recommendations ---
     story += [PageBreak(), Paragraph("6. Recommendations", h1),
               Paragraph(
-        f"For each service a greedy farthest-point algorithm places K = {RECOMMEND_K} "
-        "new facilities: each new site is the worst-served location at the time it "
-        "is added. The table shows the resulting change in worst-case access.", body)]
-    rhead = ["Service", "Max access before → after (km)", "Underserved grid pts", "New sites (nearest zone)"]
+        f"For each service a greedy algorithm places K = {RECOMMEND_K} new facilities "
+        "at the most-populated still-underserved locations, so new sites target where "
+        "people actually lack access (not the empty fringe). The table shows the drop "
+        "in underserved population and worst-case distance.", body)]
+    rhead = ["Service", "Underserved people", "Worst access (km)", "New sites (area)"]
     rdata = [rhead]
     for key, rec in recs.items():
         zones_str = ", ".join(rec.new_zones)
         rdata.append([SERVICE_TYPES[key].label,
-                      f"{rec.before.max_nn_m/1000:.2f} → {rec.after.max_nn_m/1000:.2f}",
-                      f"{rec.before.n_underserved} → {rec.after.n_underserved}", zones_str])
-    rtbl = Table(rdata, colWidths=[3.0 * cm, 4.6 * cm, 3.4 * cm, 4.3 * cm], repeatRows=1)
+                      f"{rec.before.underserved_people/1000:.0f}k → "
+                      f"{rec.after.underserved_people/1000:.0f}k",
+                      f"{rec.before.max_nn_m/1000:.1f} → {rec.after.max_nn_m/1000:.1f}",
+                      zones_str])
+    rtbl = Table(rdata, colWidths=[3.2 * cm, 3.9 * cm, 3.5 * cm, 3.8 * cm], repeatRows=1)
     rtbl.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#2c3e50")),
         ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
@@ -1486,12 +1492,13 @@ def main(force_figures: bool = False) -> None:
     table.to_csv(REPORT_DIR / "coverage_metrics.csv", index=False)
     flagship_key = max(voronois, key=lambda k: voronois[k].n)
 
-    print("[4/7] recommendations")
-    recs = {key: greedy_new_facilities(sv, coverages[key], ref)
+    print("[4/7] recommendations (population-targeted)")
+    grid_pop = sample_population(make_grid(boundary))
+    recs = {key: greedy_new_facilities(sv, coverages[key], ref, pop=grid_pop)
             for key, sv in voronois.items()}
 
     print("[5/7] section benefit (population + critical-service weighted)")
-    sb = section_benefit(voronois, ref)
+    sb = section_benefit(voronois, ref, pop=grid_pop)
     plot_section_benefit(voronois, ref, sb)
     for _, r in sb.df.iterrows():
         pop = f"{r['pop_est']/1e6:.2f}M" if sb.pop_weighted else "n/a"
