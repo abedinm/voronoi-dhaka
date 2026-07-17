@@ -14,7 +14,19 @@ This folder collects the submission-ready documents. They are generated from
 | `Dhaka_Voronoi_Literature_Review.pdf` | Same chapter as PDF |
 | `Dhaka_Voronoi_Slides.pptx` | 9-slide presentation deck |
 
-A single-file bundle of all four is at
+### Interactive maps (`interactive/`)
+Seven interactive Google-map HTML files — open any in a web browser:
+
+| File | What it shows |
+|---|---|
+| `interactive_dhaka_map.html` | **Headline** — 8 coloured sections + all six utilities (colour + emoji), toggleable |
+| `interactive_<service>.html` (×6) | Per-utility Voronoi coverage + facilities + proposed new sites |
+
+> These load the **Google Maps basemap from the internet**, so open them online;
+> the Voronoi cells, section colours and markers still display without a
+> connection (on a blank background).
+
+A single-file bundle of everything (documents + interactive maps) is at
 `../Dhaka_Voronoi_Thesis_Bundle.zip`.
 
 ## Also in the repository
