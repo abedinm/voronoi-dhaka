@@ -74,6 +74,11 @@ GRID_SPACING_M = 250.0           # metres — nearest-distance grid
 RANDOM_SEED = 42
 RECOMMEND_K = 3                  # new facilities proposed per service
 
+# Thesis identity — printed on the report, literature review and deck covers.
+THESIS_TITLE = ("Providing Utility Services using Voronoi Diagrams, Some Analyses, "
+                "Recommendations, along with a Case Study for Dhaka City")
+AUTHOR = "Minhazul Abedin"
+
 # Population raster (WorldPop Bangladesh, 1 km, UN-adjusted 2020) for weighting
 # the section benefit analysis by how many people actually live somewhere.
 POP_RASTER_URL = ("https://data.worldpop.org/GIS/Population/Global_2000_2020_1km_UNadj/"
@@ -1410,9 +1415,9 @@ def build_literature_pdf() -> str:
     cap = ParagraphStyle("Cap", parent=body, fontSize=8.5, textColor=colors.HexColor("#666666"),
                          spaceBefore=3, spaceAfter=10)
     story = [Paragraph("Chapter 2 — Literature Review", ss["Title"]),
-             Paragraph("Voronoi Analysis of Utility Services in Dhaka City &nbsp;·&nbsp; "
-                       "Minhazul Abedin", ParagraphStyle("sub", parent=body, fontSize=11,
-                       textColor=colors.HexColor("#555555"))),
+             Paragraph(THESIS_TITLE + " &nbsp;·&nbsp; " + AUTHOR,
+                       ParagraphStyle("sub", parent=body, fontSize=10.5,
+                                      textColor=colors.HexColor("#555555"))),
              Spacer(1, 0.4 * cm)]
     for head, txt in LIT_REVIEW:
         story.append(Paragraph(head, h2))
@@ -1436,7 +1441,7 @@ def build_literature_docx() -> str:
 
     doc = Document()
     doc.add_heading("Chapter 2 — Literature Review", level=0)
-    doc.add_paragraph("Voronoi Analysis of Utility Services in Dhaka City — Minhazul Abedin")
+    doc.add_paragraph(THESIS_TITLE + " — " + AUTHOR)
     for head, txt in LIT_REVIEW:
         doc.add_heading(head, level=1)
         doc.add_paragraph(txt)
@@ -1498,7 +1503,7 @@ def build_pdf_report(voronois, coverages, table, recs, flagship_key, sb) -> str:
     body = ParagraphStyle("Body", parent=ss["BodyText"], fontSize=9.5, leading=13, spaceAfter=6)
     cap = ParagraphStyle("Cap", parent=body, fontSize=8, textColor=colors.HexColor("#666666"),
                          alignment=TA_CENTER, spaceBefore=2, spaceAfter=10)
-    title_style = ParagraphStyle("Title", parent=ss["Title"], fontSize=22, leading=27)
+    title_style = ParagraphStyle("Title", parent=ss["Title"], fontSize=19, leading=24)
     sub_style = ParagraphStyle("Sub", parent=ss["Title"], fontSize=12, leading=16,
                                textColor=colors.HexColor("#555555"))
 
@@ -1516,8 +1521,8 @@ def build_pdf_report(voronois, coverages, table, recs, flagship_key, sb) -> str:
     story: list = []
 
     # --- title page ---
-    story += [Spacer(1, 3 * cm),
-              Paragraph("Voronoi Analysis of Utility Services<br/>in Dhaka City", title_style),
+    story += [Spacer(1, 2.4 * cm),
+              Paragraph(THESIS_TITLE, title_style),
               Spacer(1, 0.6 * cm),
               Paragraph("Accessibility of six utility services, measured with Voronoi "
                         "partitions, and data-driven recommendations for new facilities.", sub_style),
