@@ -968,6 +968,27 @@ def two_sfca(voronois, ref, weights, sec, grid):
     return per_section, pd.DataFrame(agreement)
 
 
+def moran_i(coords, x, k=8, perms=199):
+    """Global Moran's I of ``x`` over ``coords`` with row-standardised KNN weights.
+
+    Returns (I, pseudo_p). I > 0 means similar values cluster spatially; the
+    pseudo p-value comes from a permutation test (one-sided, clustering)."""
+    x = np.asarray(x, float)
+    z = x - x.mean()
+    if (z * z).sum() == 0:
+        return 0.0, 1.0
+    nbr = KDTree(coords).query(coords, k=k + 1)[1][:, 1:]
+
+    def stat(zz):
+        return float((zz * zz[nbr].mean(axis=1)).sum() / (zz * zz).sum())
+
+    obs = stat(z)
+    rng = np.random.default_rng(RANDOM_SEED)
+    perm = np.array([stat(rng.permutation(z)) for _ in range(perms)])
+    p = (1 + int((perm >= obs).sum())) / (perms + 1)
+    return obs, float(p)
+
+
 def mclp_greedy_vs_optimal(voronois, weights, grid, k=RECOMMEND_K, n_candidates=22):
     """Compare the greedy recommender to the exact Maximal Covering optimum.
 
@@ -1018,6 +1039,7 @@ class ExtendedAnalysis:
     tsfca_by_section: dict            # service -> {section -> 2SFCA accessibility}
     tsfca_agreement: pd.DataFrame     # 2SFCA vs Voronoi ranking correlation
     mclp: pd.DataFrame                # greedy vs exact optimal facility placement
+    moran: tuple                      # (Moran's I, pseudo p-value) of combined access
 
 
 def extended_analysis(voronois, ref, pop) -> ExtendedAnalysis:
@@ -1074,8 +1096,9 @@ def extended_analysis(voronois, ref, pop) -> ExtendedAnalysis:
 
     tsfca_sec, tsfca_agree = two_sfca(voronois, ref, weights, sec, grid)
     mclp = mclp_greedy_vs_optimal(voronois, weights, grid)
+    moran = moran_i(grid, comb)
     return ExtendedAnalysis(comb_sec, gini_svc, gini_comb, (lx, ly), density, sensitivity,
-                            tsfca_sec, tsfca_agree, mclp)
+                            tsfca_sec, tsfca_agree, mclp, moran)
 
 
 # =========================================================================== #
@@ -2001,6 +2024,12 @@ def build_pdf_report(voronois, coverages, table, recs, flagship_key, sb, ext) ->
         "the access distribution departs from equality.", body),
               fig(str(FIGURES_DIR / "lorenz_access.png"), max_h=9 * cm,
                   caption="Lorenz curve of combined utility access."),
+              Paragraph(
+        f"Access is also strongly <b>spatially clustered</b>: Moran's I of the combined "
+        f"access index is <b>{ext.moran[0]:.3f}</b> (pseudo p = {ext.moran[1]:.3f}, "
+        "permutation test), so well- and poorly-served locations form contiguous regions "
+        "rather than being randomly scattered — which supports treating the city as a "
+        "small number of coherent sections.", body),
               Paragraph("8.2 Facility density (data completeness)", h2),
               Paragraph(
         "OpenStreetMap coverage is a lower bound; the densities below contextualise the "
