@@ -968,6 +968,45 @@ def two_sfca(voronois, ref, weights, sec, grid):
     return per_section, pd.DataFrame(agreement)
 
 
+def mclp_greedy_vs_optimal(voronois, weights, grid, k=RECOMMEND_K, n_candidates=22):
+    """Compare the greedy recommender to the exact Maximal Covering optimum.
+
+    On a candidate set (the most-populated underserved cells per service), both
+    the greedy heuristic and an exhaustive search pick k sites to cover the most
+    underserved population. Shows the greedy solution is near-optimal (Church &
+    ReVelle, 1974)."""
+    from itertools import combinations
+    rows = []
+    for key, sv in voronois.items():
+        thr = SERVICE_TYPES[key].underserved_m
+        under = nearest_distance(grid, sv.seeds) > thr
+        demand = weights * under
+        cand_idx = np.argsort(demand)[::-1][:n_candidates]
+        cand = grid[cand_idx]
+        cover = np.zeros((len(cand), len(grid)), bool)
+        for c, idx in enumerate(KDTree(grid).query_ball_point(cand, r=thr)):
+            cover[c, idx] = True
+        # greedy
+        chosen, covered = [], np.zeros(len(grid), bool)
+        for _ in range(k):
+            gains = [(-1 if c in chosen else (demand * (cover[c] & ~covered)).sum())
+                     for c in range(len(cand))]
+            b = int(np.argmax(gains))
+            chosen.append(b)
+            covered |= cover[b]
+        greedy_cov = float((demand * covered).sum())
+        # exact
+        best = 0.0
+        for combo in combinations(range(len(cand)), k):
+            v = float((demand * cover[list(combo)].any(0)).sum())
+            best = max(best, v)
+        rows.append({"service": SERVICE_TYPES[key].label,
+                     "greedy_covered_k": round(greedy_cov / 1000, 0),
+                     "optimal_covered_k": round(best / 1000, 0),
+                     "greedy_pct_of_optimal": round(100 * greedy_cov / max(best, 1e-9), 1)})
+    return pd.DataFrame(rows)
+
+
 @dataclass
 class ExtendedAnalysis:
     combined_by_section: dict         # section -> mean composite access [0,1]
@@ -978,6 +1017,7 @@ class ExtendedAnalysis:
     sensitivity: pd.DataFrame         # ranking stability under scenarios
     tsfca_by_section: dict            # service -> {section -> 2SFCA accessibility}
     tsfca_agreement: pd.DataFrame     # 2SFCA vs Voronoi ranking correlation
+    mclp: pd.DataFrame                # greedy vs exact optimal facility placement
 
 
 def extended_analysis(voronois, ref, pop) -> ExtendedAnalysis:
@@ -1033,8 +1073,9 @@ def extended_analysis(voronois, ref, pop) -> ExtendedAnalysis:
     sensitivity = pd.DataFrame(srows)
 
     tsfca_sec, tsfca_agree = two_sfca(voronois, ref, weights, sec, grid)
+    mclp = mclp_greedy_vs_optimal(voronois, weights, grid)
     return ExtendedAnalysis(comb_sec, gini_svc, gini_comb, (lx, ly), density, sensitivity,
-                            tsfca_sec, tsfca_agree)
+                            tsfca_sec, tsfca_agree, mclp)
 
 
 # =========================================================================== #
@@ -2004,6 +2045,22 @@ def build_pdf_report(voronois, coverages, table, recs, flagship_key, sb, ext) ->
         "distance partition ignores. The two methods are therefore complementary: the "
         "Voronoi partition captures proximity cleanly and reproducibly, while 2SFCA adds "
         "supply–demand balance.", cap)]
+
+    story += [Paragraph("8.5 Greedy vs optimal facility placement", h2),
+              Paragraph(
+        "The greedy recommender (§6) is compared against the exact solution of the Maximal "
+        "Covering Location Problem (Church &amp; ReVelle, 1974) — an exhaustive search over "
+        f"the same candidate sites for the {RECOMMEND_K} placements that cover the most "
+        "underserved population. Coverage is shown in thousands of people:", body),
+              _simple_table(["Service", "Greedy (k people)", "Optimal (k people)", "Greedy % of optimal"],
+                            [[r["service"], f"{r['greedy_covered_k']:.0f}k",
+                              f"{r['optimal_covered_k']:.0f}k", f"{r['greedy_pct_of_optimal']}%"]
+                             for _, r in ext.mclp.iterrows()],
+                            [3.8 * cm, 3.2 * cm, 3.2 * cm, 3.4 * cm]),
+              Spacer(1, 0.2 * cm),
+              Paragraph(
+        "The greedy heuristic recovers most of the optimal coverage at a fraction of the "
+        "cost, justifying its use for the recommendations.", cap)]
 
     # --- 9. flagship ---
     story += [PageBreak(), Paragraph("9. Zone-coloured flagship map", h1),
