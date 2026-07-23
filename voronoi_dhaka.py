@@ -1693,6 +1693,14 @@ COMPARISON_TABLE = {
 }
 
 REFERENCES = [
+    "Bentley, J. L. (1975). Multidimensional binary search trees used for associative "
+    "searching. Communications of the ACM, 18(9), 509–517. "
+    "https://doi.org/10.1145/361002.361007",
+    "Boeing, G. (2017). OSMnx: New methods for acquiring, constructing, analyzing, and "
+    "visualizing complex street networks. Computers, Environment and Urban Systems, 65, "
+    "126–139. https://doi.org/10.1016/j.compenvurbsys.2017.05.004",
+    "Goodchild, M. F. (2007). Citizens as sensors: the world of volunteered geography. "
+    "GeoJournal, 69(4), 211–221. https://doi.org/10.1007/s10708-007-9111-y",
     "Ahmed, S., Adams, A. M., Islam, R., Hasan, S. M., &amp; Panciera, R. (2019). Impact "
     "of traffic variability on geographic accessibility to 24/7 emergency healthcare for "
     "the urban poor: A GIS study in Dhaka, Bangladesh. PLOS ONE, 14(9), e0222488. "
@@ -2147,7 +2155,8 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
         "2SFCA method for scarce services, the greedy recommendations recover essentially all of "
         "the exact optimum, and accounting for road-network distance roughly doubles the "
         "underserved share. The complete pipeline is released as a single reproducible program.")
-    para("Keywords: Voronoi diagram; spatial accessibility; utility services; facility location; "
+    h1("Keywords")
+    para("Voronoi diagram; spatial accessibility; utility services; facility location; "
          "maximal covering; GIS; OpenStreetMap; WorldPop; Dhaka.", justify=False)
 
     for lst in ("Table of Contents", "List of Figures", "List of Tables"):
@@ -2171,25 +2180,24 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
          "uneven: some neighbourhoods enjoy abundant access while others are poorly served. This "
          "thesis analyses that distribution for six utility services using Voronoi diagrams and "
          "open data, and identifies where new facilities would most improve access.")
-    h2("1.2 Background and Motivation")
-    para("Voronoi diagrams assign every location to its nearest facility, making them a natural, "
-         "interpretable tool for the ‘nearest-service’ question. Combined with open "
-         "geospatial data (OpenStreetMap) and gridded population (WorldPop), they allow a "
-         "city-wide, multi-service accessibility assessment at negligible cost — valuable for "
-         "planners in a data-scarce context such as Dhaka.")
-    h2("1.3 Problem Statement")
+    h2("1.2 Problem Statement")
     para("Existing accessibility studies of Dhaka each consider a single service and typically rely "
          "on the two-step floating catchment area method or simple buffers. There is no integrated, "
          "multi-utility, population-weighted assessment of Dhaka's service coverage that also "
-         "recommends where to invest, and few such studies are released as reproducible software.")
-    h2("1.4 Research Questions")
-    for q in ["How well do the six utility services cover Dhaka, and which areas are underserved?",
-              "Which parts of the city benefit most once population is taken into account?",
-              "Where should new facilities be added to help the most people?",
-              "Do the Voronoi-based results agree with established accessibility methods, and how "
-              "much does road-network distance change the picture?"]:
-        doc.add_paragraph(q, style="List Number")
-    h2("1.5 Research Objectives")
+         "recommends where to invest, and few such studies are released as reproducible software. "
+         "As a result, planners lack a city-wide, evidence-based picture of which neighbourhoods "
+         "are underserved across the utilities that matter most to daily life and safety.")
+    h2("1.3 Problem Background")
+    para("Dhaka's population has grown several-fold within a generation, while its utility "
+         "networks — transport, healthcare, water, fuel and emergency services — have expanded "
+         "piecemeal. Official, up-to-date registries of facility locations are fragmented or "
+         "unavailable, which is precisely why open, volunteered geographic data such as "
+         "OpenStreetMap has become the practical basis for spatial analysis in the city. Voronoi "
+         "diagrams assign every location to its nearest facility, making them a natural, "
+         "interpretable tool for the ‘nearest-service’ question; combined with gridded population "
+         "(WorldPop), they enable a city-wide, multi-service accessibility assessment at "
+         "negligible cost.")
+    h2("1.4 Research Objectives")
     for o in ["Partition Dhaka into Voronoi service areas for six utility services from open data.",
               "Quantify coverage and identify underserved areas, weighted by population.",
               "Rank the city's areas by how well their residents are served.",
@@ -2197,34 +2205,69 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
               "Validate the approach against established accessibility methods and release a fully "
               "reproducible pipeline."]:
         doc.add_paragraph(o, style="List Number")
-    h2("1.6 Scope of the Study")
+    h2("1.5 Research Questions")
+    for q in ["How well do the six utility services cover Dhaka, and which areas are underserved?",
+              "Which parts of the city benefit most once population is taken into account?",
+              "Where should new facilities be added to help the most people?",
+              "Do the Voronoi-based results agree with established accessibility methods, and how "
+              "much does road-network distance change the picture?"]:
+        doc.add_paragraph(q, style="List Number")
+    h2("1.6 Motivations")
+    para("The motivation for this research is practical: every year Dhaka invests in new "
+         "facilities, yet siting decisions are rarely backed by open, quantitative evidence of "
+         "where residents are actually underserved. The authors' own experience of unequal "
+         "access across the city — long journeys to hospitals or fuel from some neighbourhoods, "
+         "abundance in others — motivated a method that measures the gap for people rather than "
+         "land, is transparent enough for a planner to audit, and is cheap enough to repeat as "
+         "the city grows.")
+    h2("1.7 Flow of Research")
+    para("The research proceeded in sequence: literature review and gap identification; "
+         "acquisition and cleaning of facility, boundary and population data; exact Voronoi "
+         "construction and its verification on textbook cases; grid-based coverage measurement; "
+         "population-weighted section scoring; greedy facility recommendation; validation against "
+         "2SFCA, the exact covering optimum and road-network distance; and finally packaging of "
+         "the pipeline, figures, interactive maps and this report.")
+    h2("1.8 Scope of the Study")
     para(f"The study covers the Dhaka metropolitan bounding box {DHAKA_BBOX} and six OpenStreetMap "
          "service categories. Distances are computed in a metric projection; the core analysis uses "
          "straight-line distance, with an optional road-network extension. Facility capacity is not "
          "modelled, and the eight sections are analytical zones rather than official administrative "
          "units.")
-    h2("1.7 Significance of the Study")
+    h2("1.9 Significance of the Research")
     para("By turning opaque service-coverage patterns into clear maps, quantitative scores and "
          "concrete recommendations, this study gives planners and citizens an evidence base for "
          "prioritising investment. Its open, reproducible design means the analysis can be updated "
          "as data improves, extended with more services, or transferred to other cities at "
          "negligible cost.")
-    h2("1.8 Thesis Organization")
+    h2("1.10 Research Contribution")
+    para("The thesis contributes: (i) the first integrated, multi-utility Voronoi accessibility "
+         "assessment of Dhaka built entirely from open data; (ii) a population- and emergency-"
+         "weighted section benefit index; (iii) population-targeted, near-optimal facility "
+         "recommendations with quantified before/after impact; (iv) cross-validation against the "
+         "2SFCA method, the exact covering optimum and road-network distance; and (v) a fully "
+         "reproducible open pipeline with interactive maps and a dashboard.")
+    h2("1.11 Thesis Organization")
     para("Chapter 2 reviews related work and states the research gap. Chapter 3 describes the "
          "proposed model and methodology. Chapter 4 covers implementation, testing and results. "
          "Chapter 5 discusses standards, constraints and milestones. Chapter 6 concludes with "
          "contributions, limitations and future work.")
+    h2("1.12 Summary")
+    para("This chapter introduced the problem of uneven utility access in Dhaka, stated the "
+         "research problem and its background, and set out the objectives, questions, motivations, "
+         "flow, scope, significance and contributions of the study. The next chapter reviews the "
+         "literature on which the proposed model builds.")
     doc.add_page_break()
 
     # ------------------------------------------------------------------ Chapter 2
     h1("Chapter 2 — Literature Review")
-    for head, txt in LIT_REVIEW:
-        h2(head)
+    _ch2_names = {"Research gap": "Problem Analysis (Research Gap)"}
+    for _i, (head, txt) in enumerate(LIT_REVIEW, start=1):
+        h2(f"2.{_i} {_ch2_names.get(head, head)}")
         para(txt)
         if head.startswith("Comparative"):
             table_from(COMPARISON_TABLE["header"], COMPARISON_TABLE["rows"],
                        "Table 2.1. Comparison of related accessibility studies (this study, last row).")
-    h2("Detailed review of key studies")
+    h2(f"2.{len(LIT_REVIEW) + 1} Detailed Review of Key Studies")
     para("Okabe, Boots, Sugihara and Chiu (2000) provide the definitive treatment of Voronoi "
          "tessellations and their spatial applications; their formalisation of ordinary, weighted "
          "and network Voronoi diagrams underpins the geometric method used in this thesis. Church "
@@ -2252,7 +2295,7 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
          "completeness of OpenStreetMap points of interest against ground truth, and Tatem (2017) "
          "and Lloyd, Sorichetta and Tatem (2017) document the WorldPop modelling that produces the "
          "gridded population used for weighting.")
-    h2("Summary")
+    h2(f"2.{len(LIT_REVIEW) + 2} Summary")
     para("The reviewed literature establishes the Voronoi partition and the maximal-covering "
          "problem as sound foundations, the 2SFCA family as the benchmark accessibility method, "
          "OpenStreetMap and WorldPop as accepted open data sources, and a consistent centre-versus-"
@@ -2263,22 +2306,46 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
 
     # ------------------------------------------------------------------ Chapter 3
     h1("Chapter 3 — Proposed Model")
-    h2("3.1 Overview")
+    h2("3.1 Introduction")
     para("The proposed model is a five-stage pipeline: (1) collect and clean facility and "
          "population data; (2) build an exact Voronoi partition per service; (3) measure coverage "
          "on a fine grid; (4) score eight sections by a population-weighted benefit index; and "
-         "(5) recommend new facilities. Extended analyses validate the results.")
-    h2("3.2 Data Sources")
+         "(5) recommend new facilities. Extended analyses validate the results. This chapter "
+         "presents the feasibility and requirements of that system, the research methodology, the "
+         "design of each stage with its governing equations, and the tools used.")
+    h2("3.2 Feasibility Analysis")
+    para("The study is technically feasible because every input is openly available "
+         "(OpenStreetMap facilities, the OSM administrative boundary, the WorldPop population "
+         "grid) and every algorithm — Voronoi tessellation, k-d tree search, greedy covering — "
+         "runs in seconds to minutes on a commodity laptop. It is economically feasible because "
+         "no paid data, software or infrastructure is required, and operationally feasible "
+         "because the entire pipeline regenerates from a single command, so it can be re-run by "
+         "planners or future students without specialised setup.")
+    h2("3.3 Requirement Analysis (Functional and Non-Functional)")
+    para("Functional requirements: the system shall (i) fetch and clean facility locations for "
+         "six services; (ii) construct an exact Voronoi partition per service clipped to the city "
+         "boundary; (iii) compute nearest-facility distance on a fine grid and flag underserved "
+         "locations; (iv) score eight sections by a population-weighted benefit index; "
+         "(v) recommend k new facility sites per service; and (vi) produce figures, tables, "
+         "interactive maps and this report.")
+    para("Non-functional requirements: correctness (geometry verified by automated tests), "
+         "reproducibility (identical outputs from cached data), performance (full run in minutes "
+         "on a laptop), transparency (open source, open data, documented parameters), and "
+         "portability (pure-Python stack, no proprietary dependencies).")
+    h2("3.4 Research Methodology")
+    para("The methodology is quantitative and geospatial: facilities are modelled as Voronoi "
+         "seeds, demand as a population-weighted grid, access as nearest-facility distance against "
+         "per-service thresholds, and investment as a maximal-covering optimisation. Each design "
+         "decision below is justified against the literature reviewed in Chapter 2.")
     para("Facility locations for the six services come from OpenStreetMap via the osmnx library, "
          "giving " + ", ".join(f"{int(tf.loc[k,'n_facilities'])} {SERVICE_TYPES[k].label.lower()}s"
                                 for k in SERVICE_TYPES) +
          f" after cleaning. Population is the WorldPop 1 km grid (2020), about {total_pop_m:.1f} "
          "million residents in the study area. The city boundary is the OSM administrative polygon.")
-    h2("3.3 Coordinate System and Preprocessing")
     para("Input and output use WGS84 (EPSG:4326); every distance and area is computed in UTM zone "
          f"46N (EPSG:32646), in metres. Points are reprojected, de-duplicated within "
          f"{MIN_SEED_DISTANCE:.0f} m, and clipped to the boundary.")
-    h2("3.4 Voronoi Construction")
+    h2("3.5 System Design and Architecture")
     para("Each facility is a Voronoi seed. For two seeds p and q, the set of points at least as "
          "close to p as to q is a half-plane whose boundary is the perpendicular bisector of the "
          "segment pq:")
@@ -2290,7 +2357,10 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
          "perpendicular bisector, exactly three cells meet at each vertex in general position, and "
          "the cells tile the region without gaps or overlaps. This exact construction is what makes "
          "the diagram a faithful, testable model of the service areas rather than an approximation.")
-    h2("3.5 Coverage and Underserved Detection")
+    h2("3.6 Implementation and Simulation")
+    para("The design is realised in three computational stages — coverage measurement, section "
+         "scoring, and facility recommendation — described in turn below.")
+    doc.add_heading("Coverage and underserved detection", level=3)
     para(f"For a fine grid of demand points laid over the city at {GRID_SPACING_M:.0f} m spacing, "
          "the nearest-facility distance is computed with a k-d tree:")
     eq("d(x) = min_{p} |x − p|;    x is underserved for a service if d(x) > τ_service")
@@ -2298,7 +2368,7 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
          "for fire stations), reflecting how far a resident can reasonably travel for that service. "
          "The cell area of each Voronoi region (km²) is also recorded: a large cell means one "
          "facility must serve a wide area.")
-    h2("3.6 Population-Weighted Section Benefit")
+    doc.add_heading("Population-weighted section benefit", level=3)
     para("Eight named sections are defined as a nearest-centre (coarse Voronoi) partition of "
          "well-known area centres. Each section s is scored by a benefit index — the share of its "
          "residents within reach of each service, averaged over services with weights that "
@@ -2308,7 +2378,7 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
          "service j, and w_j is the service weight (hospital and fire = 2, water = 1.5, others = 1). "
          "Population weights come from the WorldPop grid, so the index measures how well the "
          "section's people — not its land — are served.")
-    h2("3.7 Facility Recommendation")
+    doc.add_heading("Facility recommendation", level=3)
     para("New facilities are placed with a greedy maximal-covering heuristic (Church & ReVelle, "
          "1974). At each step the algorithm adds a facility at the most-populated location that is "
          "still underserved, then recomputes distances, so the recommendations target people rather "
@@ -2321,6 +2391,15 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
     para("This greedy strategy is simple yet, for the sub-modular maximal-covering objective, "
          "provably within a (1 − 1/e) factor of the optimum; Section 4.4 shows it in fact recovers "
          "essentially all of the exact optimum on the study data.")
+    h2("3.7 Tools and Technologies Used")
+    para("The pipeline is implemented in Python 3.12 as a single reproducible script. NumPy and "
+         "SciPy provide the numerics and spatial structures (Voronoi, k-d tree, Dijkstra via "
+         "NetworkX); Shapely and GeoPandas the computational geometry and CRS handling; osmnx the "
+         "OpenStreetMap acquisition; rasterio the WorldPop raster sampling; Matplotlib and "
+         "contextily the static cartography; folium the interactive Google-basemap maps; "
+         "Streamlit the dashboard; reportlab and python-docx the report generation; and pytest "
+         "the automated test suite (29 tests). Git provides version control with continuous "
+         "integration on GitHub Actions.")
     h2("3.8 Validation and Extended Analyses")
     para("The model is cross-checked against the two-step floating catchment area (2SFCA) method. "
          "The 2SFCA accessibility of a location i is the sum of the supply-to-demand ratios R_j of "
@@ -2333,6 +2412,13 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
          "greedy recommender is benchmarked against the exact optimum, and an optional extension "
          "recomputes coverage with road-network shortest-path distance instead of straight-line "
          "distance.")
+    h2("3.9 Summary")
+    para("This chapter established that the proposed system is feasible with open data and "
+         "commodity computation, stated its functional and non-functional requirements, and "
+         "presented the design: an exact Voronoi partition per service, grid-based coverage "
+         "against per-service thresholds, a population-weighted section benefit index, and a "
+         "greedy maximal-covering recommender — together with the validation strategy. The next "
+         "chapter reports its implementation and results.")
     doc.add_page_break()
 
     # ------------------------------------------------------------------ Chapter 4
@@ -2525,19 +2611,19 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
 
     # ------------------------------------------------------------------ Chapter 6
     h1("Chapter 6 — Conclusion")
-    h2("6.1 Concluding Remarks")
+    h2("6.1 Summary of the Study")
     para("This thesis built a reproducible Voronoi-based framework to analyse the provision of six "
          "utility services in Dhaka, measure coverage and equity, and recommend new facility "
          "locations. It identified the central belt as best served, dense old Dhaka as the "
          "highest-impact investment target, and water and metro as the weakest services.")
-    h2("6.2 Contributions")
+    h2("6.2 Key Contributions")
     for c in ["A multi-utility, Voronoi-based accessibility assessment of Dhaka from open data.",
               "A population- and emergency-weighted section benefit index.",
               "Population-targeted, near-optimal facility recommendations.",
               "Cross-validation against 2SFCA, the exact optimum and road-network distance.",
               "A fully reproducible open pipeline, interactive maps and a dashboard."]:
         doc.add_paragraph(c, style="List Bullet")
-    h2("6.3 Limitations")
+    h2("6.3 Limitations of the Study")
     para("Distances are chiefly straight-line; OpenStreetMap completeness varies; facility capacity "
          "is not modelled; and the sections are analytical rather than official administrative units.")
     h2("6.4 Future Work")
@@ -2553,6 +2639,31 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
         p = doc.add_paragraph(f"[{i}]  " + r.replace("&amp;", "&"))
         p.paragraph_format.left_indent = Pt(24)
         p.paragraph_format.first_line_indent = Pt(-24)
+
+    # ------------------------------------------------------------------ Appendix
+    doc.add_page_break()
+    h1("Appendix")
+    h2("Appendix A: Reproducibility")
+    para("The complete pipeline, data-fetch scripts, tests and this document's generator are "
+         "available in the project repository (github.com/abedinm/voronoi-dhaka). To reproduce "
+         "every figure, table and analysis:")
+    code(["python -m venv .venv && source .venv/bin/activate",
+          "pip install -r requirements.txt",
+          "python voronoi_dhaka.py            # full pipeline + report",
+          "python voronoi_dhaka.py --network  # add road-network analysis",
+          "pytest                             # 29 correctness tests",
+          "streamlit run dashboard.py         # interactive dashboard"])
+    h2("Appendix B: Data Provenance")
+    para("Facility data: © OpenStreetMap contributors (ODbL), fetched via osmnx and cached under "
+         "data/raw/. Population: WorldPop Bangladesh 1 km UN-adjusted 2020 (CC-BY). Boundary: OSM "
+         "administrative polygon intersected with the study window. Every processed point carries "
+         "a source column, and data/SOURCE.md documents each dataset. Basemaps: © CARTO (static "
+         "figures) and © Google (interactive maps).")
+    h2("Appendix C: Per-Service Thresholds and Weights")
+    table_from(["Service", "Threshold (km)", "Benefit weight"],
+               [[SERVICE_TYPES[k].label, f"{SERVICE_TYPES[k].underserved_m/1000:.1f}",
+                 f"{SERVICE_WEIGHT[k]:.1f}"] for k in SERVICE_TYPES],
+               "Table A.1. Distance thresholds and service weights used throughout.")
 
     out = OUTPUTS_DIR / "Dhaka_Voronoi_AIUB_Thesis.docx"
     doc.save(str(out))
