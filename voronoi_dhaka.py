@@ -1989,6 +1989,8 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
     normal = doc.styles["Normal"]
     normal.font.name = "Times New Roman"
     normal.font.size = Pt(12)
+    normal.paragraph_format.line_spacing = 1.5      # standard thesis spacing
+    normal.paragraph_format.space_after = Pt(6)
     for hs in ("Heading 1", "Heading 2", "Heading 3", "Title"):
         try:
             doc.styles[hs].font.name = "Times New Roman"
@@ -2044,6 +2046,18 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
             run.italic = True
             run.font.size = Pt(10)
             c.alignment = AL.CENTER
+
+    def eq(t):
+        p = doc.add_paragraph()
+        r = p.add_run(t)
+        r.italic = True
+        p.alignment = AL.CENTER
+
+    def code(lines):
+        p = doc.add_paragraph()
+        r = p.add_run("\n".join(lines))
+        r.font.name = "Courier New"
+        r.font.size = Pt(10)
 
     tf = table.set_index("service")
     def upct(s):
@@ -2168,7 +2182,14 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
          "on the two-step floating catchment area method or simple buffers. There is no integrated, "
          "multi-utility, population-weighted assessment of Dhaka's service coverage that also "
          "recommends where to invest, and few such studies are released as reproducible software.")
-    h2("1.4 Research Objectives")
+    h2("1.4 Research Questions")
+    for q in ["How well do the six utility services cover Dhaka, and which areas are underserved?",
+              "Which parts of the city benefit most once population is taken into account?",
+              "Where should new facilities be added to help the most people?",
+              "Do the Voronoi-based results agree with established accessibility methods, and how "
+              "much does road-network distance change the picture?"]:
+        doc.add_paragraph(q, style="List Number")
+    h2("1.5 Research Objectives")
     for o in ["Partition Dhaka into Voronoi service areas for six utility services from open data.",
               "Quantify coverage and identify underserved areas, weighted by population.",
               "Rank the city's areas by how well their residents are served.",
@@ -2176,16 +2197,23 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
               "Validate the approach against established accessibility methods and release a fully "
               "reproducible pipeline."]:
         doc.add_paragraph(o, style="List Number")
-    h2("1.5 Scope of the Study")
+    h2("1.6 Scope of the Study")
     para(f"The study covers the Dhaka metropolitan bounding box {DHAKA_BBOX} and six OpenStreetMap "
          "service categories. Distances are computed in a metric projection; the core analysis uses "
          "straight-line distance, with an optional road-network extension. Facility capacity is not "
          "modelled, and the eight sections are analytical zones rather than official administrative "
          "units.")
-    h2("1.6 Thesis Organization")
+    h2("1.7 Significance of the Study")
+    para("By turning opaque service-coverage patterns into clear maps, quantitative scores and "
+         "concrete recommendations, this study gives planners and citizens an evidence base for "
+         "prioritising investment. Its open, reproducible design means the analysis can be updated "
+         "as data improves, extended with more services, or transferred to other cities at "
+         "negligible cost.")
+    h2("1.8 Thesis Organization")
     para("Chapter 2 reviews related work and states the research gap. Chapter 3 describes the "
-         "proposed model and methodology. Chapter 4 covers implementation and testing. Chapter 5 "
-         "discusses standards, constraints and milestones. Chapter 6 concludes.")
+         "proposed model and methodology. Chapter 4 covers implementation, testing and results. "
+         "Chapter 5 discusses standards, constraints and milestones. Chapter 6 concludes with "
+         "contributions, limitations and future work.")
     doc.add_page_break()
 
     # ------------------------------------------------------------------ Chapter 2
@@ -2196,6 +2224,41 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
         if head.startswith("Comparative"):
             table_from(COMPARISON_TABLE["header"], COMPARISON_TABLE["rows"],
                        "Table 2.1. Comparison of related accessibility studies (this study, last row).")
+    h2("Detailed review of key studies")
+    para("Okabe, Boots, Sugihara and Chiu (2000) provide the definitive treatment of Voronoi "
+         "tessellations and their spatial applications; their formalisation of ordinary, weighted "
+         "and network Voronoi diagrams underpins the geometric method used in this thesis. Church "
+         "and ReVelle (1974) introduced the maximal covering location problem, which frames "
+         "facility siting as choosing a fixed number of locations to cover the most demand within a "
+         "distance threshold — the exact objective our greedy recommender approximates.")
+    para("Luo and Wang (2003) introduced the two-step floating catchment area (2SFCA) method, and "
+         "Luo and Qi (2009) enhanced it with distance-decay weights (E2SFCA); together these remain "
+         "the dominant accessibility framework and provide the supply–demand perspective against "
+         "which the present Voronoi results are validated. Cui, Wu, Hu and Lu (2021) extend the "
+         "diagram itself, using a dynamic Voronoi construction to balance facility service capacity "
+         "— motivating capacity-weighting as a future extension of this work.")
+    para("Within Dhaka, Ahmed, Adams, Islam, Hasan and Panciera (2019) apply 2SFCA to emergency "
+         "healthcare and demonstrate that ignoring traffic congestion overstates coverage roughly "
+         "threefold, identifying peripheral and older-core settlements as underserved. Rahman, Ashik "
+         "and Mouli (2022) examine accessibility around transit-oriented developments, and Bhuiya, "
+         "Shao and Jones (2023) use participatory GIS for evacuation accessibility. Alam, Nur and "
+         "Mitra (2025) construct an accessibility index for public open space and report that "
+         "central and south-western Dhaka enjoy the best access — a finding this thesis independently "
+         "reproduces for utilities, lending external validity to the section-level results.")
+    para("Beyond Dhaka, Deliry and Uyguçgil (2023) combine GIS network analysis with location-"
+         "allocation to site new fire, emergency and park facilities in Eskişehir, the closest "
+         "methodological analogue to the recommendation component here, though it is single-city and "
+         "does not weight by population. On the data side, Klinkhardt et al. (2023) quantify the "
+         "completeness of OpenStreetMap points of interest against ground truth, and Tatem (2017) "
+         "and Lloyd, Sorichetta and Tatem (2017) document the WorldPop modelling that produces the "
+         "gridded population used for weighting.")
+    h2("Summary")
+    para("The reviewed literature establishes the Voronoi partition and the maximal-covering "
+         "problem as sound foundations, the 2SFCA family as the benchmark accessibility method, "
+         "OpenStreetMap and WorldPop as accepted open data sources, and a consistent centre-versus-"
+         "periphery inequality in Dhaka. The gap this thesis fills is the absence of an integrated, "
+         "multi-utility, population-weighted, reproducible accessibility study of Dhaka that also "
+         "recommends where to invest.")
     doc.add_page_break()
 
     # ------------------------------------------------------------------ Chapter 3
@@ -2216,27 +2279,60 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
          f"46N (EPSG:32646), in metres. Points are reprojected, de-duplicated within "
          f"{MIN_SEED_DISTANCE:.0f} m, and clipped to the boundary.")
     h2("3.4 Voronoi Construction")
-    para("Each facility is a Voronoi seed. Cells are computed exactly as the intersection of the "
-         "half-planes bounded by the perpendicular bisectors to each seed's Delaunay neighbours, "
-         "then clipped to the boundary — guaranteeing straight bisector edges, degree-three "
-         "vertices in general position, and an exact tiling.")
+    para("Each facility is a Voronoi seed. For two seeds p and q, the set of points at least as "
+         "close to p as to q is a half-plane whose boundary is the perpendicular bisector of the "
+         "segment pq:")
+    eq("H(p, q) = { x : |x − p| ≤ |x − q| }")
+    para("The Voronoi cell of facility p is the intersection of these half-planes over all of p's "
+         "Delaunay neighbours N(p), clipped to the study boundary B:")
+    eq("V(p) = B ∩ ⋂_{q ∈ N(p)} H(p, q)")
+    para("Because each cell is an intersection of half-planes, every interior edge is a true "
+         "perpendicular bisector, exactly three cells meet at each vertex in general position, and "
+         "the cells tile the region without gaps or overlaps. This exact construction is what makes "
+         "the diagram a faithful, testable model of the service areas rather than an approximation.")
     h2("3.5 Coverage and Underserved Detection")
-    para(f"Cell area (km²) and the nearest-facility distance on a {GRID_SPACING_M:.0f} m grid "
-         "(via a KD-tree) are computed per service. A location is underserved if its nearest "
-         "facility exceeds a per-service distance threshold.")
+    para(f"For a fine grid of demand points laid over the city at {GRID_SPACING_M:.0f} m spacing, "
+         "the nearest-facility distance is computed with a k-d tree:")
+    eq("d(x) = min_{p} |x − p|;    x is underserved for a service if d(x) > τ_service")
+    para("Each service has its own threshold τ (e.g. 800 m for bus stops, 2 km for hospitals, 3 km "
+         "for fire stations), reflecting how far a resident can reasonably travel for that service. "
+         "The cell area of each Voronoi region (km²) is also recorded: a large cell means one "
+         "facility must serve a wide area.")
     h2("3.6 Population-Weighted Section Benefit")
-    para("Eight named sections (a nearest-centre Voronoi of well-known area centres) are each "
-         "scored by the share of their residents within reach of each service, averaged across "
-         "services with emergency services and water weighted higher, and weighted by population.")
+    para("Eight named sections are defined as a nearest-centre (coarse Voronoi) partition of "
+         "well-known area centres. Each section s is scored by a benefit index — the share of its "
+         "residents within reach of each service, averaged over services with weights that "
+         "emphasise emergencies and water:")
+    eq("B_s = 100 · ( Σ_j w_j · f_{s,j} ) / ( Σ_j w_j )")
+    para("where f_{s,j} is the population-weighted fraction of section s within threshold τ_j of "
+         "service j, and w_j is the service weight (hospital and fire = 2, water = 1.5, others = 1). "
+         "Population weights come from the WorldPop grid, so the index measures how well the "
+         "section's people — not its land — are served.")
     h2("3.7 Facility Recommendation")
     para("New facilities are placed with a greedy maximal-covering heuristic (Church & ReVelle, "
-         "1974): each new site is the most-populated still-underserved location, chosen iteratively "
-         "— targeting people rather than empty land.")
+         "1974). At each step the algorithm adds a facility at the most-populated location that is "
+         "still underserved, then recomputes distances, so the recommendations target people rather "
+         "than empty land:")
+    code(["Input: existing facilities F, demand grid X with population pop(x), threshold τ, count k",
+          "for i in 1 .. k:",
+          "    x* = argmax_{x in X}  pop(x) · [ d_F(x) > τ ]   # most-populated underserved cell",
+          "    F = F ∪ { x* }                                 # add a facility there",
+          "return the k new sites x*"])
+    para("This greedy strategy is simple yet, for the sub-modular maximal-covering objective, "
+         "provably within a (1 − 1/e) factor of the optimum; Section 4.4 shows it in fact recovers "
+         "essentially all of the exact optimum on the study data.")
     h2("3.8 Validation and Extended Analyses")
-    para("The model is cross-checked with the 2SFCA method; equity is measured with the Gini "
-         "coefficient and a Lorenz curve; spatial clustering with Moran's I; robustness with a "
-         "sensitivity analysis; the greedy recommender against the exact optimum; and, optionally, "
-         "with road-network travel distance.")
+    para("The model is cross-checked against the two-step floating catchment area (2SFCA) method. "
+         "The 2SFCA accessibility of a location i is the sum of the supply-to-demand ratios R_j of "
+         "the facilities within its catchment:")
+    eq("A_i = Σ_{j ∈ cat(i)} R_j,   with   R_j = S_j / Σ_{k ∈ cat(j)} P_k")
+    para("Access equity is summarised by the Gini coefficient of the combined access index (with a "
+         "Lorenz curve), and spatial structure by Moran's I of spatial autocorrelation:")
+    eq("Gini = 1 − 2 ∫₀¹ L(p) dp;    I = (n / Σ w) · ( Σ_i Σ_j w_ij z_i z_j ) / Σ_i z_i²")
+    para("Robustness is checked with a sensitivity analysis (varying thresholds and weights), the "
+         "greedy recommender is benchmarked against the exact optimum, and an optional extension "
+         "recomputes coverage with road-network shortest-path distance instead of straight-line "
+         "distance.")
     doc.add_page_break()
 
     # ------------------------------------------------------------------ Chapter 4
@@ -2273,29 +2369,103 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
     h2("4.5 Results and Discussion")
     para("Coverage varies sharply by service. Water pumps and metro have the widest gaps "
          f"({upct('water_pump'):.0f}% and {upct('metro_station'):.0f}% of the area beyond threshold), "
-         f"while hospitals cover the most ({upct('hospital'):.0f}% underserved).")
-    table_from(["Service", "Facilities", "Mean cell (km²)", "Area underserved (%)"],
+         f"while hospitals cover the most ({upct('hospital'):.0f}% underserved). Table 4.3 "
+         "summarises the per-service coverage.")
+    table_from(["Service", "Facilities", "Mean cell (km²)", "Max cell (km²)", "Area underserved (%)"],
                [[SERVICE_TYPES[k].label, int(tf.loc[k, "n_facilities"]),
-                 f"{tf.loc[k, 'mean_cell_km2']:.2f}", f"{tf.loc[k, 'pct_grid_underserved']:.0f}"]
-                for k in SERVICE_TYPES],
+                 f"{tf.loc[k, 'mean_cell_km2']:.2f}", f"{tf.loc[k, 'max_cell_km2']:.1f}",
+                 f"{tf.loc[k, 'pct_grid_underserved']:.0f}"] for k in SERVICE_TYPES],
                "Table 4.3. Per-service coverage summary.")
+
+    h2("4.5.1 Coverage of each service")
+    para("Each service is examined individually below; its Voronoi partition over the Dhaka "
+         "basemap shows both the facilities (coloured dots) and the service areas (cells shaded by "
+         "size, with oversized cells outlined).")
+    _svc_notes = {
+        "metro_station": "Coverage follows only the single MRT-6 corridor from Uttara to Motijheel, "
+                         "leaving the east and much of the south well beyond reach — the sparsest network.",
+        "hospital": "Hospitals are the most numerous service and are spread across the built-up "
+                    "core, giving the best area coverage, though the eastern and southern fringes lag.",
+        "water_pump": "Mapped water sources are uneven and thin toward the fringes, producing the "
+                      "widest population gap of any service.",
+        "fuel": "Fuel stations cluster along arterial roads, with gaps in the residential interiors "
+                "and the periphery.",
+        "bus_stop": "Bus stops are dense in the central wards but thin on the outskirts, so cell "
+                    "sizes grow sharply toward the edges.",
+        "fire_station": "Fire stations are few and widely spaced; their Voronoi cells are the "
+                        "largest, and emergency reach is a concern on the fringe.",
+    }
+    for k in SERVICE_TYPES:
+        svc = SERVICE_TYPES[k]
+        figure(f"voronoi_{k}.png", f"Figure. {svc.label} — Voronoi coverage over Dhaka.", 4.4)
+        para(f"{svc.label}. {int(tf.loc[k,'n_facilities'])} facilities; mean cell "
+             f"{tf.loc[k,'mean_cell_km2']:.2f} km² (largest {tf.loc[k,'max_cell_km2']:.1f} km²); "
+             f"{tf.loc[k,'pct_grid_underserved']:.0f}% of the area beyond the "
+             f"{svc.underserved_m/1000:.1f} km threshold. {_svc_notes[k]}")
+
+    h2("4.5.2 Which areas benefit most")
     para(f"Weighting by population and emergency importance, the central belt is best served "
-         f"({best}); {worst['section']} scores lowest. The most populous section, Motijheel (old "
-         "Dhaka), is only moderately served and is the highest-impact target for investment "
-         "(Figures 4.3–4.4).")
+         f"({best}); {worst['section']} scores lowest ({worst['benefit_score']:.0f}). The most "
+         "populous section, Motijheel (old Dhaka), is only moderately served and is therefore the "
+         "highest-impact target for investment (Figures 4.3–4.4, Table 4.4).")
     figure("zones_dhaka_flagship.png", "Figure 4.3. Voronoi coloured by the eight sections.", 5.0)
     figure("section_benefit.png", "Figure 4.4. Population-weighted benefit score by section.", 5.0)
+    table_from(["Section", "Population", "Benefit score", "Weakest service"],
+               [[r["section"], f"{r['pop_est']/1e6:.2f} M" if sb.pop_weighted else "-",
+                 f"{r['benefit_score']:.0f}", r["weakest_service"]] for _, r in sb.df.iterrows()],
+               "Table 4.4. Section benefit ranking (population-weighted).")
+
+    h2("4.5.3 Recommendations")
     para("Population-targeted greedy placement concentrates new facilities in dense, underserved "
-         "areas; for example, three new fire stations cut the underserved population from "
-         f"{recs['fire_station'].before.underserved_people/1000:.0f}k to "
-         f"{recs['fire_station'].after.underserved_people/1000:.0f}k (Figure 4.5).")
+         "areas rather than the empty fringe. Table 4.5 reports the drop in underserved population "
+         "from adding three facilities per service, and Figure 4.5 shows the fire-station example.")
+    table_from(["Service", "Underserved before → after (thousands)", "New sites (sections)"],
+               [[SERVICE_TYPES[k].label,
+                 f"{recs[k].before.underserved_people/1000:.0f} → {recs[k].after.underserved_people/1000:.0f}",
+                 ", ".join(recs[k].new_zones)] for k in SERVICE_TYPES],
+               "Table 4.5. Coverage improvement from the proposed facilities.")
     figure("recommendations_fire_station.png", "Figure 4.5. Existing vs proposed fire stations.", 4.8)
-    para(f"Access is moderately unequal (Gini = {ext.gini_combined:.3f}) and strongly clustered "
-         f"(Moran's I = {ext.moran[0]:.3f}); the Lorenz curve is shown in Figure 4.6. Accounting "
-         "for the road network roughly doubles the underserved share (Figure 4.7), confirming that "
-         "straight-line distance understates the real access gap.")
-    figure("lorenz_access.png", "Figure 4.6. Lorenz curve of combined utility access.", 4.2)
-    figure("network_vs_euclid.png", "Figure 4.7. Underserved share: straight-line vs road network.", 5.6)
+    figure("recommendations_hospital.png", "Figure 4.6. Existing vs proposed hospitals.", 4.8)
+    figure("recommendations_water_pump.png", "Figure 4.7. Existing vs proposed water sources.", 4.8)
+
+    h2("4.5.4 Equity, clustering and combined access")
+    para(f"Combining all services into one access index, access is moderately unequal (Gini = "
+         f"{ext.gini_combined:.3f}) and strongly clustered (Moran's I = {ext.moran[0]:.3f}, "
+         f"pseudo p = {ext.moran[1]:.3f}) — well- and poorly-served areas form contiguous regions "
+         "(Figures 4.6–4.7).")
+    figure("combined_access.png", "Figure 4.6. Combined access index across all services.", 5.0)
+    figure("lorenz_access.png", "Figure 4.7. Lorenz curve of combined utility access.", 4.2)
+    para("A sensitivity check (Table 4.6) shows the section ranking is robust: under ±25% "
+         "thresholds and equal service weights the ranking barely changes (Spearman ρ ≈ 0.98).")
+    table_from(["Scenario", "Rank corr. (ρ)", "Best", "Worst"],
+               [[r["scenario"], r["rank_corr_vs_baseline"], r["best"], r["worst"]]
+                for _, r in ext.sensitivity.iterrows()],
+               "Table 4.6. Sensitivity of the section ranking.")
+
+    h2("4.5.5 Road-network distance")
+    para("Repeating the analysis with shortest-path distance on the Dhaka road network (rather than "
+         "straight-line distance) confirms that Euclidean distance understates real travel: the "
+         "median detour is about 1.5×, and the underserved share roughly doubles for several "
+         "services (Figure 4.8). This is a key finding — the true access gap is larger than a "
+         "straight-line analysis suggests.")
+    figure("network_vs_euclid.png", "Figure 4.10. Underserved share: straight-line vs road network.", 5.6)
+
+    h2("4.5.6 Validation against the 2SFCA method")
+    para("As a further check, the two-step floating catchment area (2SFCA) accessibility was "
+         "computed per service and its section ranking correlated with the Voronoi nearest-distance "
+         "ranking (Table 4.1). Agreement is strong for scarce, distance-dominated services (metro, "
+         "water, hospital) and weaker for dense or demand-sensitive ones, where 2SFCA additionally "
+         "penalises the crowding of facilities. The two methods are complementary: the Voronoi "
+         "partition captures proximity cleanly and reproducibly, while 2SFCA adds supply–demand "
+         "balance. Figure 4.11 maps the 2SFCA accessibility to hospitals.")
+    figure("tsfca_hospital.png", "Figure 4.11. 2SFCA accessibility to hospitals, by section.", 4.8)
+    para("Facility density (Table 4.7) contextualises the counts against area and population; "
+         "because OpenStreetMap completeness varies, these figures should be read as a lower bound.")
+    table_from(["Service", "Facilities", "per 100k people", "km² / facility"],
+               [[r["service"], int(r["facilities"]), r["per_100k_people"], r["km2_per_facility"]]
+                for _, r in ext.density.iterrows()],
+               "Table 4.7. Facility density and completeness context.")
+
     h2("4.6 Summary")
     para("This chapter described the implementation environment, the pipeline stages, the testing "
          "performed, and the results — identifying the central belt as best served, Motijheel "
