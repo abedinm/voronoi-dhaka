@@ -1193,12 +1193,12 @@ def plot_service_voronoi(sv: ServiceVoronoi, cov: CoverageResult) -> str:
     svc = SERVICE_TYPES[sv.key]
     gdf = sv.cells_gdf().to_crs(WEB)
     fig, ax = plt.subplots(figsize=(10, 11))
-    gdf.plot(ax=ax, column="area_km2", cmap="YlOrRd", alpha=0.5, edgecolor="#2a2a2a",
-             linewidth=0.5, legend=True,
-             legend_kwds={"label": "Voronoi cell area (km²)", "shrink": 0.5})
+    # plain Voronoi over the street map — no gradient fill
+    gdf.boundary.plot(ax=ax, color="#2a2a2a", linewidth=0.7)
     under = gdf[gdf["seed_index"].isin(cov.underserved_cells)]
     if len(under):
-        under.boundary.plot(ax=ax, color="#b30000", linewidth=1.6)
+        under.plot(ax=ax, facecolor="#b30000", alpha=0.12, edgecolor="none")
+        under.boundary.plot(ax=ax, color="#b30000", linewidth=1.7)
     _seeds_web(sv).plot(ax=ax, color=svc.color, markersize=10, marker="o", zorder=5)
     _boundary_web(sv).boundary.plot(ax=ax, color="black", linewidth=1.3)
     _add_basemap(ax)
@@ -2465,8 +2465,8 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
 
     h2("4.5.1 Coverage of each service")
     para("Each service is examined individually below; its Voronoi partition over the Dhaka "
-         "basemap shows both the facilities (coloured dots) and the service areas (cells shaded by "
-         "size, with oversized cells outlined).")
+         "basemap shows the facilities (coloured dots) and their service areas as clean cell "
+         "boundaries, with underserved (oversized) cells outlined and tinted in red.")
     _svc_notes = {
         "metro_station": "Coverage follows only the single MRT-6 corridor from Uttara to Motijheel, "
                          "leaving the east and much of the south well beyond reach — the sparsest network.",
@@ -2517,10 +2517,10 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
     h2("4.5.4 Equity, clustering and combined access")
     para(f"Combining all services into one access index, access is moderately unequal (Gini = "
          f"{ext.gini_combined:.3f}) and strongly clustered (Moran's I = {ext.moran[0]:.3f}, "
-         f"pseudo p = {ext.moran[1]:.3f}) — well- and poorly-served areas form contiguous regions "
-         "(Figures 4.6–4.7).")
-    figure("combined_access.png", "Figure 4.6. Combined access index across all services.", 5.0)
-    figure("lorenz_access.png", "Figure 4.7. Lorenz curve of combined utility access.", 4.2)
+         f"pseudo p = {ext.moran[1]:.3f}) — well- and poorly-served areas form contiguous "
+         "regions. Per-section values of the combined index mirror the benefit ranking of "
+         "Table 4.4. The Lorenz curve (Figure 4.8) summarises the equity of access.")
+    figure("lorenz_access.png", "Figure 4.8. Lorenz curve of combined utility access.", 4.2)
     para("A sensitivity check (Table 4.6) shows the section ranking is robust: under ±25% "
          "thresholds and equal service weights the ranking barely changes (Spearman ρ ≈ 0.98).")
     table_from(["Scenario", "Rank corr. (ρ)", "Best", "Worst"],
@@ -2532,9 +2532,9 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
     para("Repeating the analysis with shortest-path distance on the Dhaka road network (rather than "
          "straight-line distance) confirms that Euclidean distance understates real travel: the "
          "median detour is about 1.5×, and the underserved share roughly doubles for several "
-         "services (Figure 4.8). This is a key finding — the true access gap is larger than a "
+         "services (Figure 4.9). This is a key finding — the true access gap is larger than a "
          "straight-line analysis suggests.")
-    figure("network_vs_euclid.png", "Figure 4.10. Underserved share: straight-line vs road network.", 5.6)
+    figure("network_vs_euclid.png", "Figure 4.9. Underserved share: straight-line vs road network.", 5.6)
 
     h2("4.5.6 Validation against the 2SFCA method")
     para("As a further check, the two-step floating catchment area (2SFCA) accessibility was "
@@ -2543,8 +2543,7 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
          "water, hospital) and weaker for dense or demand-sensitive ones, where 2SFCA additionally "
          "penalises the crowding of facilities. The two methods are complementary: the Voronoi "
          "partition captures proximity cleanly and reproducibly, while 2SFCA adds supply–demand "
-         "balance. Figure 4.11 maps the 2SFCA accessibility to hospitals.")
-    figure("tsfca_hospital.png", "Figure 4.11. 2SFCA accessibility to hospitals, by section.", 4.8)
+         "balance.")
     para("Facility density (Table 4.7) contextualises the counts against area and population; "
          "because OpenStreetMap completeness varies, these figures should be read as a lower bound.")
     table_from(["Service", "Facilities", "per 100k people", "km² / facility"],
