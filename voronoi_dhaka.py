@@ -1191,19 +1191,32 @@ def _seeds_web(sv): return sv.seeds_gdf().to_crs(WEB)
 
 def plot_service_voronoi(sv: ServiceVoronoi, cov: CoverageResult) -> str:
     svc = SERVICE_TYPES[sv.key]
-    gdf = sv.cells_gdf().to_crs(WEB)
+    ref = zone_reference()
+    zgdf = color_cells_by_zone(sv, ref).to_crs(WEB)
     fig, ax = plt.subplots(figsize=(10, 11))
-    # plain Voronoi over the street map — no gradient fill
-    gdf.boundary.plot(ax=ax, color="#2a2a2a", linewidth=0.7)
-    under = gdf[gdf["seed_index"].isin(cov.underserved_cells)]
+    # cells coloured by their named section (flagship style)
+    zgdf.plot(ax=ax, color=zgdf["zone_color"].tolist(), alpha=0.55,
+              edgecolor="#333333", linewidth=0.4)
+    under = zgdf[zgdf["seed_index"].isin(cov.underserved_cells)]
     if len(under):
-        under.plot(ax=ax, facecolor="#b30000", alpha=0.12, edgecolor="none")
-        under.boundary.plot(ax=ax, color="#b30000", linewidth=1.7)
-    _seeds_web(sv).plot(ax=ax, color=svc.color, markersize=10, marker="o", zorder=5)
+        under.boundary.plot(ax=ax, color="#b30000", linewidth=2.0)
+    # bold dashed section boundaries + labels
+    build_zone_voronoi(sv.boundary, ref).to_crs(WEB).boundary.plot(
+        ax=ax, color="#111111", linewidth=1.4, linestyle=(0, (5, 3)))
+    # facilities in this utility's own colour
+    _seeds_web(sv).plot(ax=ax, color=svc.color, markersize=16, marker="o",
+                        edgecolor="white", linewidth=0.5, zorder=5)
     _boundary_web(sv).boundary.plot(ax=ax, color="black", linewidth=1.3)
+    centers = gpd.GeoSeries(gpd.points_from_xy(ref.centers_m[:, 0], ref.centers_m[:, 1]),
+                            crs=CRS_METRIC).to_crs(WEB)
+    for name, pt in zip(ref.names, centers):
+        ax.annotate(name, (pt.x, pt.y), ha="center", va="center", fontsize=10,
+                    fontweight="bold", zorder=7,
+                    bbox=dict(boxstyle="round,pad=0.2", fc="white", ec="#333", alpha=0.8))
     _add_basemap(ax)
     ax.set_title(f"Dhaka {svc.label} — Voronoi coverage ({sv.n} facilities)\n"
-                 "red outline = underserved cell (area > mean + 1σ)", fontsize=12)
+                 f"cells coloured by section · {svc.label.lower()} sites in "
+                 "service colour · red outline = underserved", fontsize=12)
     ax.set_axis_off()
     out = FIGURES_DIR / f"voronoi_{sv.key}.png"
     fig.savefig(out, dpi=FIGURE_DPI, bbox_inches="tight")
@@ -1252,7 +1265,8 @@ def plot_zone_colored_voronoi(sv: ServiceVoronoi, ref: ZoneRef, flagship: bool =
               edgecolor="#333333", linewidth=0.4)
     build_zone_voronoi(sv.boundary, ref).to_crs(WEB).boundary.plot(
         ax=ax, color="#111111", linewidth=1.4, linestyle=(0, (5, 3)))
-    _seeds_web(sv).plot(ax=ax, color="#111111", markersize=6, marker="o", zorder=5)
+    _seeds_web(sv).plot(ax=ax, color=svc.color, markersize=14, marker="o",
+                        edgecolor="white", linewidth=0.5, zorder=5)
     _boundary_web(sv).boundary.plot(ax=ax, color="black", linewidth=1.4)
     centers = gpd.GeoSeries(gpd.points_from_xy(ref.centers_m[:, 0], ref.centers_m[:, 1]),
                             crs=CRS_METRIC).to_crs(WEB)
@@ -2464,9 +2478,9 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
                "Table 4.3. Per-service coverage summary.")
 
     h2("4.5.1 Coverage of each service")
-    para("Each service is examined individually below; its Voronoi partition over the Dhaka "
-         "basemap shows the facilities (coloured dots) and their service areas as clean cell "
-         "boundaries, with underserved (oversized) cells outlined and tinted in red.")
+    para("Each service is examined individually below. Its Voronoi partition is drawn over the "
+         "Dhaka basemap with cells coloured by the section they belong to, the facilities marked "
+         "in the service's own colour, and underserved (oversized) cells outlined in red.")
     _svc_notes = {
         "metro_station": "Coverage follows only the single MRT-6 corridor from Uttara to Motijheel, "
                          "leaving the east and much of the south well beyond reach — the sparsest network.",
