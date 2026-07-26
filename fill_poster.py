@@ -45,8 +45,9 @@ by_idx = {i: sh for i, sh in enumerate(shapes)}
 fill(by_idx[1], ["Providing Utility Services using Voronoi Diagrams"], keep_first=False)
 fill(by_idx[2], ["Some Analyses, Recommendations, along with a Case Study for Dhaka City"],
      keep_first=False, size=30)
-fill(by_idx[3], ["Minhazul Abedin ([ID]), Ramim [Full Name] ([ID]), [Member 3] ([ID])  ·  "
-                 "Supervisor: [Supervisor's Name], Dept. of Computer Science"],
+fill(by_idx[3], ["Minhazul Abedin (21-44625-1), Zarin Tasnim Rayta (21-45742-3), "
+                 "Abdullah Al Noman (21-45825-3), Mehedi Hasan Aziz (19-40060-1)  ·  "
+                 "Supervisor: [Name of the Supervisor], Dept. of Computer Science"],
      keep_first=False, size=18)
 
 # ---------------- column 1 ----------------
@@ -120,7 +121,7 @@ fill(by_idx[26], [
     "Boeing, G. (2017). OSMnx. CEUS 65.",
     "Alam, I. et al. (2025). Public open space access in Dhaka. Comput. Urban Sci. 5."])
 fill(by_idx[27], [
-    "We thank our supervisor, [Supervisor's Name], Department of Computer Science, AIUB, "
+    "We thank our supervisor, [Name of the Supervisor], Department of Computer Science, AIUB, "
     "for continuous guidance, and the Faculty of Science and Technology for its support. "
     "Facility data © OpenStreetMap contributors; population from WorldPop; basemaps © "
     "CARTO and Google."])
