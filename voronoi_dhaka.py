@@ -79,6 +79,62 @@ THESIS_TITLE = ("Providing Utility Services using Voronoi Diagrams, Some Analyse
                 "Recommendations, along with a Case Study for Dhaka City")
 AUTHOR = "Minhazul Abedin"
 
+# --------------------------------------------------------------------------- #
+# AIUB thesis identity (official Fall 2025-2026 template)
+# --------------------------------------------------------------------------- #
+AUTHORS = [
+    ("Minhazul Abedin", "21-44625-1"),
+    ("Zarin Tasnim Rayta", "21-45742-3"),
+    ("Abdullah Al Noman", "21-45825-3"),
+    ("Mehedi Hasan Aziz", "19-40060-1"),
+]
+SEMESTER = "Fall 2025-2026 Semester"
+DEGREE_LINES = [
+    "A Thesis submitted for the degree of Bachelor of Science (BSc) in",
+    "Computer Science and Engineering (CSE) at",
+    "American International University Bangladesh (AIUB)",
+    "Faculty of Science and Technology (FST)",
+]
+DECLARATION_TEXT = [
+    "This thesis is composed of our original work, and contains no material previously "
+    "published or written by another person except where due reference has been made in the "
+    "text. We have clearly stated the contribution of others to our thesis as a whole, "
+    "including statistical assistance, survey design, data analysis, significant technical "
+    "procedures, professional editorial advice, financial and any other original research work "
+    "used or reported in our thesis. The content of our thesis is the result of work we have "
+    "carried out since the commencement of the Thesis.",
+    "We acknowledge that copyright of all material contained in my thesis resides with the "
+    "copyright holder(s) of that material. Where appropriate we have obtained copyright "
+    "permission from the copyright holder to reproduce material in this thesis and have sought "
+    "permission from co-authors for any jointly authored works included in the thesis.",
+]
+EXAMINERS = [
+    ("[Name of the Supervisor]", "[Rank], Supervisor"),
+    ("Prof. Dr. Muhammad Firoz Mridha", "Professor, Department of Computer Science"),
+    ("Prof. Dr. Dip Nandi", "Professor & Associate Dean, FST"),
+    ("Mashiour Rahman", "Sr. Associate Professor, External"),
+]
+ABBREVIATIONS = [
+    ("2SFCA", "Two-Step Floating Catchment Area"),
+    ("AIUB", "American International University-Bangladesh"),
+    ("API", "Application Programming Interface"),
+    ("CRS", "Coordinate Reference System"),
+    ("CSE", "Computer Science and Engineering"),
+    ("CSV", "Comma-Separated Values"),
+    ("DPI", "Dots Per Inch"),
+    ("EPSG", "European Petroleum Survey Group (CRS registry)"),
+    ("FST", "Faculty of Science and Technology"),
+    ("GIS", "Geographic Information System"),
+    ("KD-tree", "k-Dimensional Tree"),
+    ("MCLP", "Maximal Covering Location Problem"),
+    ("MRT", "Mass Rapid Transit"),
+    ("ODbL", "Open Database License"),
+    ("OSM", "OpenStreetMap"),
+    ("POI", "Point of Interest"),
+    ("UTM", "Universal Transverse Mercator"),
+    ("WGS84", "World Geodetic System 1984"),
+]
+
 # Population raster (WorldPop Bangladesh, 1 km, UN-adjusted 2020) for weighting
 # the section benefit analysis by how many people actually live somewhere.
 POP_RASTER_URL = ("https://data.worldpop.org/GIS/Population/Global_2000_2020_1km_UNadj/"
@@ -2000,9 +2056,10 @@ def build_poster(table, sb, ext, recs, flagship_key) -> str:
     return str(out)
 
 
-def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
-    """Complete AIUB-formatted thesis (Times New Roman, A4, 1in margins) with our
-    content in the AIUB chapter structure. Names/IDs/supervisor left as [placeholders]."""
+def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TABLE_INDEX,
+                 collect: bool = False) -> str:
+    """Render the AIUB-format thesis. With ``collect=True`` it only harvests the
+    figure/table captions (skipping images) so the front-matter lists can be built."""
     from docx import Document
     from docx.enum.text import WD_ALIGN_PARAGRAPH as AL
     from docx.shared import Inches, Pt
@@ -2037,6 +2094,9 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
         doc.add_heading(t, level=2)
 
     def figure(name, caption, width=5.6):
+        if collect:
+            FIGURE_INDEX.append(caption)
+            return
         p = FIGURES_DIR / name
         if p.exists():
             doc.add_picture(str(p), width=Inches(width))
@@ -2048,6 +2108,10 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
             c.alignment = AL.CENTER
 
     def table_from(header, rows, caption=None):
+        if collect:
+            if caption:
+                TABLE_INDEX.append(caption)
+            return
         t = doc.add_table(rows=1, cols=len(header))
         try:
             t.style = "Light Grid Accent 1"
@@ -2082,6 +2146,7 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
         r.font.size = Pt(10)
 
     tf = table.set_index("service")
+    ref_sections = zone_reference()
     def upct(s):
         return tf.loc[s, "pct_grid_underserved"]
     total_pop_m = (sb.df["pop_est"].sum() / 1e6) if sb.pop_weighted else 10.7
@@ -2089,100 +2154,147 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
     worst = sb.df.iloc[-1]
 
     # ------------------------------------------------------------------ title page
-    for _ in range(3):
-        doc.add_paragraph()
-    tt = doc.add_paragraph()
-    tr = tt.add_run(THESIS_TITLE)
-    tr.bold = True
-    tr.font.size = Pt(18)
-    tt.alignment = AL.CENTER
-    doc.add_paragraph()
-    for line, sz, b in [("A thesis submitted in partial fulfilment of the requirements for the "
-                         "degree of Bachelor of Science in Computer Science & Engineering", 12, False),
-                        ("", 12, False),
-                        ("Submitted by", 12, True),
-                        ("[Student Name] — [ID]   ·   Minhazul Abedin — [ID]   ·   Ramim [Full Name] — [ID]", 12, False),
-                        ("", 12, False),
-                        ("Supervised by", 12, True),
-                        ("[Supervisor's Name], Department of Computer Science", 12, False),
-                        ("", 12, False),
-                        ("Faculty of Science and Technology", 12, False),
-                        ("American International University-Bangladesh (AIUB)", 12, True),
-                        ("[Month, Year]", 12, False)]:
+    def centred(txt, size, bold=False, space_after=0):
         p = doc.add_paragraph()
-        r = p.add_run(line)
-        r.bold = b
-        r.font.size = Pt(sz)
         p.alignment = AL.CENTER
+        p.paragraph_format.line_spacing = 1.0
+        p.paragraph_format.space_after = Pt(space_after)
+        r = p.add_run(txt)
+        r.font.size = Pt(size)
+        r.bold = bold
+        return p
+
+    centred("American International University-Bangladesh (AIUB)", 14)
+    centred("Faculty of Science and Technology", 14, space_after=28)
+    centred(THESIS_TITLE, 22, bold=True, space_after=30)
+    for nm, sid in AUTHORS:
+        centred(f"{nm} ({sid})", 17)
+    doc.add_paragraph()
+    for line in DEGREE_LINES:
+        centred(line, 14)
+    doc.add_paragraph()
+    centred(SEMESTER, 14)
+    centred("Submission Date: [Month, Year]", 14)
     doc.add_page_break()
 
     # ------------------------------------------------------------------ front matter
     h1("Declaration")
-    para("(All candidates to reproduce this section in their thesis verbatim.)", italic=True)
-    para("This thesis is composed of our original work, and contains no material previously "
-         "published or written by another person except where due reference has been made in the "
-         "text. We have clearly stated the contribution by others to jointly-authored works that "
-         "we have included in our thesis. We acknowledge that copyright of all material contained "
-         "in our thesis resides with the copyright holder(s) of that material. Where appropriate we "
-         "have obtained copyright permission from the copyright holders to reproduce material in "
-         "this thesis.")
+    para("(All candidates to reproduce this section in their thesis verbatim)", italic=True)
+    for t in DECLARATION_TEXT:
+        para(t)
     doc.add_paragraph()
-    for nm in ("[Student Name] — [ID]", "Minhazul Abedin — [ID]", "Ramim [Full Name] — [ID]"):
-        para(nm + "  ____________________", justify=False)
+    sig = doc.add_table(rows=len(AUTHORS), cols=2)
+    sig.style = "Table Grid"
+    for i, (nm, sid) in enumerate(AUTHORS):
+        sig.rows[i].cells[0].text = f"{nm}\n{sid}"
+        sig.rows[i].cells[1].text = "\n______________________\nSignature"
+    doc.add_page_break()
 
     h1("Approval")
     para("The thesis titled “" + THESIS_TITLE + "” has been submitted to the following "
-         "respected members of the Board of Examiners of the Faculty of Science and Technology in "
-         "partial fulfilment of the requirements for the degree of Bachelor of Science in Computer "
-         "Science & Engineering on [date] and has been accepted as satisfactory.")
+         "respected members of the board of examiners of the department of computer science in "
+         "partial fulfilment of the requirements for the degree of Bachelor of Science in "
+         "Computer Science on [date of defense] and has been accepted as satisfactory.")
     doc.add_paragraph()
-    for role in ("[Supervisor's Name]  —  Supervisor", "[External Examiner]  —  External Examiner",
-                 "[Head of Department]  —  Department of Computer Science"):
-        para(role, justify=False)
+    ex = doc.add_table(rows=len(EXAMINERS), cols=2)
+    ex.style = "Table Grid"
+    for i, (nm, rank) in enumerate(EXAMINERS):
+        c0 = ex.rows[i].cells[0]
+        c0.text = nm
+        for r in c0.paragraphs[0].runs:
+            r.bold = True
+        c0.add_paragraph(rank)
+        ex.rows[i].cells[1].text = "\n______________________\nSignature"
+    doc.add_page_break()
 
     h1("Acknowledgement")
-    para("All praise is due to Almighty Allah for granting us the strength, patience, and "
-         "opportunity to complete this thesis successfully. We express our sincere gratitude to our "
-         "supervisor, [Supervisor's Name], Department of Computer Science, American International "
-         "University-Bangladesh, for his continuous guidance and valuable feedback. We are also "
-         "grateful to the Faculty of Science and Technology and the Department of Computer Science, "
-         "AIUB, for providing the academic environment and resources. Finally, we acknowledge the "
-         "open-data communities behind OpenStreetMap, WorldPop and the Humanitarian Data Exchange, "
-         "whose freely available datasets made this study possible.")
+    para("All praise is due to Almighty Allah for granting us the strength, patience and "
+         "opportunity to complete this thesis successfully.")
+    para("We express our sincere gratitude to our supervisor, [Name of the Supervisor], "
+         "Department of Computer Science, American International University-Bangladesh, for "
+         "continuous guidance, constructive criticism and encouragement throughout this research. "
+         "The scope and rigour of this work owe much to that supervision.")
+    para("We are grateful to the Faculty of Science and Technology and the Department of Computer "
+         "Science, AIUB, for providing the academic environment, laboratory access and resources "
+         "that made this study possible, and to the members of the board of examiners for their "
+         "time and valuable feedback.")
+    para("We also acknowledge the open-data communities whose freely available datasets underpin "
+         "this research: the OpenStreetMap contributors, whose volunteered geographic information "
+         "provided every facility location used here; the WorldPop programme at the University of "
+         "Southampton for open gridded population estimates; and the maintainers of the "
+         "open-source scientific Python ecosystem — NumPy, SciPy, Shapely, GeoPandas, OSMnx, "
+         "Matplotlib and others — on which the entire analysis is built.")
+    para("Finally, we thank our families and friends for their patience and support during the "
+         "course of this work.")
+    doc.add_page_break()
 
     h1("Abstract")
     para(
-        "Dhaka, one of the world's densest megacities, has expanded far faster than its public "
-        "utilities, producing sharp spatial inequalities in access. This thesis presents a "
-        "reproducible framework that uses Voronoi diagrams to analyse the provision of six utility "
-        "services — metro stations, hospitals, water sources, fuel stations, bus stops and fire "
-        "stations — across Dhaka. Facility locations are drawn from OpenStreetMap and residents "
-        "from the WorldPop population grid. For each service an exact Voronoi partition is built, "
-        "nearest-facility coverage is measured on a fine grid, and the city is scored by a "
-        "population- and emergency-weighted benefit index over eight named sections. New facility "
-        "locations are recommended with a greedy maximal-covering heuristic that targets the "
-        "most-populated underserved areas. Access is strongly clustered (Moran's I = "
-        f"{ext.moran[0]:.2f}) and moderately unequal (Gini = {ext.gini_combined:.2f}); the central "
-        f"belt ({best}) is best served while {worst['section']} ({worst['benefit_score']:.0f}) lags. "
-        "Water pumps and metro are the widest gaps, and dense old Dhaka (Motijheel) is the "
-        "highest-impact site for new facilities. The Voronoi results agree with the established "
-        "2SFCA method for scarce services, the greedy recommendations recover essentially all of "
-        "the exact optimum, and accounting for road-network distance roughly doubles the "
-        "underserved share. The complete pipeline is released as a single reproducible program.")
+        "Dhaka is among the most densely populated cities in the world and has expanded far "
+        "faster than its public utility networks, producing pronounced spatial inequalities in "
+        "access to essential services. This thesis analyses the provision of six utility services "
+        "across Dhaka — metro stations, hospitals, water sources, fuel stations, bus stops and "
+        "fire stations — using Voronoi diagrams, and recommends where new facilities should be "
+        f"placed. Facility locations for {int(table['n_facilities'].sum())} facilities were "
+        "collected from OpenStreetMap and the resident population from the WorldPop 1 km gridded "
+        f"estimates (approximately {total_pop_m:.1f} million residents within the study area). "
+        "For every service an exact Voronoi partition was constructed from perpendicular "
+        "bisectors and clipped to the city boundary; nearest-facility distance was measured on a "
+        f"{GRID_SPACING_M:.0f} m demand grid using a k-d tree; the city was divided into eight "
+        "named sections and scored with a population- and emergency-weighted benefit index; and "
+        "new facility sites were selected with a greedy maximal-covering heuristic that targets "
+        "the most-populated underserved locations.")
+    para(
+        f"The results show that combined utility access is moderately unequal (Gini = "
+        f"{ext.gini_combined:.3f}) and strongly spatially clustered (Moran's I = "
+        f"{ext.moran[0]:.2f}, pseudo p = {ext.moran[1]:.3f}). The central belt is best served "
+        f"({best}), while {worst['section']} ({worst['benefit_score']:.0f}) and Uttara lag "
+        f"behind. Water sources ({upct('water_pump'):.0f}% of the area beyond threshold) and "
+        f"metro stations ({upct('metro_station'):.0f}%) exhibit the widest coverage gaps, whereas "
+        f"hospitals show the narrowest ({upct('hospital'):.0f}%). Because Motijheel is the most "
+        "populous section yet only moderately served, it emerges as the highest-impact target for "
+        "investment: three new fire stations there and in adjacent sections reduce the "
+        f"underserved population from {recs['fire_station'].before.underserved_people/1000:.0f} "
+        f"thousand to {recs['fire_station'].after.underserved_people/1000:.0f} thousand.")
+    para(
+        "The approach was validated in three ways: its section rankings agree with the "
+        "established two-step floating catchment area (2SFCA) method for scarce, "
+        "distance-dominated services; the greedy recommender recovers essentially all of the "
+        "coverage achieved by an exact maximal-covering optimum; and repeating the analysis with "
+        "road-network shortest-path distance shows that straight-line distance understates the "
+        "true access gap, roughly doubling the underserved share. The work is significant because "
+        "it provides the first integrated, multi-utility, population-weighted and fully "
+        "reproducible accessibility assessment of Dhaka, giving planners an auditable evidence "
+        "base for siting decisions; the complete pipeline, figures, interactive maps and this "
+        "report regenerate from a single command.")
     h1("Keywords")
-    para("Voronoi diagram; spatial accessibility; utility services; facility location; "
-         "maximal covering; GIS; OpenStreetMap; WorldPop; Dhaka.", justify=False)
+    para("Voronoi diagram; spatial accessibility; utility services; facility location; maximal "
+         "covering location problem; geographic information system; OpenStreetMap; WorldPop; "
+         "urban service equity; Dhaka.", justify=False)
+    doc.add_page_break()
 
-    for lst in ("Table of Contents", "List of Figures", "List of Tables"):
-        h1(lst)
-        para(f"[{lst}: generate in Word via References → {'Table of Contents' if 'Content' in lst else 'Insert Table of ' + lst.split()[-1]}, "
-             "or update the field after inserting figure/table captions.]", italic=True, justify=False)
+    h1("Table of Content")
+    para("Insert an automatic table of contents here in Microsoft Word "
+         "(References → Table of Contents → Automatic Table), then right-click and choose "
+         "“Update Field” after the document is finalised. All chapter and section headings in "
+         "this document use the built-in Heading 1/2/3 styles, so they will be captured "
+         "automatically.", italic=True)
+    doc.add_page_break()
+
+    h1("List of Figures")
+    _fig_rows = [[cap, ""] for cap in FIGURE_INDEX]
+    table_from(["Figure", "Page"], _fig_rows)
+    para("Page numbers are populated automatically when the list is inserted as a Table of "
+         "Figures in Word (References → Insert Table of Figures).", italic=True)
+    doc.add_page_break()
+
+    h1("List of Tables")
+    _tab_rows = [[cap, ""] for cap in TABLE_INDEX]
+    table_from(["Table", "Page"], _tab_rows)
+    doc.add_page_break()
+
     h1("List of Abbreviations")
-    table_from(["Abbreviation", "Meaning"],
-               [["GIS", "Geographic Information System"], ["OSM", "OpenStreetMap"],
-                ["CRS", "Coordinate Reference System"], ["UTM", "Universal Transverse Mercator"],
-                ["2SFCA", "Two-Step Floating Catchment Area"], ["MCLP", "Maximal Covering Location Problem"],
-                ["POI", "Point of Interest"], ["KDE/KD-tree", "k-dimensional tree"]])
+    table_from(["Abbreviation", "Elaboration"], [[a, b] for a, b in ABBREVIATIONS])
     doc.add_page_break()
 
     # ------------------------------------------------------------------ Chapter 1
@@ -2445,15 +2557,97 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
          "Shapely, GeoPandas, osmnx, rasterio, contextily, folium, Matplotlib and pytest. All "
          "outputs — figures, report, interactive maps and a dashboard — regenerate with a "
          "single command.")
-    h2("4.3 Implementation of the System")
+    h2("4.3 Data Collection and Preparation")
+    para("All facility data used in this study is authentic, openly licensed data rather than "
+         "simulated coordinates. Each of the six services was queried from the live OpenStreetMap "
+         "database through the OSMnx library using the tag filters listed in Table 4.1, restricted "
+         f"to the Dhaka bounding box {DHAKA_BBOX}. Because OpenStreetMap represents many "
+         "facilities as building polygons rather than points, every returned geometry was reduced "
+         "to a single interior representative point computed in the metric projection. The raw "
+         "responses were then de-duplicated within "
+         f"{MIN_SEED_DISTANCE:.0f} m — necessary because large hospitals and filling stations are "
+         "frequently mapped several times as separate nodes, ways and relations — and clipped to "
+         "the administrative boundary of the city.")
+    _osm_rows = []
+    for k in SERVICE_TYPES:
+        svc = SERVICE_TYPES[k]
+        tags = "; ".join(f"{t}={'|'.join(v) if isinstance(v, list) else v}"
+                         for t, v in svc.osm_tags.items())
+        raw_p = RAW_DIR / f"{k}.csv"
+        n_raw = max(sum(1 for _ in open(raw_p, encoding="utf-8")) - 1, 0) if raw_p.exists() else 0
+        _osm_rows.append([svc.label, tags, n_raw, int(tf.loc[k, "n_facilities"]),
+                          f"{svc.underserved_m/1000:.1f}"])
+    table_from(["Service", "OpenStreetMap tag filter", "Raw", "Cleaned", "Threshold (km)"],
+               _osm_rows,
+               "Table 4.1. Authentic OpenStreetMap queries, facility counts before and after "
+               "cleaning, and the distance threshold applied to each service.")
+    para(f"The retained dataset comprises {int(table['n_facilities'].sum())} facilities. The "
+         "reduction from raw to cleaned counts is substantial for the densely mapped categories "
+         "(water sources and hospitals in particular), which reflects duplicate mapping and "
+         "features lying just outside the administrative boundary rather than data loss. Table 4.2 "
+         "lists representative records drawn directly from the processed files to demonstrate the "
+         "authenticity and heterogeneity of the source data: names appear in both Bangla and "
+         "English exactly as contributed by OpenStreetMap volunteers.")
+    _sample_rows = []
+    for k in SERVICE_TYPES:
+        _pp = PROCESSED_DIR / f"{k}.csv"
+        if not _pp.exists():
+            continue
+        _df = pd.read_csv(_pp)
+        _named = [n for n in _df["name"].tolist()
+                  if isinstance(n, str) and not n.startswith(k + " #") and n.lower() != "unknown"]
+        for _nm in _named[:2]:
+            _row = _df[_df["name"] == _nm].iloc[0]
+            _sample_rows.append([SERVICE_TYPES[k].label, _nm[:44],
+                                 f"{_row['lat']:.4f}", f"{_row['lon']:.4f}", _row["source"]])
+    table_from(["Service", "Facility name (as mapped)", "Latitude", "Longitude", "Source"],
+               _sample_rows,
+               "Table 4.2. Representative authentic records from the processed datasets, showing "
+               "original OpenStreetMap names and coordinates.")
+    para("Resident population was taken from the WorldPop Bangladesh 1 km UN-adjusted 2020 raster "
+         "and sampled at every demand-grid point, scaled from persons per raster pixel to persons "
+         f"per grid cell. Summed over the study area this yields approximately {total_pop_m:.1f} "
+         "million residents, which is consistent with published estimates for the Dhaka city "
+         "area and provides an independent check that the raster was sampled and scaled correctly. "
+         "Table 4.3 records the fixed analysis parameters so that the experiment can be repeated "
+         "exactly.")
+    table_from(["Parameter", "Value"],
+               [["Study-area bounding box (lon/lat)", str(DHAKA_BBOX)],
+                ["Geographic CRS (input/output)", CRS_GEO + " (WGS 84)"],
+                ["Metric CRS (all distance and area)", CRS_METRIC + " (UTM zone 46N)"],
+                ["Boundary", "OpenStreetMap administrative polygon ∩ bounding box"],
+                ["Demand-grid spacing", f"{GRID_SPACING_M:.0f} m"],
+                ["De-duplication distance", f"{MIN_SEED_DISTANCE:.0f} m"],
+                ["Population raster", "WorldPop BGD 1 km UN-adjusted, 2020"],
+                ["Facilities proposed per service (k)", str(RECOMMEND_K)],
+                ["Figure resolution", f"{FIGURE_DPI} DPI"]],
+               "Table 4.3. Fixed analysis parameters.")
+    para("Finally, Table 4.4 reports how the authentic facilities distribute across the eight "
+         "sections. The concentration in the central sections, and the sparse coverage of "
+         "Bashundhara and the outer fringe, is visible in the raw counts before any accessibility "
+         "modelling is applied — an early indication of the inequality the later analysis "
+         "quantifies.")
+    _sec_names, _sec_counts = list(ref_sections.names), {}
+    for k, sv in voronois.items():
+        _idx = KDTree(ref_sections.centers_m).query(sv.seeds)[1]
+        _sec_counts[k] = [int((_idx == i).sum()) for i in range(len(_sec_names))]
+    _rows = []
+    for i, _s in enumerate(_sec_names):
+        _rows.append([_s] + [_sec_counts[k][i] for k in SERVICE_TYPES]
+                     + [sum(_sec_counts[k][i] for k in SERVICE_TYPES)])
+    table_from(["Section"] + [SERVICE_TYPES[k].label.split()[0] for k in SERVICE_TYPES] + ["Total"],
+               _rows,
+               "Table 4.4. Authentic facility counts by section and service.")
+
+    h2("4.4 Implementation of the System")
     para("Before analysing Dhaka, the Voronoi construction was verified on three textbook seed "
          "sets: every diagram has straight perpendicular-bisector edges, degree-three vertices, and "
          "tiles its bounding box exactly (Figure 4.1).")
     figure("textbook_all.png", "Figure 4.1. Textbook Voronoi correctness verification.", 5.8)
-    para("The pipeline then builds a Voronoi partition and coverage map for each service; Figure "
-         "4.2 shows the hospital example over the Dhaka basemap.")
-    figure("voronoi_hospital.png", "Figure 4.2. Hospital Voronoi coverage over Dhaka.", 5.2)
-    h2("4.4 Evaluation and Testing")
+    para("With the geometry verified, the pipeline builds a Voronoi partition, coverage grid and "
+         "section scores for each of the six services in turn; the resulting maps are presented "
+         "service by service in Section 4.5.1.")
+    h2("4.5 Evaluation and Testing")
     para("As a spatial-analysis system, testing centred on correctness rather than predictive "
          "accuracy. A suite of 29 automated tests verifies the geometry (exact tiling, degree-three "
          "vertices, bisector midpoints), the coverage metrics, and the recommender. The Voronoi "
@@ -2461,23 +2655,23 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
          "maximal-covering optimum.")
     table_from(["Service", "2SFCA vs Voronoi (ρ)"],
                [[r["service"], r["spearman_vs_voronoi"]] for _, r in ext.tsfca_agreement.iterrows()],
-               "Table 4.1. Agreement between Voronoi and 2SFCA rankings.")
+               "Table 4.5. Agreement between Voronoi and 2SFCA rankings.")
     table_from(["Service", "Greedy (k, thousands)", "Optimal (k, thousands)", "Greedy % of optimal"],
                [[r["service"], f"{r['greedy_covered_k']:.0f}", f"{r['optimal_covered_k']:.0f}",
                  f"{r['greedy_pct_of_optimal']}%"] for _, r in ext.mclp.iterrows()],
-               "Table 4.2. Greedy vs exact maximal-covering placement.")
-    h2("4.5 Results and Discussion")
+               "Table 4.6. Greedy vs exact maximal-covering placement.")
+    h2("4.6 Results and Discussion")
     para("Coverage varies sharply by service. Water pumps and metro have the widest gaps "
          f"({upct('water_pump'):.0f}% and {upct('metro_station'):.0f}% of the area beyond threshold), "
-         f"while hospitals cover the most ({upct('hospital'):.0f}% underserved). Table 4.3 "
+         f"while hospitals cover the most ({upct('hospital'):.0f}% underserved). Table 4.7 "
          "summarises the per-service coverage.")
     table_from(["Service", "Facilities", "Mean cell (km²)", "Max cell (km²)", "Area underserved (%)"],
                [[SERVICE_TYPES[k].label, int(tf.loc[k, "n_facilities"]),
                  f"{tf.loc[k, 'mean_cell_km2']:.2f}", f"{tf.loc[k, 'max_cell_km2']:.1f}",
                  f"{tf.loc[k, 'pct_grid_underserved']:.0f}"] for k in SERVICE_TYPES],
-               "Table 4.3. Per-service coverage summary.")
+               "Table 4.7. Per-service coverage summary.")
 
-    h2("4.5.1 Coverage of each service")
+    h2("4.6.1 Coverage of each service")
     para("Each service is examined individually below. Its Voronoi partition is drawn over the "
          "Dhaka basemap with cells coloured by the section they belong to, the facilities marked "
          "in the service's own colour, and underserved (oversized) cells outlined in red.")
@@ -2495,77 +2689,79 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
         "fire_station": "Fire stations are few and widely spaced; their Voronoi cells are the "
                         "largest, and emergency reach is a concern on the fringe.",
     }
-    for k in SERVICE_TYPES:
+    for _svc_i, k in enumerate(SERVICE_TYPES):
         svc = SERVICE_TYPES[k]
-        figure(f"voronoi_{k}.png", f"Figure. {svc.label} — Voronoi coverage over Dhaka.", 4.4)
+        figure(f"voronoi_{k}.png",
+               f"Figure 4.{_svc_i + 2}. {svc.label} — Voronoi coverage over Dhaka, cells "
+               "coloured by section.", 4.4)
         para(f"{svc.label}. {int(tf.loc[k,'n_facilities'])} facilities; mean cell "
              f"{tf.loc[k,'mean_cell_km2']:.2f} km² (largest {tf.loc[k,'max_cell_km2']:.1f} km²); "
              f"{tf.loc[k,'pct_grid_underserved']:.0f}% of the area beyond the "
              f"{svc.underserved_m/1000:.1f} km threshold. {_svc_notes[k]}")
 
-    h2("4.5.2 Which areas benefit most")
+    h2("4.6.2 Which areas benefit most")
     para(f"Weighting by population and emergency importance, the central belt is best served "
          f"({best}); {worst['section']} scores lowest ({worst['benefit_score']:.0f}). The most "
          "populous section, Motijheel (old Dhaka), is only moderately served and is therefore the "
-         "highest-impact target for investment (Figures 4.3–4.4, Table 4.4).")
-    figure("zones_dhaka_flagship.png", "Figure 4.3. Voronoi coloured by the eight sections.", 5.0)
-    figure("section_benefit.png", "Figure 4.4. Population-weighted benefit score by section.", 5.0)
+         "highest-impact target for investment (Figures 4.8–4.9, Table 4.8).")
+    figure("zones_dhaka_flagship.png", "Figure 4.8. Voronoi coloured by the eight sections.", 5.0)
+    figure("section_benefit.png", "Figure 4.9. Population-weighted benefit score by section.", 5.0)
     table_from(["Section", "Population", "Benefit score", "Weakest service"],
                [[r["section"], f"{r['pop_est']/1e6:.2f} M" if sb.pop_weighted else "-",
                  f"{r['benefit_score']:.0f}", r["weakest_service"]] for _, r in sb.df.iterrows()],
-               "Table 4.4. Section benefit ranking (population-weighted).")
+               "Table 4.8. Section benefit ranking (population-weighted).")
 
-    h2("4.5.3 Recommendations")
+    h2("4.6.3 Recommendations")
     para("Population-targeted greedy placement concentrates new facilities in dense, underserved "
-         "areas rather than the empty fringe. Table 4.5 reports the drop in underserved population "
-         "from adding three facilities per service, and Figure 4.5 shows the fire-station example.")
+         "areas rather than the empty fringe. Table 4.9 reports the drop in underserved population "
+         "from adding three facilities per service, and Figures 4.10–4.12 show three examples.")
     table_from(["Service", "Underserved before → after (thousands)", "New sites (sections)"],
                [[SERVICE_TYPES[k].label,
                  f"{recs[k].before.underserved_people/1000:.0f} → {recs[k].after.underserved_people/1000:.0f}",
                  ", ".join(recs[k].new_zones)] for k in SERVICE_TYPES],
-               "Table 4.5. Coverage improvement from the proposed facilities.")
-    figure("recommendations_fire_station.png", "Figure 4.5. Existing vs proposed fire stations.", 4.8)
-    figure("recommendations_hospital.png", "Figure 4.6. Existing vs proposed hospitals.", 4.8)
-    figure("recommendations_water_pump.png", "Figure 4.7. Existing vs proposed water sources.", 4.8)
+               "Table 4.9. Coverage improvement from the proposed facilities.")
+    figure("recommendations_fire_station.png", "Figure 4.10. Existing vs proposed fire stations.", 4.8)
+    figure("recommendations_hospital.png", "Figure 4.11. Existing vs proposed hospitals.", 4.8)
+    figure("recommendations_water_pump.png", "Figure 4.12. Existing vs proposed water sources.", 4.8)
 
-    h2("4.5.4 Equity, clustering and combined access")
+    h2("4.6.4 Equity, clustering and combined access")
     para(f"Combining all services into one access index, access is moderately unequal (Gini = "
          f"{ext.gini_combined:.3f}) and strongly clustered (Moran's I = {ext.moran[0]:.3f}, "
          f"pseudo p = {ext.moran[1]:.3f}) — well- and poorly-served areas form contiguous "
          "regions. Per-section values of the combined index mirror the benefit ranking of "
-         "Table 4.4. The Lorenz curve (Figure 4.8) summarises the equity of access.")
-    figure("lorenz_access.png", "Figure 4.8. Lorenz curve of combined utility access.", 4.2)
-    para("A sensitivity check (Table 4.6) shows the section ranking is robust: under ±25% "
+         "Table 4.8. The Lorenz curve (Figure 4.13) summarises the equity of access.")
+    figure("lorenz_access.png", "Figure 4.13. Lorenz curve of combined utility access.", 4.2)
+    para("A sensitivity check (Table 4.50) shows the section ranking is robust: under ±25% "
          "thresholds and equal service weights the ranking barely changes (Spearman ρ ≈ 0.98).")
     table_from(["Scenario", "Rank corr. (ρ)", "Best", "Worst"],
                [[r["scenario"], r["rank_corr_vs_baseline"], r["best"], r["worst"]]
                 for _, r in ext.sensitivity.iterrows()],
-               "Table 4.6. Sensitivity of the section ranking.")
+               "Table 4.50. Sensitivity of the section ranking.")
 
-    h2("4.5.5 Road-network distance")
+    h2("4.6.5 Road-network distance")
     para("Repeating the analysis with shortest-path distance on the Dhaka road network (rather than "
          "straight-line distance) confirms that Euclidean distance understates real travel: the "
          "median detour is about 1.5×, and the underserved share roughly doubles for several "
-         "services (Figure 4.9). This is a key finding — the true access gap is larger than a "
+         "services (Figure 4.14). This is a key finding — the true access gap is larger than a "
          "straight-line analysis suggests.")
-    figure("network_vs_euclid.png", "Figure 4.9. Underserved share: straight-line vs road network.", 5.6)
+    figure("network_vs_euclid.png", "Figure 4.14. Underserved share: straight-line vs road network.", 5.6)
 
-    h2("4.5.6 Validation against the 2SFCA method")
+    h2("4.6.6 Validation against the 2SFCA method")
     para("As a further check, the two-step floating catchment area (2SFCA) accessibility was "
          "computed per service and its section ranking correlated with the Voronoi nearest-distance "
-         "ranking (Table 4.1). Agreement is strong for scarce, distance-dominated services (metro, "
+         "ranking (Table 4.5). Agreement is strong for scarce, distance-dominated services (metro, "
          "water, hospital) and weaker for dense or demand-sensitive ones, where 2SFCA additionally "
          "penalises the crowding of facilities. The two methods are complementary: the Voronoi "
          "partition captures proximity cleanly and reproducibly, while 2SFCA adds supply–demand "
          "balance.")
-    para("Facility density (Table 4.7) contextualises the counts against area and population; "
+    para("Facility density (Table 4.51) contextualises the counts against area and population; "
          "because OpenStreetMap completeness varies, these figures should be read as a lower bound.")
     table_from(["Service", "Facilities", "per 100k people", "km² / facility"],
                [[r["service"], int(r["facilities"]), r["per_100k_people"], r["km2_per_facility"]]
                 for _, r in ext.density.iterrows()],
-               "Table 4.7. Facility density and completeness context.")
+               "Table 4.51. Facility density and completeness context.")
 
-    h2("4.6 Summary")
+    h2("4.7 Summary")
     para("This chapter described the implementation environment, the pipeline stages, the testing "
          "performed, and the results — identifying the central belt as best served, Motijheel "
          "as the top investment target, and water and metro as the weakest services.")
@@ -2679,8 +2875,18 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
                "Table A.1. Distance thresholds and service weights used throughout.")
 
     out = OUTPUTS_DIR / "Dhaka_Voronoi_AIUB_Thesis.docx"
+    if collect:
+        return ""
     doc.save(str(out))
     return str(out)
+
+
+def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key, voronois) -> str:
+    """Two-pass build: harvest figure/table captions, then render with real lists."""
+    figs: list[str] = []
+    tabs: list[str] = []
+    _render_aiub(table, sb, ext, recs, flagship_key, voronois, figs, tabs, collect=True)
+    return _render_aiub(table, sb, ext, recs, flagship_key, voronois, figs, tabs, collect=False)
 
 
 def build_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
@@ -3423,7 +3629,7 @@ def main(force_figures: bool = False, k: int = RECOMMEND_K, network: bool = Fals
     thesisdocx = build_thesis_docx(table, sb, ext, recs, flagship_key)
     poster = build_poster(table, sb, ext, recs, flagship_key)
     plot_gantt()
-    aiub = build_aiub_thesis_docx(table, sb, ext, recs, flagship_key)
+    aiub = build_aiub_thesis_docx(table, sb, ext, recs, flagship_key, voronois)
     print("\nDONE")
     print("  PDF (static, full)                             ->", pdf)
     print("  PDF (static, lightweight)                      ->", pdf_light)
