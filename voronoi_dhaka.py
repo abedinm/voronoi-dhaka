@@ -3554,6 +3554,42 @@ def build_pdf_report(voronois, coverages, table, recs, flagship_key, sb, ext, li
     return str(out)
 
 
+def export_office_pdfs() -> list[str]:
+    """Convert the Word/PowerPoint deliverables to PDF via LibreOffice, if available.
+
+    Returns the paths written. Skips silently (with a note) when LibreOffice is not
+    installed, since the .docx/.pptx files remain the primary artefacts."""
+    import shutil
+    import subprocess
+
+    soffice = shutil.which("soffice") or shutil.which("libreoffice")
+    if soffice is None:
+        mac = Path("/Applications/LibreOffice.app/Contents/MacOS/soffice")
+        soffice = str(mac) if mac.exists() else None
+    if soffice is None:
+        print("    [pdf] LibreOffice not found; skipping .docx/.pptx -> PDF export")
+        return []
+
+    targets = ["Dhaka_Voronoi_AIUB_Thesis.docx", "Dhaka_Voronoi_Poster_AIUB.pptx",
+               "Dhaka_Voronoi_Slides.pptx"]
+    written = []
+    for name in targets:
+        src_file = OUTPUTS_DIR / name
+        if not src_file.exists():
+            continue
+        try:
+            subprocess.run([soffice, "--headless", "--convert-to", "pdf",
+                            "--outdir", str(OUTPUTS_DIR), str(src_file)],
+                           check=True, capture_output=True, timeout=300)
+        except Exception as exc:
+            print(f"    [pdf] {name}: conversion failed ({type(exc).__name__})")
+            continue
+        out = src_file.with_suffix(".pdf")
+        if out.exists():
+            written.append(str(out))
+    return written
+
+
 # =========================================================================== #
 # MAIN
 # =========================================================================== #
@@ -3643,6 +3679,8 @@ def main(force_figures: bool = False, k: int = RECOMMEND_K, network: bool = Fals
     print("  Thesis draft (Word: Abstract, Ch.1,3,4,5)      ->", thesisdocx)
     print("  AIUB-formatted thesis (Word, full)             ->", aiub)
     print("  Defense poster (A1)                            ->", poster)
+    for _p in export_office_pdfs():
+        print("  PDF export                                     ->", _p)
     print("  Benefit map                                    -> outputs/figures/section_benefit.png")
     print("  Interactive — Dhaka sections + all utilities   ->", headline_html)
     print("  Interactive — per-utility Voronoi coverage     -> outputs/report/interactive_<service>.html")
