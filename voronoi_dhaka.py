@@ -89,7 +89,7 @@ AUTHORS = [
     ("Mehedi Hasan Aziz", "19-40060-1"),
 ]
 SEMESTER = "Fall 2025-2026 Semester"
-SUBMISSION_DATE = "July, 2026"
+SUBMISSION_DATE = "August, 2026"
 DEFENSE_DATE = "06.07.2026"
 SUPERVISOR = "Dr. Md. Manzurul Hasan"
 SUPERVISOR_RANK = "Associate Professor, Faculty"
