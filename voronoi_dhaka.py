@@ -89,6 +89,10 @@ AUTHORS = [
     ("Mehedi Hasan Aziz", "19-40060-1"),
 ]
 SEMESTER = "Fall 2025-2026 Semester"
+SUBMISSION_DATE = "July, 2026"
+DEFENSE_DATE = "06.07.2026"
+SUPERVISOR = "Dr. Md. Manzurul Hasan"
+SUPERVISOR_RANK = "Associate Professor, Faculty"
 DEGREE_LINES = [
     "A Thesis submitted for the degree of Bachelor of Science (BSc) in",
     "Computer Science and Engineering (CSE) at",
@@ -109,7 +113,7 @@ DECLARATION_TEXT = [
     "permission from co-authors for any jointly authored works included in the thesis.",
 ]
 EXAMINERS = [
-    ("[Name of the Supervisor]", "[Rank], Supervisor"),
+    (SUPERVISOR, SUPERVISOR_RANK + ", Supervisor"),
     ("Prof. Dr. Muhammad Firoz Mridha", "Professor, Department of Computer Science"),
     ("Prof. Dr. Dip Nandi", "Professor & Associate Dean, FST"),
     ("Mashiour Rahman", "Sr. Associate Professor, External"),
@@ -2174,7 +2178,7 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
         centred(line, 14)
     doc.add_paragraph()
     centred(SEMESTER, 14)
-    centred("Submission Date: [Month, Year]", 14)
+    centred("Submission Date: " + SUBMISSION_DATE, 14)
     doc.add_page_break()
 
     # ------------------------------------------------------------------ front matter
@@ -2194,7 +2198,7 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
     para("The thesis titled “" + THESIS_TITLE + "” has been submitted to the following "
          "respected members of the board of examiners of the department of computer science in "
          "partial fulfilment of the requirements for the degree of Bachelor of Science in "
-         "Computer Science on [date of defense] and has been accepted as satisfactory.")
+         "Computer Science on " + DEFENSE_DATE + " and has been accepted as satisfactory.")
     doc.add_paragraph()
     ex = doc.add_table(rows=len(EXAMINERS), cols=2)
     ex.style = "Table Grid"
@@ -2210,8 +2214,9 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
     h1("Acknowledgement")
     para("All praise is due to Almighty Allah for granting us the strength, patience and "
          "opportunity to complete this thesis successfully.")
-    para("We express our sincere gratitude to our supervisor, [Name of the Supervisor], "
-         "Department of Computer Science, American International University-Bangladesh, for "
+    para("We express our sincere gratitude to our supervisor, " + SUPERVISOR + ", "
+         + SUPERVISOR_RANK + ", Department of Computer Science, American International "
+         "University-Bangladesh, for "
          "continuous guidance, constructive criticism and encouragement throughout this research. "
          "The scope and rigour of this work owe much to that supervision.")
     para("We are grateful to the Faculty of Science and Technology and the Department of Computer "
