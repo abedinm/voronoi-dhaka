@@ -3756,7 +3756,7 @@ def export_office_pdfs() -> list[str]:
         return []
 
     targets = ["Dhaka_Voronoi_AIUB_Thesis.docx", "Dhaka_Voronoi_Poster_AIUB.pptx",
-               "Dhaka_Voronoi_Slides.pptx"]
+               "Dhaka_Voronoi_Slides.pptx", "Dhaka_Voronoi_IEEE_Paper.docx"]
     written = []
     for name in targets:
         src_file = OUTPUTS_DIR / name
@@ -3773,6 +3773,389 @@ def export_office_pdfs() -> list[str]:
         if out.exists():
             written.append(str(out))
     return written
+
+
+# =========================================================================== #
+# IEEE CONFERENCE PAPER
+# =========================================================================== #
+PAPER_TITLE = ("Voronoi-Based Multi-Utility Accessibility Assessment and "
+               "Population-Weighted Facility Siting: A Case Study of Dhaka City")
+
+
+def _two_columns(section, space_twips: int = 360):
+    """Set an IEEE-style two-column layout on a section."""
+    from docx.oxml.ns import qn
+    from docx.oxml import OxmlElement
+
+    sectPr = section._sectPr
+    for old in sectPr.findall(qn("w:cols")):
+        sectPr.remove(old)
+    cols = OxmlElement("w:cols")
+    cols.set(qn("w:num"), "2")
+    cols.set(qn("w:space"), str(space_twips))
+    cols.set(qn("w:equalWidth"), "1")
+    sectPr.append(cols)
+
+
+def build_ieee_paper_docx(table, sb, ext, recs) -> str:
+    """Six-page IEEE-format conference paper distilled from the thesis."""
+    from docx import Document
+    from docx.enum.section import WD_SECTION
+    from docx.enum.text import WD_ALIGN_PARAGRAPH as AL
+    from docx.shared import Inches, Pt, RGBColor
+
+    doc = Document()
+    st = doc.styles["Normal"]
+    st.font.name = "Times New Roman"
+    st.font.size = Pt(10)
+    st.paragraph_format.space_after = Pt(0)
+    st.paragraph_format.line_spacing = 1.0
+
+    sec = doc.sections[0]
+    sec.page_width, sec.page_height = Inches(8.5), Inches(11)
+    sec.left_margin = sec.right_margin = Inches(0.75)
+    sec.top_margin = Inches(0.75)
+    sec.bottom_margin = Inches(1.0)
+
+    def p(text, size=10, bold=False, italic=False, align=AL.JUSTIFY,
+          space_before=0, space_after=0, indent=0.2):
+        par = doc.add_paragraph()
+        par.alignment = align
+        par.paragraph_format.space_before = Pt(space_before)
+        par.paragraph_format.space_after = Pt(space_after)
+        if indent:
+            par.paragraph_format.first_line_indent = Inches(indent)
+        r = par.add_run(text)
+        r.font.size = Pt(size)
+        r.bold, r.italic = bold, italic
+        r.font.color.rgb = RGBColor(0, 0, 0)
+        return par
+
+    def heading(num, text):
+        p(f"{num}.  {text.upper()}", size=10, bold=False, align=AL.CENTER,
+          space_before=10, space_after=4, indent=0)
+
+    def subheading(text):
+        p(text, size=10, italic=True, align=AL.LEFT,
+          space_before=6, space_after=2, indent=0)
+
+    def figure(name, caption, width=3.3):
+        path = FIGURES_DIR / name
+        if not path.exists():
+            return
+        doc.add_picture(str(path), width=Inches(width))
+        doc.paragraphs[-1].alignment = AL.CENTER
+        p(caption, size=8, align=AL.CENTER, space_before=3,
+          space_after=8, indent=0)
+
+    def small_table(header, rows, caption, widths=None):
+        """Table sized to fit inside one IEEE column (3.3 in total)."""
+        p(caption, size=8, align=AL.CENTER, space_before=6, space_after=3, indent=0)
+        n = len(header)
+        if widths is None:
+            widths = [3.3 / n] * n
+        t = doc.add_table(rows=1, cols=n)
+        t.style = "Table Grid"
+        t.autofit = False
+        # force a fixed layout with an explicit grid, else Word/LO collapse columns
+        from docx.oxml.ns import qn as _qn
+        from docx.oxml import OxmlElement as _El
+        _tblPr = t._tbl.tblPr
+        _layout = _El("w:tblLayout")
+        _layout.set(_qn("w:type"), "fixed")
+        _tblPr.append(_layout)
+        _tblW = _El("w:tblW")
+        _tblW.set(_qn("w:w"), str(int(sum(widths) * 1440)))
+        _tblW.set(_qn("w:type"), "dxa")
+        _tblPr.append(_tblW)
+        for _gc, _wd in zip(t._tbl.find(_qn("w:tblGrid")).findall(_qn("w:gridCol")), widths):
+            _gc.set(_qn("w:w"), str(int(_wd * 1440)))
+        for j, h in enumerate(header):
+            c = t.rows[0].cells[j]
+            c.width = Inches(widths[j])
+            c.text = str(h)
+            for r in c.paragraphs[0].runs:
+                r.bold = True
+                r.font.size = Pt(7.5)
+        for row in rows:
+            cells = t.add_row().cells
+            for j, v in enumerate(row):
+                cells[j].width = Inches(widths[j])
+                cells[j].text = str(v)
+                for par in cells[j].paragraphs:
+                    par.paragraph_format.space_after = Pt(0)
+                    for r in par.runs:
+                        r.font.size = Pt(7.5)
+        doc.add_paragraph().paragraph_format.space_after = Pt(6)
+
+    tf = table.set_index("service")
+    total_fac = int(table["n_facilities"].sum())
+    total_pop_m = sb.df["pop_est"].sum() / 1e6
+    best3 = ", ".join(f"{r['section']} ({r['benefit_score']:.0f})"
+                      for _, r in sb.df.head(3).iterrows())
+    worst = sb.df.iloc[-1]
+
+    # ---------------- title block (single column) ----------------
+    p(PAPER_TITLE, size=20, align=AL.CENTER, space_after=12, indent=0)
+    authors = "  ".join(f"{n}" for n, _ in AUTHORS)
+    p(authors, size=11, align=AL.CENTER, space_after=2, indent=0)
+    p("Department of Computer Science, Faculty of Science and Technology",
+      size=10, align=AL.CENTER, space_after=0, indent=0)
+    p("American International University-Bangladesh (AIUB), Dhaka, Bangladesh",
+      size=10, align=AL.CENTER, space_after=14, indent=0)
+
+    # ---------------- two-column body ----------------
+    body = doc.add_section(WD_SECTION.CONTINUOUS)
+    body.left_margin = body.right_margin = Inches(0.75)
+    _two_columns(body)
+
+    par = doc.add_paragraph()
+    par.alignment = AL.JUSTIFY
+    r = par.add_run("Abstract—")
+    r.bold = True
+    r.italic = True
+    r.font.size = Pt(9)
+    r2 = par.add_run(
+        "Rapid and largely unplanned growth has left the distribution of essential "
+        "utility services in Dhaka highly uneven, yet existing accessibility studies "
+        "of the city examine one service at a time and rarely weight results by the "
+        "population actually affected. This paper presents an integrated, "
+        "population-weighted framework that uses Voronoi diagrams to assess the "
+        f"provision of six utility services — metro stations, hospitals, water "
+        f"sources, fuel stations, bus stops and fire stations ({total_fac} facilities "
+        "obtained from OpenStreetMap) — and to recommend where new facilities should "
+        "be sited. Each service is partitioned into exact Voronoi cells constructed "
+        "from perpendicular bisectors; nearest-facility distance is evaluated on a "
+        f"{GRID_SPACING_M:.0f} m demand grid using a k-d tree; and eight named "
+        "sections of the city are scored by a benefit index weighted by WorldPop "
+        f"gridded population (approximately {total_pop_m:.1f} million residents) and "
+        "by service criticality. New sites are selected with a greedy maximal-covering "
+        "heuristic that targets the most populated underserved locations. Results show "
+        f"that combined access is moderately unequal (Gini = {ext.gini_combined:.3f}) "
+        f"and strongly spatially clustered (Moran's I = {ext.moran[0]:.2f}, p = "
+        f"{ext.moran[1]:.3f}); the central belt is best served while peripheral "
+        "sections lag, and the most populous section is only moderately served, making "
+        "it the highest-impact investment target. The framework is validated against "
+        "the two-step floating catchment area method, against an exact maximal-covering "
+        "optimum, and against road-network distance, which roughly doubles the measured "
+        "underserved share. The complete pipeline is released as reproducible software.")
+    r2.font.size = Pt(9)
+
+    par = doc.add_paragraph()
+    par.alignment = AL.JUSTIFY
+    r = par.add_run("Keywords—")
+    r.bold = True
+    r.italic = True
+    r.font.size = Pt(9)
+    r2 = par.add_run("Voronoi diagram; spatial accessibility; facility location; "
+                     "maximal covering location problem; GIS; OpenStreetMap; urban "
+                     "service equity; Dhaka")
+    r2.font.size = Pt(9)
+    doc.add_paragraph().paragraph_format.space_after = Pt(4)
+
+    # ---------------- I. Introduction ----------------
+    heading("I", "Introduction")
+    p("Dhaka is among the most densely populated cities in the world and has expanded "
+      "faster than almost any comparable city in South Asia. Utility networks — "
+      "transport, healthcare, water supply, fuel distribution and emergency response — "
+      "have not kept pace with that growth, and provision has proceeded piecemeal. The "
+      "result is a city in which some neighbourhoods enjoy abundant access to essential "
+      "services while others remain materially underserved.", indent=0)
+    p("Measuring where those gaps fall is complicated by the absence of consolidated "
+      "official registries of facility locations, which is precisely why volunteered "
+      "geographic information such as OpenStreetMap has become the practical basis for "
+      "spatial analysis of the city. Voronoi diagrams offer a natural instrument for "
+      "the resulting nearest-service question: partitioning space so that every "
+      "location is assigned to its closest facility yields service areas directly, and "
+      "oversized cells expose coverage gaps without further modelling.")
+    p("Prior accessibility studies of Dhaka, however, share two limitations. They "
+      "consider a single service class in isolation, and they typically report "
+      "coverage over area rather than over population, which overstates the importance "
+      "of sparsely inhabited peripheral land. This paper addresses both. Its "
+      "contributions are: (i) an integrated Voronoi-based assessment of six utility "
+      "services built entirely from open data; (ii) a benefit index that weights "
+      "coverage by gridded population and by service criticality; (iii) "
+      "population-targeted facility recommendations produced by a greedy "
+      "maximal-covering heuristic; and (iv) a threefold validation against the 2SFCA "
+      "method, an exact covering optimum, and road-network distance.")
+
+    # ---------------- II. Related Work ----------------
+    heading("II", "Related Work")
+    p("The Voronoi diagram is the classical instrument for nearest-facility "
+      "partitioning; Okabe et al. [16] provide its definitive treatment and its "
+      "spatial applications. Facility siting under a distance threshold is formalised "
+      "by the maximal covering location problem of Church and ReVelle [6], which "
+      "selects a fixed number of sites so as to cover the greatest demand.", indent=0)
+    p("Distance-decay refinements led to the two-step floating catchment area (2SFCA) "
+      "method of Luo and Wang [14] and the enhanced variant of Luo and Qi [13], which "
+      "jointly account for supply, demand and impedance and remain the dominant "
+      "accessibility framework. Cui et al. [7] generalise the diagram itself, using a "
+      "dynamic Voronoi construction to balance facility service capacity, while Deliry "
+      "and Uygucgil [8] combine network analysis with location-allocation to site new "
+      "facilities.")
+    p("Within Dhaka, Ahmed et al. [1] apply 2SFCA to emergency healthcare and show "
+      "that neglecting traffic congestion overstates coverage roughly threefold. "
+      "Rahman et al. [17] examine accessibility around transit-oriented developments, "
+      "Bhuiya et al. [4] assess evacuation accessibility using participatory GIS, and "
+      "Alam et al. [2] construct an accessibility index for public open space, "
+      "reporting that central and south-western areas enjoy the best access. Each of "
+      "these studies is confined to a single service class.")
+    p("On the data side, Goodchild [10] frames the volunteered geographic information "
+      "paradigm on which OpenStreetMap rests, Klinkhardt et al. [11] quantify the "
+      "completeness of its points of interest against ground truth, and Tatem [18] and "
+      "Lloyd et al. [12] document the WorldPop modelling used here for population "
+      "weighting. Boeing [5] provides the OSMnx toolkit used for data acquisition, and "
+      "Bentley [3] the k-d tree underlying the nearest-facility search.")
+
+    # ---------------- III. Methodology ----------------
+    heading("III", "Methodology")
+    subheading("A. Study Area and Data")
+    p(f"The study area is the Dhaka metropolitan bounding box {DHAKA_BBOX}, "
+      "intersected with the OpenStreetMap administrative boundary of the city. "
+      "Facility locations for the six services were retrieved from OpenStreetMap using "
+      "OSMnx. Polygonal features were reduced to interior representative points, "
+      "duplicates within "
+      f"{MIN_SEED_DISTANCE:.0f} m were removed, and the remainder clipped to the "
+      f"boundary, yielding {total_fac} facilities. Population was sampled from the "
+      "WorldPop 1 km UN-adjusted raster and scaled to the demand grid, giving "
+      f"approximately {total_pop_m:.1f} million residents within the study area.",
+      indent=0)
+    p("All input and output uses WGS 84 (EPSG:4326), while every distance and area is "
+      "computed in UTM zone 46N (EPSG:32646) so that measurements are metric.")
+
+    subheading("B. Voronoi Construction")
+    p("For two facilities p and q, the locus of points at least as close to p is the "
+      "half-plane H(p,q) = {x : |x−p| ≤ |x−q|}, whose boundary is the perpendicular "
+      "bisector of the segment pq. The Voronoi cell of p is the intersection of these "
+      "half-planes over its Delaunay neighbours N(p), clipped to the study boundary B:",
+      indent=0)
+    p("V(p) = B ∩ ⋂ H(p,q),  q ∈ N(p)", align=AL.CENTER, italic=True,
+      space_before=4, space_after=4, indent=0)
+    p("Because each cell is an intersection of half-planes, every interior edge is a "
+      "true perpendicular bisector, exactly three cells meet at each vertex in general "
+      "position, and the cells tile the region without gaps or overlaps. These "
+      "properties are verified by an automated test suite.")
+
+    subheading("C. Coverage and Benefit Index")
+    p("Nearest-facility distance d(x) = min |x−p| is evaluated at every point of a "
+      f"{GRID_SPACING_M:.0f} m grid using a k-d tree [3]. A location is underserved "
+      "for a service when d(x) exceeds a service-specific threshold τ drawn from "
+      "planning practice. Eight named sections, defined as a coarse Voronoi partition "
+      "of well-known area centres, are then scored by", indent=0)
+    p("B_s = 100 · ( Σ w_j · f_{s,j} ) / ( Σ w_j )", align=AL.CENTER, italic=True,
+      space_before=4, space_after=4, indent=0)
+    p("where f_{s,j} is the population-weighted fraction of section s lying within "
+      "τ_j of service j, and w_j weights emergency services and water supply above "
+      "the remainder. Because the fractions are population-weighted, the index "
+      "measures how well a section's residents are served rather than its land.")
+
+    subheading("D. Facility Recommendation")
+    p("New facilities are placed greedily: at each step a site is added at the "
+      "most populated location that remains underserved, and distances are recomputed. "
+      "This directly approximates the maximal covering objective [6] while targeting "
+      "population rather than empty land.", indent=0)
+
+    # ---------------- IV. Results ----------------
+    heading("IV", "Results and Discussion")
+    subheading("A. Coverage by Service")
+    p("Coverage differs sharply between services. Water sources and metro stations "
+      f"exhibit the widest gaps, with {tf.loc['water_pump','pct_grid_underserved']:.0f}% "
+      f"and {tf.loc['metro_station','pct_grid_underserved']:.0f}% of the study area "
+      "beyond threshold respectively, the latter reflecting the single MRT Line-6 "
+      "corridor. Hospitals show the narrowest gap at "
+      f"{tf.loc['hospital','pct_grid_underserved']:.0f}%.", indent=0)
+    small_table(["Service", "Facilities", "Mean cell (km²)", "Underserved (%)"],
+                [[SERVICE_TYPES[k].label, int(tf.loc[k, "n_facilities"]),
+                  f"{tf.loc[k,'mean_cell_km2']:.2f}",
+                  f"{tf.loc[k,'pct_grid_underserved']:.0f}"] for k in SERVICE_TYPES],
+                "TABLE I.  PER-SERVICE COVERAGE SUMMARY",
+                widths=[1.25, 0.6, 0.75, 0.7])
+    figure("zones_dhaka_flagship.png",
+           "Fig. 1.  Voronoi partition of Dhaka coloured by the eight named sections.")
+
+    subheading("B. Which Areas Benefit Most")
+    p(f"Weighting by population and criticality, the central belt is best served "
+      f"({best3}), while {worst['section']} scores lowest at "
+      f"{worst['benefit_score']:.0f}. Motijheel is the most populous section at "
+      f"{sb.df[sb.df['section']=='Motijheel']['pop_est'].iloc[0]/1e6:.1f} million "
+      "residents yet attains only a moderate score, which makes it the "
+      "highest-impact target for investment. This centre-versus-periphery pattern is "
+      "independently consistent with the open-space findings of Alam et al. [2].",
+      indent=0)
+    small_table(["Section", "Pop. (M)", "Benefit"],
+                [[r["section"], f"{r['pop_est']/1e6:.2f}", f"{r['benefit_score']:.0f}"]
+                 for _, r in sb.df.iterrows()],
+                "TABLE II.  POPULATION-WEIGHTED SECTION BENEFIT",
+                widths=[1.5, 0.9, 0.9])
+    figure("section_benefit.png",
+           "Fig. 2.  Section benefit index, population and criticality weighted.")
+
+    subheading("C. Recommended Facility Locations")
+    p("Greedy population-targeted placement concentrates new facilities in dense, "
+      "underserved areas rather than on the sparsely inhabited periphery. Adding three "
+      "fire stations reduces the underserved population from "
+      f"{recs['fire_station'].before.underserved_people/1000:.0f} thousand to "
+      f"{recs['fire_station'].after.underserved_people/1000:.0f} thousand, and three "
+      f"hospitals from {recs['hospital'].before.underserved_people/1000:.0f} thousand "
+      f"to {recs['hospital'].after.underserved_people/1000:.0f} thousand.", indent=0)
+    small_table(["Service", "Underserved before → after (thousands)"],
+                [[SERVICE_TYPES[k].label,
+                  f"{recs[k].before.underserved_people/1000:.0f} → "
+                  f"{recs[k].after.underserved_people/1000:.0f}"]
+                 for k in SERVICE_TYPES],
+                "TABLE III.  COVERAGE IMPROVEMENT FROM PROPOSED FACILITIES",
+                widths=[1.5, 1.8])
+
+    subheading("D. Equity, Clustering and Validation")
+    p(f"Combined access across the six services is moderately unequal, with a Gini "
+      f"coefficient of {ext.gini_combined:.3f}, and strongly spatially clustered "
+      f"(Moran's I = {ext.moran[0]:.2f}, pseudo p = {ext.moran[1]:.3f}), indicating "
+      "that well- and poorly-served locations form contiguous regions rather than a "
+      "random scatter. This supports treating the city as a small number of coherent "
+      "sections.", indent=0)
+    p("Three validations were performed. First, section rankings were compared with "
+      "2SFCA accessibility [14]: agreement is strong for scarce, distance-dominated "
+      "services (metro and water, ρ = 0.93; hospitals, ρ = 0.71) and weaker for dense "
+      "or demand-sensitive services, where 2SFCA additionally penalises facility "
+      "crowding. The methods are therefore complementary. Second, the greedy "
+      "recommender was benchmarked against an exact maximal-covering optimum over the "
+      "same candidate set and recovered essentially all of the optimal coverage. "
+      "Third, recomputing coverage with road-network shortest-path distance produced a "
+      "median detour factor of about 1.5 and roughly doubled the underserved share, "
+      "confirming that straight-line analyses understate the true access gap.")
+    figure("network_vs_euclid.png",
+           "Fig. 3.  Underserved population under straight-line versus road-network "
+           "distance.")
+
+    # ---------------- V. Conclusion ----------------
+    heading("V", "Conclusion")
+    p("This paper presented an integrated, population-weighted Voronoi framework for "
+      "assessing utility accessibility in Dhaka and for siting new facilities. Applied "
+      f"to {total_fac} facilities across six services, it identified the central belt "
+      "as best served, the periphery as lagging, and dense old Dhaka as the "
+      "highest-impact investment target; it also showed that water supply and metro "
+      "coverage are the weakest services city-wide. Validation against 2SFCA, an exact "
+      "covering optimum and road-network distance supports the approach while "
+      "quantifying the optimism of straight-line measurement.", indent=0)
+    p("Limitations point to future work. Travel time under realistic traffic "
+      "conditions would replace geometric distance; capacity-weighted diagrams [7] "
+      "would reflect facility size; finer population rasters and official "
+      "administrative boundaries would sharpen the spatial units; and applying the "
+      "framework to other Bangladeshi cities would test its transferability.")
+
+    # ---------------- references ----------------
+    heading("", "References")
+    for i, ref in enumerate(REFERENCES, 1):
+        par = doc.add_paragraph()
+        par.alignment = AL.JUSTIFY
+        par.paragraph_format.left_indent = Inches(0.25)
+        par.paragraph_format.first_line_indent = Inches(-0.25)
+        r = par.add_run(f"[{i}]  " + ref.replace("&amp;", "&"))
+        r.font.size = Pt(8)
+
+    out = OUTPUTS_DIR / "Dhaka_Voronoi_IEEE_Paper.docx"
+    doc.save(str(out))
+    return str(out)
 
 
 # =========================================================================== #
@@ -3854,6 +4237,7 @@ def main(force_figures: bool = False, k: int = RECOMMEND_K, network: bool = Fals
     litdocx = build_literature_docx()
     thesisdocx = build_thesis_docx(table, sb, ext, recs, flagship_key)
     poster = build_poster(table, sb, ext, recs, flagship_key)
+    paper = build_ieee_paper_docx(table, sb, ext, recs)
     plot_gantt()
     aiub = build_aiub_thesis_docx(table, sb, ext, recs, flagship_key, voronois)
     print("\nDONE")
@@ -3864,6 +4248,7 @@ def main(force_figures: bool = False, k: int = RECOMMEND_K, network: bool = Fals
     print("  Thesis draft (Word: Abstract, Ch.1,3,4,5)      ->", thesisdocx)
     print("  AIUB-formatted thesis (Word, full)             ->", aiub)
     print("  Defense poster (A1)                            ->", poster)
+    print("  IEEE conference paper (Word)                   ->", paper)
     for _p in export_office_pdfs():
         print("  PDF export                                     ->", _p)
     print("  Benefit map                                    -> outputs/figures/section_benefit.png")
