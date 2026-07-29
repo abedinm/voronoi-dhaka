@@ -93,6 +93,7 @@ SUBMISSION_DATE = "August, 2026"
 DEFENSE_DATE = "06.07.2026"
 SUPERVISOR = "Dr. Md. Manzurul Hasan"
 SUPERVISOR_RANK = "Associate Professor, Faculty"
+AIUB_LOGO = ROOT / "data" / "templates" / "aiub_logo.png"
 DEGREE_LINES = [
     "A Thesis submitted for the degree of Bachelor of Science (BSc) in",
     "Computer Science and Engineering (CSE) at",
@@ -2272,8 +2273,13 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
         r.bold = bold
         return p
 
+    if AIUB_LOGO.exists():
+        doc.add_picture(str(AIUB_LOGO), width=Inches(1.35))
+        _lp = doc.paragraphs[-1]
+        _lp.alignment = AL.CENTER
+        _lp.paragraph_format.space_after = Pt(10)
     centred("American International University-Bangladesh (AIUB)", 14)
-    centred("Faculty of Science and Technology", 14, space_after=28)
+    centred("Faculty of Science and Technology", 14, space_after=22)
     centred(THESIS_TITLE, 22, bold=True, space_after=30)
     for nm, sid in AUTHORS:
         centred(f"{nm} ({sid})", 17)
