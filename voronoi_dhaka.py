@@ -1767,61 +1767,24 @@ COMPARISON_TABLE = {
 }
 
 REFERENCES = [
-    "Bentley, J. L. (1975). Multidimensional binary search trees used for associative "
-    "searching. Communications of the ACM, 18(9), 509–517. "
-    "https://doi.org/10.1145/361002.361007",
-    "Boeing, G. (2017). OSMnx: New methods for acquiring, constructing, analyzing, and "
-    "visualizing complex street networks. Computers, Environment and Urban Systems, 65, "
-    "126–139. https://doi.org/10.1016/j.compenvurbsys.2017.05.004",
-    "Goodchild, M. F. (2007). Citizens as sensors: the world of volunteered geography. "
-    "GeoJournal, 69(4), 211–221. https://doi.org/10.1007/s10708-007-9111-y",
-    "Ahmed, S., Adams, A. M., Islam, R., Hasan, S. M., &amp; Panciera, R. (2019). Impact "
-    "of traffic variability on geographic accessibility to 24/7 emergency healthcare for "
-    "the urban poor: A GIS study in Dhaka, Bangladesh. PLOS ONE, 14(9), e0222488. "
-    "https://doi.org/10.1371/journal.pone.0222488",
-    "Alam, I., Nur, S. M. S., &amp; Mitra, C. (2025). Accessibility to Public Open Space of "
-    "a densely populated city: a case study of Dhaka, Bangladesh. Computational Urban "
-    "Science, 5(1), 23. https://doi.org/10.1007/s43762-025-00187-9",
-    "Bhuiya, M. M. R., Shao, W., &amp; Jones, S. L. (2023). Measuring accessibility of "
-    "movement challenged persons during earthquake evacuation of Dhaka City, Bangladesh: A "
-    "participatory GIS-based approach. Applied Geography [confirm volume/article no.]. "
-    "https://www.sciencedirect.com/science/article/abs/pii/S0143622823001054",
-    "Church, R. L., &amp; ReVelle, C. S. (1974). The maximal covering location problem. "
-    "Papers in Regional Science, 32(1), 101–118. https://doi.org/10.1007/BF01942293",
-    "Cui, H., Wu, L., Hu, S., &amp; Lu, R. (2021). Measuring the Service Capacity of Public "
-    "Facilities Based on a Dynamic Voronoi Diagram. Remote Sensing, 13(5), 1027. "
-    "https://doi.org/10.3390/rs13051027",
-    "Deliry, S. I., &amp; Uygucgil, H. (2023). Accessibility assessment of urban public "
-    "services using GIS-based network analysis: a case study in Eskisehir, Turkiye. "
-    "GeoJournal, 88, 4805–4825. https://doi.org/10.1007/s10708-023-10900-y",
-    "El-Geneidy, A., Grimsrud, M., Wasfi, R., Tétreault, P., &amp; Surprenant-Legault, J. "
-    "(2014). New evidence on walking distances to transit stops: identifying redundancies "
-    "and gaps using variable service areas. Transportation, 41(1), 193–210. "
-    "https://doi.org/10.1007/s11116-013-9508-z",
-    "Klinkhardt, C., Kühnel, F., Heilig, M., Lautenbach, S., Wörle, T., Vortisch, P., &amp; "
-    "Kuhnimhof, T. (2023). Quality Assessment of OpenStreetMap's Points of Interest with "
-    "Large-Scale Real Data. Transportation Research Record, 2677. "
-    "https://doi.org/10.1177/03611981231169280",
-    "Lloyd, C. T., Sorichetta, A., &amp; Tatem, A. J. (2017). High resolution global gridded "
-    "data for use in population studies. Scientific Data, 4, 170001. "
-    "https://doi.org/10.1038/sdata.2017.1",
-    "Luo, W., &amp; Qi, Y. (2009). An enhanced two-step floating catchment area (E2SFCA) "
-    "method for measuring spatial accessibility to primary care physicians. Health &amp; "
-    "Place, 15(4), 1100–1107. https://doi.org/10.1016/j.healthplace.2009.06.002",
-    "Luo, W., &amp; Wang, F. (2003). Measures of spatial accessibility to health care in a "
-    "GIS environment: synthesis and a case study in the Chicago region. Environment and "
-    "Planning B, 30(6), 865–884. https://doi.org/10.1068/b29120",
-    "National Fire Protection Association. (2020). NFPA 1710: Standard for the Organization "
-    "and Deployment of Fire Suppression Operations, Emergency Medical Operations, and "
-    "Special Operations to the Public by Career Fire Departments. NFPA.",
-    "Okabe, A., Boots, B., Sugihara, K., &amp; Chiu, S. N. (2000). Spatial Tessellations: "
-    "Concepts and Applications of Voronoi Diagrams (2nd ed.). Wiley.",
-    "Rahman, M. H., Ashik, F. R., &amp; Mouli, M. J. (2022). Investigating spatial "
-    "accessibility to urban facility outcome of transit-oriented development in Dhaka. "
-    "Transportation Research Interdisciplinary Perspectives, 15, 100607. "
-    "https://doi.org/10.1016/j.trip.2022.100607",
-    "Tatem, A. J. (2017). WorldPop, open data for spatial demography. Scientific Data, 4, "
-    "170004. https://doi.org/10.1038/sdata.2017.4",
+    'Ahmed, S., Adams, A. M., Islam, R., Hasan, S. M., &amp; Panciera, R. (2019). Impact of traffic variability on geographic accessibility to 24/7 emergency healthcare for the urban poor: A GIS study in Dhaka, Bangladesh. PLOS ONE, 14(9), e0222488. https://doi.org/10.1371/journal.pone.0222488',
+    'Alam, I., Nur, S. M. S., &amp; Mitra, C. (2025). Accessibility to Public Open Space of a densely populated city: a case study of Dhaka, Bangladesh. Computational Urban Science, 5(1), 23. https://doi.org/10.1007/s43762-025-00187-9',
+    'Bentley, J. L. (1975). Multidimensional binary search trees used for associative searching. Communications of the ACM, 18(9), 509–517. https://doi.org/10.1145/361002.361007',
+    'Bhuiya, M. M. R., Shao, W., &amp; Jones, S. L. (2023). Measuring accessibility of movement challenged persons during earthquake evacuation of Dhaka City, Bangladesh: A participatory GIS-based approach. Applied Geography [confirm volume/article no.]. https://www.sciencedirect.com/science/article/abs/pii/S0143622823001054',
+    'Boeing, G. (2017). OSMnx: New methods for acquiring, constructing, analyzing, and visualizing complex street networks. Computers, Environment and Urban Systems, 65, 126–139. https://doi.org/10.1016/j.compenvurbsys.2017.05.004',
+    'Church, R. L., &amp; ReVelle, C. S. (1974). The maximal covering location problem. Papers in Regional Science, 32(1), 101–118. https://doi.org/10.1007/BF01942293',
+    'Cui, H., Wu, L., Hu, S., &amp; Lu, R. (2021). Measuring the Service Capacity of Public Facilities Based on a Dynamic Voronoi Diagram. Remote Sensing, 13(5), 1027. https://doi.org/10.3390/rs13051027',
+    'Deliry, S. I., &amp; Uygucgil, H. (2023). Accessibility assessment of urban public services using GIS-based network analysis: a case study in Eskisehir, Turkiye. GeoJournal, 88, 4805–4825. https://doi.org/10.1007/s10708-023-10900-y',
+    'El-Geneidy, A., Grimsrud, M., Wasfi, R., Tétreault, P., &amp; Surprenant-Legault, J. (2014). New evidence on walking distances to transit stops: identifying redundancies and gaps using variable service areas. Transportation, 41(1), 193–210. https://doi.org/10.1007/s11116-013-9508-z',
+    'Goodchild, M. F. (2007). Citizens as sensors: the world of volunteered geography. GeoJournal, 69(4), 211–221. https://doi.org/10.1007/s10708-007-9111-y',
+    "Klinkhardt, C., Kühnel, F., Heilig, M., Lautenbach, S., Wörle, T., Vortisch, P., &amp; Kuhnimhof, T. (2023). Quality Assessment of OpenStreetMap's Points of Interest with Large-Scale Real Data. Transportation Research Record, 2677. https://doi.org/10.1177/03611981231169280",
+    'Lloyd, C. T., Sorichetta, A., &amp; Tatem, A. J. (2017). High resolution global gridded data for use in population studies. Scientific Data, 4, 170001. https://doi.org/10.1038/sdata.2017.1',
+    'Luo, W., &amp; Qi, Y. (2009). An enhanced two-step floating catchment area (E2SFCA) method for measuring spatial accessibility to primary care physicians. Health &amp; Place, 15(4), 1100–1107. https://doi.org/10.1016/j.healthplace.2009.06.002',
+    'Luo, W., &amp; Wang, F. (2003). Measures of spatial accessibility to health care in a GIS environment: synthesis and a case study in the Chicago region. Environment and Planning B, 30(6), 865–884. https://doi.org/10.1068/b29120',
+    'National Fire Protection Association. (2020). NFPA 1710: Standard for the Organization and Deployment of Fire Suppression Operations, Emergency Medical Operations, and Special Operations to the Public by Career Fire Departments. NFPA.',
+    'Okabe, A., Boots, B., Sugihara, K., &amp; Chiu, S. N. (2000). Spatial Tessellations: Concepts and Applications of Voronoi Diagrams (2nd ed.). Wiley.',
+    'Rahman, M. H., Ashik, F. R., &amp; Mouli, M. J. (2022). Investigating spatial accessibility to urban facility outcome of transit-oriented development in Dhaka. Transportation Research Interdisciplinary Perspectives, 15, 100607. https://doi.org/10.1016/j.trip.2022.100607',
+    'Tatem, A. J. (2017). WorldPop, open data for spatial demography. Scientific Data, 4, 170004. https://doi.org/10.1038/sdata.2017.4',
 ]
 
 
@@ -2060,13 +2023,123 @@ def build_poster(table, sb, ext, recs, flagship_key) -> str:
     return str(out)
 
 
+# --------------------------------------------------------------------------- #
+# In-text citation numbering  ([n] matching the sorted reference list)
+# --------------------------------------------------------------------------- #
+CITE_KEYS = [
+    ("Ahmed", "2019"), ("Alam", "2025"), ("Bentley", "1975"), ("Bhuiya", "2023"),
+    ("Boeing", "2017"), ("Church", "1974"), ("Cui", "2021"), ("Deliry", "2023"),
+    ("El-Geneidy", "2014"), ("Goodchild", "2007"), ("Klinkhardt", "2023"),
+    ("Lloyd", "2017"), ("Luo", "2009"), ("Luo", "2003"), ("NFPA", "2020"),
+    ("Okabe", "2000"), ("Rahman", "2022"), ("Tatem", "2017"),
+]
+
+
+def cite_number(surname: str, year: str) -> int:
+    """1-based index of a reference in the sorted REFERENCES list."""
+    return CITE_KEYS.index((surname, year)) + 1
+
+
+def add_citation_numbers(text: str) -> str:
+    """Append the bracketed reference number after each in-text citation.
+
+    Handles both narrative ("Luo and Wang (2003)") and parenthetical
+    ("(Church and ReVelle, 1974)") forms, and skips text already numbered."""
+    import re as _re
+
+    for idx, (surname, year) in enumerate(CITE_KEYS, 1):
+        tag = " [%d]" % idx
+        esc = _re.escape(surname)
+        # parenthetical: (Surname ..., YEAR)
+        text = _re.sub(r"(\(" + esc + r"[^()]{0,60}?" + year + r"\))(?!\s*\[)",
+                       r"\1" + tag, text)
+        # narrative: Surname ... (YEAR)
+        text = _re.sub(r"(" + esc + r"[^()]{0,60}?\(" + year + r"\))(?!\s*\[)",
+                       r"\1" + tag, text)
+    return text
+
+
+# --------------------------------------------------------------------------- #
+# AIUB footer + page numbering (matches the official template exactly)
+# --------------------------------------------------------------------------- #
+COURSE_CODE = "CSC 4298 Thesis/Project"
+DEPARTMENT = "Department of Computer Science"
+
+
+def _w(tag: str) -> str:
+    return "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}" + tag
+
+
+def _page_field(paragraph):
+    """Insert a live PAGE field so numbers update when the document reflows."""
+    from docx.oxml.ns import qn
+    from docx.oxml import OxmlElement
+
+    run = paragraph.add_run()
+    for kind, text in (("begin", None), (None, "PAGE"), ("end", None)):
+        if kind:
+            fld = OxmlElement("w:fldChar")
+            fld.set(qn("w:fldCharType"), kind)
+            run._r.append(fld)
+        else:
+            instr = OxmlElement("w:instrText")
+            instr.set(qn("xml:space"), "preserve")
+            instr.text = " PAGE "
+            run._r.append(instr)
+    return run
+
+
+def build_aiub_footer(section, show_number: bool = True):
+    """Two-line AIUB footer: page number, then course code + department."""
+    from docx.enum.text import WD_ALIGN_PARAGRAPH as AL
+    from docx.shared import Pt, RGBColor
+
+    footer = section.footer
+    footer.is_linked_to_previous = False
+    for p in list(footer.paragraphs):
+        p._element.getparent().remove(p._element)
+
+    p1 = footer.add_paragraph()
+    p1.alignment = AL.LEFT
+    if show_number:
+        r = _page_field(p1)
+        r.font.size = Pt(11)
+        r.font.color.rgb = RGBColor(0, 0, 0)
+
+    p2 = footer.add_paragraph()
+    p2.alignment = AL.LEFT
+    tabs = p2.paragraph_format.tab_stops
+    from docx.enum.text import WD_TAB_ALIGNMENT
+    from docx.shared import Inches
+    tabs.add_tab_stop(Inches(6.3), WD_TAB_ALIGNMENT.RIGHT)
+    r1 = p2.add_run(COURSE_CODE + "\t" + DEPARTMENT)
+    r1.font.size = Pt(11)
+    r1.font.color.rgb = RGBColor(0, 0, 0)
+    return footer
+
+
+def set_page_numbering(section, fmt: str, start: int | None = None):
+    """Set a section's page-number format ('lowerRoman' or 'decimal')."""
+    from docx.oxml.ns import qn
+    from docx.oxml import OxmlElement
+
+    sectPr = section._sectPr
+    for old in sectPr.findall(qn("w:pgNumType")):
+        sectPr.remove(old)
+    pg = OxmlElement("w:pgNumType")
+    pg.set(qn("w:fmt"), fmt)
+    if start is not None:
+        pg.set(qn("w:start"), str(start))
+    sectPr.append(pg)
+
+
 def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TABLE_INDEX,
                  collect: bool = False) -> str:
     """Render the AIUB-format thesis. With ``collect=True`` it only harvests the
     figure/table captions (skipping images) so the front-matter lists can be built."""
     from docx import Document
     from docx.enum.text import WD_ALIGN_PARAGRAPH as AL
-    from docx.shared import Inches, Pt
+    from docx.shared import Inches, Pt, RGBColor
 
     doc = Document()
     normal = doc.styles["Normal"]
@@ -2085,17 +2158,25 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
 
     def para(t, justify=True, italic=False, bold=False):
         p = doc.add_paragraph()
-        r = p.add_run(t)
+        r = p.add_run(add_citation_numbers(t))
         r.italic, r.bold = italic, bold
+        r.font.color.rgb = RGBColor(0, 0, 0)
         if justify:
             p.alignment = AL.JUSTIFY
         return p
 
+    def _black_heading(t, level):
+        h = doc.add_heading(t, level=level)
+        for r in h.runs:
+            r.font.color.rgb = RGBColor(0, 0, 0)
+            r.font.name = "Times New Roman"
+        return h
+
     def h1(t):
-        doc.add_heading(t, level=1)
+        _black_heading(t, 1)
 
     def h2(t):
-        doc.add_heading(t, level=2)
+        _black_heading(t, 2)
 
     def figure(name, caption, width=5.6):
         if collect:
@@ -2105,31 +2186,54 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
         if p.exists():
             doc.add_picture(str(p), width=Inches(width))
             doc.paragraphs[-1].alignment = AL.CENTER
-            c = doc.add_paragraph()
-            run = c.add_run(caption)
-            run.italic = True
-            run.font.size = Pt(10)
-            c.alignment = AL.CENTER
+            _caption(caption)                    # figure caption BELOW the figure
+
+    def roman_list(items):
+        """Numbered list in lowercase Roman numerals, restarting each time."""
+        romans = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x"]
+        for n, item in enumerate(items):
+            p = doc.add_paragraph()
+            p.paragraph_format.left_indent = Inches(0.5)
+            p.paragraph_format.first_line_indent = Inches(-0.3)
+            r = p.add_run(f"{romans[n]}.  ")
+            r.font.color.rgb = RGBColor(0, 0, 0)
+            r2 = p.add_run(add_citation_numbers(item))
+            r2.font.color.rgb = RGBColor(0, 0, 0)
+            p.alignment = AL.JUSTIFY
+
+    def _caption(text, above=False):
+        c = doc.add_paragraph()
+        run = c.add_run(text)
+        run.italic = True
+        run.font.size = Pt(10)
+        run.font.color.rgb = RGBColor(0, 0, 0)
+        c.alignment = AL.CENTER
+        return c
 
     def table_from(header, rows, caption=None):
         if collect:
             if caption:
                 TABLE_INDEX.append(caption)
             return
+        if caption:                       # table caption goes ABOVE the table
+            _caption(caption)
         t = doc.add_table(rows=1, cols=len(header))
-        try:
-            t.style = "Light Grid Accent 1"
-        except KeyError:
-            t.style = "Table Grid"
+        t.style = "Table Grid"            # plain black grid, no colour
         for j, hh in enumerate(header):
             cell = t.rows[0].cells[j]
             cell.text = str(hh)
             for r in cell.paragraphs[0].runs:
                 r.bold = True
+                r.font.color.rgb = RGBColor(0, 0, 0)
         for row in rows:
             cells = t.add_row().cells
             for j, v in enumerate(row):
                 cells[j].text = str(v)
+                for p_ in cells[j].paragraphs:
+                    for r in p_.runs:
+                        r.font.color.rgb = RGBColor(0, 0, 0)
+        doc.add_paragraph()
+        return
         if caption:
             c = doc.add_paragraph()
             run = c.add_run(caption)
@@ -2179,7 +2283,17 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
     doc.add_paragraph()
     centred(SEMESTER, 14)
     centred("Submission Date: " + SUBMISSION_DATE, 14)
-    doc.add_page_break()
+
+    # --- section 1 ends: title page carries the footer text but no page number ---
+    if not collect:
+        from docx.enum.section import WD_SECTION
+        build_aiub_footer(doc.sections[0], show_number=False)
+        set_page_numbering(doc.sections[0], "lowerRoman", start=1)
+        _front = doc.add_section(WD_SECTION.NEW_PAGE)
+        build_aiub_footer(_front, show_number=True)
+        set_page_numbering(_front, "lowerRoman", start=1)
+    else:
+        doc.add_page_break()
 
     # ------------------------------------------------------------------ front matter
     h1("Declaration")
@@ -2300,9 +2414,13 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
 
     h1("List of Abbreviations")
     table_from(["Abbreviation", "Elaboration"], [[a, b] for a, b in ABBREVIATIONS])
-    doc.add_page_break()
 
     # ------------------------------------------------------------------ Chapter 1
+    if not collect:                      # body section: Arabic numbering from 1
+        from docx.enum.section import WD_SECTION
+        _body = doc.add_section(WD_SECTION.NEW_PAGE)
+        build_aiub_footer(_body, show_number=True)
+        set_page_numbering(_body, "decimal", start=1)
     h1("Chapter 1 — Introduction")
     h2("1.1 Introduction")
     para("Dhaka is, by most measures, among the most densely populated cities in the world, and it "
@@ -2329,20 +2447,20 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
          "(WorldPop), they enable a city-wide, multi-service accessibility assessment at "
          "negligible cost.")
     h2("1.4 Research Objectives")
-    for o in ["Partition Dhaka into Voronoi service areas for six utility services from open data.",
-              "Quantify coverage and identify underserved areas, weighted by population.",
-              "Rank the city's areas by how well their residents are served.",
-              "Recommend new facility locations that most improve access.",
-              "Validate the approach against established accessibility methods and release a fully "
-              "reproducible pipeline."]:
-        doc.add_paragraph(o, style="List Number")
+    roman_list([
+        "Partition Dhaka into Voronoi service areas for six utility services from open data.",
+        "Quantify coverage and identify underserved areas, weighted by population.",
+        "Rank the city's areas by how well their residents are served.",
+        "Recommend new facility locations that most improve access.",
+        "Validate the approach against established accessibility methods and release a fully "
+        "reproducible pipeline."])
     h2("1.5 Research Questions")
-    for q in ["How well do the six utility services cover Dhaka, and which areas are underserved?",
-              "Which parts of the city benefit most once population is taken into account?",
-              "Where should new facilities be added to help the most people?",
-              "Do the Voronoi-based results agree with established accessibility methods, and how "
-              "much does road-network distance change the picture?"]:
-        doc.add_paragraph(q, style="List Number")
+    roman_list([
+        "How well do the six utility services cover Dhaka, and which areas are underserved?",
+        "Which parts of the city benefit most once population is taken into account?",
+        "Where should new facilities be added to help the most people?",
+        "Do the Voronoi-based results agree with established accessibility methods, and how "
+        "much does road-network distance change the picture?"])
     h2("1.6 Motivations")
     para("The motivation for this research is practical: every year Dhaka invests in new "
          "facilities, yet siting decisions are rarely backed by open, quantitative evidence of "
@@ -2491,7 +2609,7 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
     h2("3.6 Implementation and Simulation")
     para("The design is realised in three computational stages — coverage measurement, section "
          "scoring, and facility recommendation — described in turn below.")
-    doc.add_heading("Coverage and underserved detection", level=3)
+    _black_heading("Coverage and underserved detection", 3)
     para(f"For a fine grid of demand points laid over the city at {GRID_SPACING_M:.0f} m spacing, "
          "the nearest-facility distance is computed with a k-d tree:")
     eq("d(x) = min_{p} |x − p|;    x is underserved for a service if d(x) > τ_service")
@@ -2499,7 +2617,7 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
          "for fire stations), reflecting how far a resident can reasonably travel for that service. "
          "The cell area of each Voronoi region (km²) is also recorded: a large cell means one "
          "facility must serve a wide area.")
-    doc.add_heading("Population-weighted section benefit", level=3)
+    _black_heading("Population-weighted section benefit", 3)
     para("Eight named sections are defined as a nearest-centre (coarse Voronoi) partition of "
          "well-known area centres. Each section s is scored by a benefit index — the share of its "
          "residents within reach of each service, averaged over services with weights that "
@@ -2509,7 +2627,7 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
          "service j, and w_j is the service weight (hospital and fire = 2, water = 1.5, others = 1). "
          "Population weights come from the WorldPop grid, so the index measures how well the "
          "section's people — not its land — are served.")
-    doc.add_heading("Facility recommendation", level=3)
+    _black_heading("Facility recommendation", 3)
     para("New facilities are placed with a greedy maximal-covering heuristic (Church & ReVelle, "
          "1974). At each step the algorithm adds a facility at the most-populated location that is "
          "still underserved, then recomputes distances, so the recommendations target people rather "
@@ -2736,12 +2854,12 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
          "regions. Per-section values of the combined index mirror the benefit ranking of "
          "Table 4.8. The Lorenz curve (Figure 4.13) summarises the equity of access.")
     figure("lorenz_access.png", "Figure 4.13. Lorenz curve of combined utility access.", 4.2)
-    para("A sensitivity check (Table 4.50) shows the section ranking is robust: under ±25% "
+    para("A sensitivity check (Table 4.10) shows the section ranking is robust: under ±25% "
          "thresholds and equal service weights the ranking barely changes (Spearman ρ ≈ 0.98).")
     table_from(["Scenario", "Rank corr. (ρ)", "Best", "Worst"],
                [[r["scenario"], r["rank_corr_vs_baseline"], r["best"], r["worst"]]
                 for _, r in ext.sensitivity.iterrows()],
-               "Table 4.50. Sensitivity of the section ranking.")
+               "Table 4.10. Sensitivity of the section ranking.")
 
     h2("4.6.5 Road-network distance")
     para("Repeating the analysis with shortest-path distance on the Dhaka road network (rather than "
@@ -2759,12 +2877,12 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
          "penalises the crowding of facilities. The two methods are complementary: the Voronoi "
          "partition captures proximity cleanly and reproducibly, while 2SFCA adds supply–demand "
          "balance.")
-    para("Facility density (Table 4.51) contextualises the counts against area and population; "
+    para("Facility density (Table 4.11) contextualises the counts against area and population; "
          "because OpenStreetMap completeness varies, these figures should be read as a lower bound.")
     table_from(["Service", "Facilities", "per 100k people", "km² / facility"],
                [[r["service"], int(r["facilities"]), r["per_100k_people"], r["km2_per_facility"]]
                 for _, r in ext.density.iterrows()],
-               "Table 4.51. Facility density and completeness context.")
+               "Table 4.11. Facility density and completeness context.")
 
     h2("4.7 Summary")
     para("This chapter described the implementation environment, the pipeline stages, the testing "
@@ -2838,13 +2956,68 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
               "A fully reproducible open pipeline, interactive maps and a dashboard."]:
         doc.add_paragraph(c, style="List Bullet")
     h2("6.3 Limitations of the Study")
-    para("Distances are chiefly straight-line; OpenStreetMap completeness varies; facility capacity "
-         "is not modelled; and the sections are analytical rather than official administrative units.")
-    h2("6.4 Future Work")
-    para("Natural extensions include full road-network and traffic-aware travel distance, "
-         "capacity-weighted Voronoi diagrams, finer (100 m) population and official administrative "
-         "boundaries, a machine-learning demand model, and validation against official facility "
-         "registries.")
+    para("Several limitations qualify the findings of this study and should be considered when "
+         "interpreting the results.")
+    para("First, the core analysis measures straight-line (Euclidean) distance in a metric "
+         "projection rather than the distance a resident actually travels. Section 4.6.5 quantifies "
+         "the consequence — a median detour factor of roughly 1.5 and an underserved share that "
+         "roughly doubles — so the headline coverage figures should be read as an optimistic bound. "
+         "Travel time, traffic congestion, road quality and the reality that Dhaka's traffic makes "
+         "distance a poor proxy for time are not modelled at all; Ahmed et al. (2019) show that "
+         "ignoring congestion can overstate emergency coverage roughly threefold.")
+    para("Second, all facility locations come from OpenStreetMap, a volunteered source whose "
+         "completeness varies by category and by neighbourhood. Comparing the raw and cleaned counts "
+         "in Table 4.1 shows how much duplicate and boundary-adjacent mapping the data contains, and "
+         "Klinkhardt et al. (2023) document uneven completeness in exactly this kind of dataset. "
+         "Facility counts are therefore a lower bound: unmapped clinics, private water points and "
+         "informal transport stops are invisible to the analysis, which likely understates coverage "
+         "in poorly mapped peripheral areas.")
+    para("Third, the model treats every facility as identical. A twelve-bed clinic and a thousand-bed "
+         "tertiary hospital seed the same Voronoi cell, because OpenStreetMap carries no reliable "
+         "capacity attribute. Real accessibility depends on capacity, opening hours, cost and "
+         "service quality, none of which are represented here.")
+    para("Fourth, the eight sections are analytical zones defined by nearest-centre partitioning of "
+         "well-known area centres, not official ward or thana boundaries. They were chosen because "
+         "the administrative polygons available through OpenStreetMap for Dhaka are inconsistent, "
+         "but it means section-level figures depend on where those centres were placed.")
+    para("Fifth, population comes from a modelled 1 km raster rather than a census enumeration. "
+         "WorldPop disaggregates census totals using satellite covariates, so fine-grained "
+         "population distribution within each kilometre is estimated rather than observed, and the "
+         "estimates date from 2020.")
+    para("Finally, the distance thresholds and service weights are planning conventions drawn from "
+         "the literature rather than universal constants. The sensitivity analysis in Section 4.6.4 "
+         "shows the section ranking is robust to reasonable variation in both, but the absolute "
+         "percentages would shift under a different threshold regime.")
+    h2("6.4 Future Work Scopes")
+    para("The limitations above map directly onto opportunities for further research, and the "
+         "reproducible pipeline released with this thesis is intended to make each of them "
+         "straightforward to pursue.")
+    para("The most valuable extension is to replace straight-line distance with travel time on the "
+         "road network under realistic traffic conditions. The road-network machinery already exists "
+         "in the pipeline; adding time-of-day speed profiles would turn the coverage maps into "
+         "genuine accessibility-by-travel-time surfaces, which is what planners actually need for "
+         "emergency response.")
+    para("A second direction is capacity-weighted Voronoi diagrams, in which each facility's cell "
+         "grows or shrinks according to its service capacity, following the dynamic formulation of "
+         "Cui et al. (2021). This would require capacity data from official registries — hospital "
+         "bed counts from the Directorate General of Health Services, pumping capacity from Dhaka "
+         "WASA — which would simultaneously address the completeness limitation by validating and "
+         "supplementing the OpenStreetMap layer.")
+    para("Third, the spatial resolution can be improved: WorldPop publishes a 100 m population "
+         "raster, and official thana or ward boundaries would replace the analytical sections with "
+         "units that match how the city is actually administered and budgeted.")
+    para("Fourth, the accessibility measure can be broadened beyond physical proximity to include "
+         "socio-economic dimensions — income, vehicle ownership and informal-settlement status — so "
+         "that the benefit index reflects who can realistically reach a facility rather than who "
+         "lives near one.")
+    para("Fifth, a machine-learning component could be introduced to predict underservice from "
+         "urban form indicators such as population density, road density and land use, allowing the "
+         "framework to anticipate where gaps will emerge as the city grows rather than only "
+         "describing the present.")
+    para("Finally, the framework is city-agnostic. Applying it to Chattogram, Khulna or Sylhet "
+         "would test its transferability and produce comparable national evidence, and extending it "
+         "to additional services — schools, markets, waste collection — would broaden the picture of "
+         "urban service equity in Bangladesh.")
     doc.add_page_break()
 
     # ------------------------------------------------------------------ References
