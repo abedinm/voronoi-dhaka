@@ -114,10 +114,16 @@ DECLARATION_TEXT = [
     "permission from co-authors for any jointly authored works included in the thesis.",
 ]
 EXAMINERS = [
-    (SUPERVISOR, SUPERVISOR_RANK + ", Supervisor"),
-    ("Prof. Dr. Muhammad Firoz Mridha", "Professor, Department of Computer Science"),
-    ("Prof. Dr. Dip Nandi", "Professor & Associate Dean, FST"),
-    ("Mashiour Rahman", "Sr. Associate Professor, External"),
+    ("Dr. Md. Manzurul Hasan",
+     "Associate Professor & Supervisor, Department of Computer Science"),
+    ("Prof. Dr. Muhammad Firoz Mridha",
+     "Professor, Department of Computer Science"),
+    ("Dr. Khandaker Tabin Hasan",
+     "Professor & Associate Dean, Department of Computer Science"),
+    ("Prof. Dr. Dip Nandi",
+     "Professor & Dean, Faculty of Science and Technology"),
+    ("Mashiour Rahman",
+     "Senior Associate Professor, Faculty"),
 ]
 ABBREVIATIONS = [
     ("2SFCA", "Two-Step Floating Catchment Area"),
