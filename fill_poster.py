@@ -86,8 +86,53 @@ by_idx[10].insert_picture(FIG + "network_vs_euclid.png")
 
 # dummy donut chart -> Lorenz curve
 delete(by_idx[13])
-slide.shapes.add_picture(FIG + "lorenz_access.png", Inches(2.55), Inches(34.7),
-                         width=Inches(5.4))
+slide.shapes.add_picture(FIG + "lorenz_access.png", Inches(3.4), Inches(34.1),
+                         width=Inches(3.9))
+
+# ---------------- Limitations & Future Work (column 1) ----------------
+from pptx.util import Pt as _Pt
+from pptx.dml.color import RGBColor as _RGB
+
+def _textbox(x, y, w, h):
+    tb = slide.shapes.add_textbox(Inches(x), Inches(y), Inches(w), Inches(h))
+    tb.text_frame.word_wrap = True
+    return tb
+
+_head = _textbox(1.0, 38.3, 9.0, 1.0)
+_p = _head.text_frame.paragraphs[0]
+_r = _p.add_run()
+_r.text = "Limitations & Future Work"
+_r.font.size = _Pt(40)
+_r.font.bold = True
+_r.font.color.rgb = _RGB(0x00, 0x5B, 0xBB)
+
+def _list_block(x, y, w, title, items, title_colour):
+    tb = _textbox(x, y, w, 3.1)
+    tf = tb.text_frame
+    p0 = tf.paragraphs[0]
+    r0 = p0.add_run()
+    r0.text = title
+    r0.font.size = _Pt(26)
+    r0.font.bold = True
+    r0.font.color.rgb = title_colour
+    for it in items:
+        p = tf.add_paragraph()
+        r = p.add_run()
+        r.text = "•  " + it
+        r.font.size = _Pt(22)
+        r.font.color.rgb = _RGB(0x1C, 0x2B, 0x39)
+
+_list_block(1.0, 39.5, 4.4, "LIMITATIONS", [
+    "Straight-line distance, not travel time.",
+    "OSM completeness varies — counts are a lower bound.",
+    "Capacity not modelled; sections are analytical zones.",
+], _RGB(0xC0, 0x39, 0x2B))
+
+_list_block(5.6, 39.5, 4.4, "FUTURE WORK", [
+    "Traffic-aware travel time on the road network.",
+    "Capacity-weighted Voronoi from official registries.",
+    "Finer population grid; transfer to other cities.",
+], _RGB(0x2E, 0x8B, 0x57))
 
 # ---------------- column 2 ----------------
 for i in (15, 16, 17, 20, 21, 22, 23):          # dummy table, footnote, chart, pyramid, labels
