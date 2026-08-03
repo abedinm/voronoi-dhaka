@@ -45,10 +45,14 @@ by_idx = {i: sh for i, sh in enumerate(shapes)}
 fill(by_idx[1], ["Providing Utility Services using Voronoi Diagrams"], keep_first=False)
 fill(by_idx[2], ["Some Analyses, Recommendations, along with a Case Study for Dhaka City"],
      keep_first=False, size=30)
-fill(by_idx[3], ["Minhazul Abedin (21-44625-1), Zarin Tasnim Rayta (21-45742-3), "
-                 "Abdullah Al Noman (21-45825-3), Mehedi Hasan Aziz (19-40060-1)  ·  "
-                 "Supervisor: Dr. Md. Manzurul Hasan, Associate Professor, Dept. of Computer Science"],
-     keep_first=False, size=18)
+by_idx[3].top = Inches(2.62)
+by_idx[3].height = Inches(1.0)
+by_idx[3].width = Inches(24.0)
+fill(by_idx[3], ["Minhazul Abedin (21-44625-1)   ·   Zarin Tasnim Rayta (21-45742-3)   ·   "
+                 "Abdullah Al Noman (21-45825-3)   ·   Mehedi Hasan Aziz (19-40060-1)\n"
+                 "Supervisor: Dr. Md. Manzurul Hasan, Associate Professor, "
+                 "Department of Computer Science"],
+     keep_first=False, size=17)
 
 # ---------------- column 1 ----------------
 fill(by_idx[7], [
@@ -67,8 +71,7 @@ fill(by_idx[9], [
     "GREEDY MAXIMAL COVERING",
     "New sites are placed at the most-populated underserved locations "
     "(Church & ReVelle, 1974) and recover ~100% of the exact optimum."])
-fill(by_idx[11], ["Figure: road-network distance roughly doubles the underserved share "
-                  "(median detour ×1.5)."], keep_first=False)
+delete(by_idx[11])          # chart has its own title; caption would clash
 fill(by_idx[12], [
     "Combined access across all six utilities is moderately unequal (Gini = 0.165) and "
     "strongly clustered (Moran's I = 0.99, p = 0.005): well- and poorly-served locations "
@@ -80,7 +83,6 @@ fill(by_idx[12], [
 
 # picture placeholder in column 1 -> network comparison chart
 by_idx[10].insert_picture(FIG + "network_vs_euclid.png")
-by_idx[11].top = Inches(26.15)   # caption clear of the chart's axis labels
 
 # dummy donut chart -> Lorenz curve
 delete(by_idx[13])
@@ -93,23 +95,21 @@ for i in (15, 16, 17, 20, 21, 22, 23):          # dummy table, footnote, chart, 
 slide.shapes.add_picture(FIG + "zones_dhaka_flagship.png", Inches(10.7), Inches(4.5),
                          width=Inches(9.0))     # -> ~14.3 in tall
 fill(by_idx[19], [
-    "The central belt is best served — Mirpur (92), Banani (90), Dhanmondi (85), Gulshan "
-    "(81) — while Bashundhara (55) and Uttara (61) lag. Motijheel, the most populous "
-    "section (3.9M people), is only moderately served (68) and is the highest-impact "
-    "investment target.",
-    "Water pumps (73% of area) and metro (67%) show the widest gaps; hospitals the "
+    "The central belt is best served — Mirpur (92), Banani (90), Dhanmondi (85) — while "
+    "Bashundhara (55) and Uttara (61) lag. Motijheel, the most populous section at 3.1M "
+    "residents, scores only 68, making it the highest-impact investment target.",
+    "Water sources (73% of area) and metro (67%) show the widest gaps; hospitals the "
     "narrowest (33%). Three targeted sites per service cut the underserved population "
-    "sharply (fire 1.67M → 0.74M; hospitals 1.07M → 0.61M)."])
-slide.shapes.add_picture(FIG + "section_benefit.png", Inches(11.6), Inches(26.4),
-                         width=Inches(7.0))     # -> ~9.5 in tall
+    "sharply — fire 1.67M → 0.74M, hospitals 1.07M → 0.61M."], size=17)
+slide.shapes.add_picture(FIG + "section_benefit.png", Inches(11.6), Inches(25.2),
+                         width=Inches(7.4))     # -> ~9.5 in tall
 fill(by_idx[24], [
-    "A reproducible, open-data Voronoi framework answers where Dhaka's utilities serve "
+    "A reproducible, open-data Voronoi framework showing where Dhaka's utilities serve "
     "people well and where to add capacity.",
-    "Key findings: the centre is well served, the periphery lags; dense old Dhaka is the "
-    "top priority for hospitals and fire stations; straight-line analyses understate the "
-    "gap — road distance doubles the underserved share.",
-    "Everything regenerates from one command: python voronoi_dhaka.py "
-    "(github.com/abedinm/voronoi-dhaka)."])
+    "The centre is well served and the periphery lags; dense old Dhaka is the top "
+    "priority for hospitals and fire stations; straight-line analysis understates the "
+    "true gap.",
+    "Fully reproducible: python voronoi_dhaka.py"], size=17)
 
 # ---------------- column 3 ----------------
 fill(by_idx[26], [
