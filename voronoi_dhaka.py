@@ -2140,8 +2140,64 @@ def set_page_numbering(section, fmt: str, start: int | None = None):
     sectPr.append(pg)
 
 
+def _caption_page_map(docx_path, captions) -> dict:
+    """Map each figure/table caption to its printed page number.
+
+    Renders the document, finds the page each caption falls on, and converts the
+    PDF page index to the number actually shown in the footer (front matter runs
+    i-xi, so the body's Arabic numbering starts at PDF page 13)."""
+    import shutil
+    import subprocess
+    import tempfile
+
+    soffice = shutil.which("soffice") or shutil.which("libreoffice")
+    if soffice is None:
+        mac = Path("/Applications/LibreOffice.app/Contents/MacOS/soffice")
+        soffice = str(mac) if mac.exists() else None
+    if soffice is None or shutil.which("pdftotext") is None:
+        return {}
+
+    tmp = tempfile.mkdtemp(prefix="pagemap_")
+    try:
+        subprocess.run([soffice, "--headless", "--convert-to", "pdf", "--outdir", tmp,
+                        str(docx_path)], check=True, capture_output=True, timeout=300)
+        pdf = Path(tmp) / (Path(docx_path).stem + ".pdf")
+        if not pdf.exists():
+            return {}
+        text = subprocess.run(["pdftotext", "-layout", str(pdf), "-"],
+                              capture_output=True, text=True, timeout=120).stdout
+    except Exception as exc:
+        print(f"    [pagemap] skipped ({type(exc).__name__})")
+        return {}
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+    pages = text.split("\f")
+    # locate where the body's Arabic numbering starts (the page holding "Chapter 1")
+    body_start = next((i for i, p in enumerate(pages, 1)
+                       if p.lstrip().startswith("Chapter 1")), 13)
+    offset = body_start - 1                       # printed = pdf_page - offset
+
+    import re as _re
+
+    def key(cap):                                  # full label, e.g. "Figure 4.3."
+        m = _re.match(r"((?:Figure|Table)\s+[A-Z0-9]+\.\d+)\.", cap.strip())
+        return (m.group(1) + ".") if m else cap[:14]
+
+    out = {}
+    for cap in captions:
+        k = key(cap)
+        for i, p in enumerate(pages, 1):
+            if i < body_start:                     # skip the List pages themselves
+                continue
+            if k in p:
+                out[cap] = str(i - offset)
+                break
+    return out
+
+
 def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TABLE_INDEX,
-                 collect: bool = False) -> str:
+                 collect: bool = False, PAGE_MAP: dict | None = None) -> str:
     """Render the AIUB-format thesis. With ``collect=True`` it only harvests the
     figure/table captions (skipping images) so the front-matter lists can be built."""
     from docx import Document
@@ -2260,6 +2316,7 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
         r.font.name = "Courier New"
         r.font.size = Pt(10)
 
+    PAGE_MAP = PAGE_MAP or {}
     tf = table.set_index("service")
     ref_sections = zone_reference()
     def upct(s):
@@ -2413,14 +2470,14 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
     doc.add_page_break()
 
     h1("List of Figures")
-    _fig_rows = [[cap, ""] for cap in FIGURE_INDEX]
+    _fig_rows = [[cap, PAGE_MAP.get(cap, "")] for cap in FIGURE_INDEX]
     table_from(["Figure", "Page"], _fig_rows)
     para("Page numbers are populated automatically when the list is inserted as a Table of "
          "Figures in Word (References → Insert Table of Figures).", italic=True)
     doc.add_page_break()
 
     h1("List of Tables")
-    _tab_rows = [[cap, ""] for cap in TABLE_INDEX]
+    _tab_rows = [[cap, PAGE_MAP.get(cap, "")] for cap in TABLE_INDEX]
     table_from(["Table", "Page"], _tab_rows)
     doc.add_page_break()
 
@@ -3076,7 +3133,13 @@ def build_aiub_thesis_docx(table, sb, ext, recs, flagship_key, voronois) -> str:
     figs: list[str] = []
     tabs: list[str] = []
     _render_aiub(table, sb, ext, recs, flagship_key, voronois, figs, tabs, collect=True)
-    return _render_aiub(table, sb, ext, recs, flagship_key, voronois, figs, tabs, collect=False)
+    out = _render_aiub(table, sb, ext, recs, flagship_key, voronois, figs, tabs, collect=False)
+    # third pass: paginate, then rewrite the lists with real page numbers
+    pmap = _caption_page_map(out, figs + tabs)
+    if pmap:
+        out = _render_aiub(table, sb, ext, recs, flagship_key, voronois, figs, tabs,
+                           collect=False, PAGE_MAP=pmap)
+    return out
 
 
 def build_thesis_docx(table, sb, ext, recs, flagship_key) -> str:
