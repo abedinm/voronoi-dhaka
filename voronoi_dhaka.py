@@ -3756,7 +3756,8 @@ def export_office_pdfs() -> list[str]:
         return []
 
     targets = ["Dhaka_Voronoi_AIUB_Thesis.docx", "Dhaka_Voronoi_Poster_AIUB.pptx",
-               "Dhaka_Voronoi_Slides.pptx", "Dhaka_Voronoi_IEEE_Paper.docx"]
+               "Dhaka_Voronoi_Slides.pptx", "Dhaka_Voronoi_IEEE_Paper.docx",
+               "Dhaka_Voronoi_Defense.pptx"]
     written = []
     for name in targets:
         src_file = OUTPUTS_DIR / name
