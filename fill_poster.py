@@ -143,7 +143,7 @@ fill(by_idx[19], [
     "residents, scores only 68, making it the highest-impact investment target.",
     "Water sources (73% of area) and metro (67%) show the widest gaps; hospitals the "
     "narrowest (33%). Three targeted sites per service cut the underserved population "
-    "sharply — fire 1.67M → 0.74M, hospitals 1.07M → 0.61M."], size=17)
+    "sharply — fire 1.67M → 0.73M, hospitals 1.07M → 0.61M."], size=17)
 slide.shapes.add_picture(FIG + "section_benefit.png", Inches(11.6), Inches(25.2),
                          width=Inches(7.4))     # -> ~9.5 in tall
 fill(by_idx[24], [

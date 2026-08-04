@@ -246,7 +246,7 @@ def card1():
             ("Strongest", "Hospitals — only 33% too far"),
             ("Equity", "Gini 0.165 (moderately unequal)"),
             ("Clustering", "Moran's I 0.99 → contiguous zones, not random"),
-            ("Payoff", "3 new fire stations → 930,000 people back in reach"),
+            ("Payoff", "3 new fire stations → 946,000 people back in reach"),
             ("Sensitivity", "±25% on every threshold → ranking holds, ρ ≈ 0.98"),
         ], CW, klabel=2.35),
 
@@ -313,7 +313,7 @@ SLIDES = [
     ("10", "Mathematics", "Cell = intersection of half-planes ⇒ perpendicular-bisector edges."),
     ("11", "Coverage", "Water and metro are weakest; hospitals strongest. One number each."),
     ("12", "Benefit ranking", "<b>The key slide.</b> Area vs population flips the answer to Motijheel."),
-    ("13", "Recommendations", "Where new facilities go. 3 fire stations → 930,000 people."),
+    ("13", "Recommendations", "Where new facilities go. 3 fire stations → 946,000 people."),
     ("14", "Validation &amp; equity", "2SFCA, exact optimum, road network. Gini 0.165, Moran 0.99."),
     ("15", "Limitations", "Say them yourself, plainly. It buys credibility for the Q&amp;A."),
     ("16", "Conclusion", "Contribution + reproducible software + one line of future work."),
@@ -408,7 +408,7 @@ def card3():
             "point: earlier studies weight by land area, which makes empty fields look "
             "like the crisis. Weighted by population, the real priority is dense "
             "Motijheel — 3.1 million people. Finally we compute where new facilities "
-            "should go: three fire stations alone bring 930,000 people back within "
+            "should go: three fire stations alone bring 946,000 people back within "
             "reach.&rdquo;", CW, NAVY),
 
         Paragraph("Panel map — walk them in this order", H),
@@ -442,7 +442,7 @@ def card3():
             ("250 m", "demand grid; UTM 46N for true metres"),
             ("92 → 55", "Mirpur best, Bashundhara worst (score /100)"),
             ("3.1 M", "people in Motijheel — the top target"),
-            ("930,000", "people recovered by 3 new fire stations"),
+            ("946,000", "people recovered by 3 new fire stations"),
             ("0.165", "Gini — moderately unequal access"),
             ("×1.5", "road-network detour vs straight line"),
         ], CW, klabel=2.0),

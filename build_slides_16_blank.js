@@ -458,8 +458,8 @@ s.addText("Greedy placement adds each facility at the most-populated location th
 s.addTable(
   [["Service", "Underserved before", "After 3 new sites"].map((h) => ({
     text: h, options: { bold: true, color: WHITE, fill: { color: DEEP }, fontSize: 12 } }))].concat(
-    [["Fire station", "1.67M", "0.74M"], ["Hospital", "1.07M", "0.61M"],
-     ["Fuel station", "1.94M", "1.42M"], ["Metro station", "5.0M", "3.9M"],
+    [["Fire station", "1.67M", "0.73M"], ["Hospital", "1.07M", "0.61M"],
+     ["Fuel station", "1.94M", "1.43M"], ["Metro station", "5.0M", "3.9M"],
      ["Bus stop", "3.0M", "2.8M"], ["Water pump", "4.7M", "4.3M"]].map((r, i) => [
       { text: r[0], options: { fontSize: 13, bold: true, color: INK, fill: { color: i % 2 ? TINT : WHITE } } },
       { text: r[1], options: { fontSize: 13, color: MUTED, align: "center", fill: { color: i % 2 ? TINT : WHITE } } },
@@ -469,7 +469,7 @@ s.addTable(
     fontFace: BF, rowH: 0.42, valign: "middle" });
 s.addShape(pres.ShapeType.roundRect, { x: 7.6, y: 5.95, w: 5.2, h: 0.95,
   fill: { color: "E6EFE6" }, line: { color: GREEN, width: 1.5 }, rectRadius: 0.08 });
-s.addText("Three fire stations alone bring 930,000 people back within reach.", {
+s.addText("Three fire stations alone bring 946,000 people back within reach.", {
   x: 7.7, y: 5.95, w: 5.0, h: 0.95, align: "center", valign: "middle", fontFace: BF,
   fontSize: 13.5, bold: true, color: GREEN, margin: 0 });
 s.addNotes("Because placement targets population, proposed sites land in dense underserved areas, not empty land.");

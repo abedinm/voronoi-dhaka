@@ -139,7 +139,7 @@ findings = [
     ["Strongest service", "Hospitals (only 33% of area too far)"],
     ["Fairness", "Gini = 0.165 → access is moderately unequal"],
     ["Pattern", "Moran's I = 0.99 → good and bad areas form big clumps, not a random mix"],
-    ["Fixing it", "3 new fire stations move 930,000 people back within reach"],
+    ["Fixing it", "3 new fire stations move 946,000 people back within reach"],
 ]
 t = Table([[Paragraph("<b>" + a + "</b>", ParagraphStyle("k", parent=BODY, fontSize=9.5)),
             Paragraph(b, ParagraphStyle("v", parent=BODY, fontSize=9.5))] for a, b in findings],

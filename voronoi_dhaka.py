@@ -842,6 +842,66 @@ def _snapshot(grid, seeds, thr, pop) -> Snapshot:
                     float(pop[under].sum()))
 
 
+# Land that cannot take a new building. Water first, then the other classes a
+# siting decision would rule out on sight.
+UNBUILDABLE_TAGS: dict[str, list[str]] = {
+    "natural": ["water", "wetland", "marsh", "bay", "strait"],
+    "waterway": ["riverbank", "river", "stream", "canal", "drain", "ditch"],
+    "landuse": ["reservoir", "basin", "salt_pond", "aquaculture", "quarry",
+                "landfill", "cemetery", "military"],
+    "aeroway": ["aerodrome", "runway", "taxiway", "apron"],
+    "leisure": ["swimming_pool"],
+}
+UNBUILDABLE_BUFFER_M = 30.0     # keep new sites off the very edge of a water body
+_UNBUILDABLE_CACHE: dict[str, object] = {}
+
+
+def unbuildable_area(boundary):
+    """Union of water bodies and other land a facility cannot be built on.
+
+    Linear waterways (drains, canals) carry no width in OSM, so everything is
+    buffered by UNBUILDABLE_BUFFER_M; that also keeps proposed sites off the
+    immediate bank of a pond or river rather than merely outside it."""
+    if "geom" in _UNBUILDABLE_CACHE:
+        return _UNBUILDABLE_CACHE["geom"]
+    parts = []
+    for tag, values in UNBUILDABLE_TAGS.items():
+        try:
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                gdf = ox.features_from_bbox(DHAKA_BBOX, tags={tag: values})
+        except Exception as exc:
+            print(f"    [land] {tag}: fetch failed ({type(exc).__name__}); skipped")
+            continue
+        if gdf is None or len(gdf) == 0:
+            continue
+        g = gdf.to_crs(CRS_METRIC).geometry
+        g = g[~g.is_empty & g.notna()]
+        if len(g):
+            parts.append(g.buffer(UNBUILDABLE_BUFFER_M).union_all())
+            print(f"    [land] {tag}: {len(g)} features")
+    if not parts:
+        print("    [land] no exclusion data available; siting is unconstrained")
+        geom = None
+    else:
+        geom = unary_union(parts).intersection(boundary)
+    _UNBUILDABLE_CACHE["geom"] = geom
+    return geom
+
+
+def buildable_mask(grid_xy: np.ndarray, boundary) -> np.ndarray:
+    """True where a new facility may be sited."""
+    bad = unbuildable_area(boundary)
+    if bad is None:
+        return np.ones(len(grid_xy), dtype=bool)
+    pts = gpd.GeoSeries(gpd.points_from_xy(grid_xy[:, 0], grid_xy[:, 1]),
+                        crs=CRS_METRIC)
+    ok = ~pts.intersects(bad).to_numpy()
+    print(f"    [land] {int((~ok).sum())}/{len(ok)} candidate points excluded "
+          f"({100 * (~ok).mean():.1f}% of the grid)")
+    return ok
+
+
 def greedy_new_facilities(sv: ServiceVoronoi, cov: CoverageResult,
                           ref: ZoneRef | None = None, k: int = RECOMMEND_K,
                           pop: np.ndarray | None = None) -> RecommendResult:
@@ -854,14 +914,22 @@ def greedy_new_facilities(sv: ServiceVoronoi, cov: CoverageResult,
     grid, thr = cov.grid_xy, cov.threshold_m
     snap_pop = pop if pop is not None else np.ones(len(grid))
     before = _snapshot(grid, sv.seeds, thr, snap_pop)
+    # coverage is still measured over the whole grid; only the sites a facility
+    # may be *placed* on are restricted
+    sitable = buildable_mask(grid, sv.boundary)
+    cand = np.flatnonzero(sitable)
+    if len(cand) == 0:
+        cand = np.arange(len(grid))
     current, new_pts = sv.seeds.copy(), []
     for _ in range(k):
         d = KDTree(current).query(grid)[0]
         if pop is None:
-            idx = int(np.argmax(d))                       # farthest-point
+            j = int(np.argmax(d[cand]))                   # farthest-point
         else:
             score = np.where(d > thr, pop, 0.0)           # most underserved people
-            idx = int(np.argmax(score)) if score.max() > 0 else int(np.argmax(d))
+            sub = score[cand]
+            j = int(np.argmax(sub)) if sub.max() > 0 else int(np.argmax(d[cand]))
+        idx = int(cand[j])
         new_pts.append(grid[idx])
         current = np.vstack([current, grid[idx]])
     after = _snapshot(grid, current, thr, snap_pop)
@@ -3285,6 +3353,17 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
          "areas rather than the empty fringe. Table 4.9 reports the drop in underserved population "
          "from adding three facilities per service. Figure 4.13 shows the proposed sites for "
          "all six utilities together; Figures 4.14–4.16 then show three of them at full size.")
+    para("A site that scores well is of no use if nothing can be built on it, so candidate "
+         "locations are screened for buildability before placement. Water bodies, wetlands "
+         "and marshes, rivers, canals, drains and ditches, reservoirs and basins, quarries, "
+         "landfills, cemeteries, military land and airport surfaces are taken from "
+         "OpenStreetMap and removed from the candidate set. Because linear features such as "
+         f"drains and canals carry no width in OpenStreetMap, every exclusion is buffered by "
+         f"{UNBUILDABLE_BUFFER_M:.0f} m; this also keeps a proposed site off the immediate "
+         "bank of a pond or river rather than merely outside its outline. The screen removes "
+         "roughly a fifth of the 250 m demand grid. Coverage is still measured over the whole "
+         "grid — people living beside a river are still counted as needing service; only the "
+         "locations at which a facility may be placed are restricted.")
     figure("recommendations_all_services.png",
            "Figure 4.13. Proposed new facilities for all six utilities — existing sites in "
            "each utility's colour, proposed sites as red stars.", 6.2)
