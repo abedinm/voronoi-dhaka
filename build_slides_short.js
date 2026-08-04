@@ -131,7 +131,7 @@ s.addText("Research problem", { x: 0.95, y: 4.78, w: 6, h: 0.35, fontFace: BF,
   fontSize: 14, bold: true, color: AMBER, margin: 0 });
 s.addText("Existing Dhaka studies examine one service at a time and weight coverage by land area, not by the people actually affected.",
   { x: 0.95, y: 5.15, w: 6.1, h: 1.0, fontFace: BF, fontSize: 14, color: INK, margin: 0 });
-framedImage(s, FIG + "sections_only.png", 7.9, 1.7, 4.8, 4.9);
+framedImage(s, FIG + "all_facilities.png", 7.9, 1.7, 4.8, 4.9);
 s.addNotes("Dhaka's utilities have not kept pace with its growth. Prior studies look at a single service and measure over area rather than population.");
 
 // ------------------------------------------------------------------ 4. objectives

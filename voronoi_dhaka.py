@@ -1401,6 +1401,43 @@ def plot_recommendations(sv: ServiceVoronoi, rec: RecommendResult) -> str:
     return str(out)
 
 
+def plot_all_facilities(voronois: dict[str, ServiceVoronoi]) -> str:
+    """Every facility on one map, coloured by utility, with no Voronoi overlay.
+
+    This is the Introduction's figure: it states the problem (a dense centre and a
+    thin fringe) using nothing but the raw locations, so it commits to no result
+    and does not repeat the study-area map used later."""
+    boundary = next(iter(voronois.values())).boundary
+    fig, ax = plt.subplots(figsize=(11, 12))
+    gpd.GeoSeries([boundary], crs=CRS_METRIC).to_crs(WEB).plot(
+        ax=ax, color="#f2f5f7", edgecolor="black", linewidth=1.4, alpha=0.35)
+    total = 0
+    for key in SERVICE_TYPES:
+        if key not in voronois:
+            continue
+        sv, svc = voronois[key], SERVICE_TYPES[key]
+        total += sv.n
+        _seeds_web(sv).plot(ax=ax, color=svc.color, markersize=22,
+                            marker=SERVICE_MARKER.get(key, "o"), edgecolor="white",
+                            linewidth=0.4, alpha=0.9, zorder=5)
+    _add_basemap(ax)
+    ax.legend(handles=[Line2D([], [], marker=SERVICE_MARKER.get(k, "o"), color="none",
+                              markerfacecolor=SERVICE_TYPES[k].color,
+                              markeredgecolor="white", markersize=9,
+                              label=f"{SERVICE_TYPES[k].label} ({voronois[k].n})")
+                       for k in SERVICE_TYPES if k in voronois],
+              loc="upper right", fontsize=9, framealpha=0.93, title="Utility service",
+              title_fontsize=10)
+    ax.set_title(f"All {total} utility facilities in the study area\n"
+                 "concentrated in the central belt, sparse toward the fringe",
+                 fontsize=13)
+    ax.set_axis_off()
+    out = FIGURES_DIR / "all_facilities.png"
+    fig.savefig(out, dpi=FIGURE_DPI, bbox_inches="tight")
+    plt.close(fig)
+    return str(out)
+
+
 def plot_all_recommendations_panel(voronois: dict[str, ServiceVoronoi],
                                    recs: dict[str, RecommendResult]) -> str:
     """Proposed sites for every utility, not just one standing in for the rest.
@@ -4476,6 +4513,8 @@ def main(force_figures: bool = False, k: int = RECOMMEND_K, network: bool = Fals
         plot_sections_only(next(iter(voronois.values())).boundary, ref)
     if _need(str(FIGURES_DIR / "recommendations_all_services.png"), force_figures):
         plot_all_recommendations_panel(voronois, recs)
+    if _need(str(FIGURES_DIR / "all_facilities.png"), force_figures):
+        plot_all_facilities(voronois)
     headline_html = folium_sections_map(voronois, ref)
 
     print("[7/7] PDF report + literature review")

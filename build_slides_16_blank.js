@@ -53,6 +53,7 @@ function newSlide(kicker, title, opts = {}) {
 
 // Empty, labelled slot where a figure should be dropped in.
 const SLOT_LABELS = {
+  "all_facilities.png": "All 901 facilities across Dhaka, coloured by utility — dense centre, sparse fringe",
   "voronoi_all_services.png": "Six Voronoi diagrams — one per utility, each in its own colour with generator points",
   "sections_only.png": "The eight study sections of Dhaka, with their centre points",
   "textbook_all.png": "Textbook Voronoi correctness proof (three diagrams)",
@@ -182,7 +183,7 @@ s.addText("Problem statement", { x: 0.95, y: 4.73, w: 6, h: 0.35, fontFace: BF,
   fontSize: 14, bold: true, color: AMBER, margin: 0 });
 s.addText("Planners lack a city-wide, evidence-based picture of which neighbourhoods are underserved across the utilities that matter to daily life and safety.",
   { x: 0.95, y: 5.1, w: 6.15, h: 1.1, fontFace: BF, fontSize: 14, color: INK, margin: 0 });
-framedImage(s, FIG + "sections_only.png", 7.9, 1.7, 4.8, 4.9);
+framedImage(s, FIG + "all_facilities.png", 7.9, 1.7, 4.8, 4.9);
 s.addNotes("Dhaka's utilities have not kept pace with its growth, and no open evidence base exists for siting decisions.");
 
 // ================================================================ 4. INTRO
