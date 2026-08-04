@@ -323,13 +323,16 @@ s.addText("The border between two facilities is the line where you are exactly e
   { x: 6.7, y: 2.62, w: 6.0, h: 1.0, fontFace: BF, fontSize: 14, color: INK, margin: 0 });
 s.addText("Build every cell that way and the rest follows: no gaps, no overlaps, and exactly three cells meeting at each corner.",
   { x: 6.7, y: 3.6, w: 6.0, h: 0.95, fontFace: BF, fontSize: 14, color: INK, margin: 0 });
-s.addShape(pres.ShapeType.roundRect, { x: 6.7, y: 4.62, w: 6.0, h: 1.0,
+s.addShape(pres.ShapeType.roundRect, { x: 6.7, y: 4.55, w: 6.0, h: 1.15,
   fill: { color: TINT }, line: { color: LINE, width: 1 }, rectRadius: 0.08 });
-s.addText("Formally", { x: 6.95, y: 4.72, w: 2.0, h: 0.28, fontFace: BF, fontSize: 11,
+s.addText("Formally", { x: 6.95, y: 4.63, w: 2.0, h: 0.26, fontFace: BF, fontSize: 11,
   bold: true, color: MUTED, charSpacing: 1, margin: 0 });
-s.addText("H(p,q) = { x : |x\u2212p| \u2264 |x\u2212q| }        V(p) = B \u2229 H(p,q) for every neighbour q",
-  { x: 6.95, y: 5.02, w: 5.6, h: 0.5, fontFace: HF, fontSize: 12, italic: true,
+s.addText("H(p,q) = { x : |x\u2212p| \u2264 |x\u2212q| }        V(p) = B \u2229 H(p,q1) \u2229 H(p,q2) \u2229 ... \u2229 H(p,qk)",
+  { x: 6.95, y: 4.92, w: 5.6, h: 0.4, fontFace: HF, fontSize: 12, italic: true,
     color: INK, margin: 0 });
+s.addText("q1 ... qk are the neighbouring facilities of p;  B is the study boundary.",
+  { x: 6.95, y: 5.3, w: 5.6, h: 0.3, fontFace: BF, fontSize: 10.5, color: MUTED,
+    margin: 0 });
 s.addShape(pres.ShapeType.roundRect, { x: 6.7, y: 5.75, w: 6.0, h: 0.9,
   fill: { color: "E6EFE6" }, line: { color: GREEN, width: 1.5 }, rectRadius: 0.08 });
 s.addText("Verified by 29 automated tests \u2014 degree-3 vertices, exact tiling, bisector midpoints.",
