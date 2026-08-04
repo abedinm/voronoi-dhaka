@@ -547,6 +547,8 @@ function backupSlide(title) {
   s.addText("BACKUP", { x: 11.35, y: 0.38, w: 1.45, h: 0.4, align: "center",
     valign: "middle", fontFace: BF, fontSize: 10, bold: true, color: AMBER,
     charSpacing: 1, margin: 0 });
+  // deliberately NOT hidden: LibreOffice drops hidden slides from the PDF export,
+  // and the printed PDF is the fallback if the laptop fails.
   return s;
 }
 
