@@ -1401,6 +1401,54 @@ def plot_recommendations(sv: ServiceVoronoi, rec: RecommendResult) -> str:
     return str(out)
 
 
+def plot_all_recommendations_panel(voronois: dict[str, ServiceVoronoi],
+                                   recs: dict[str, RecommendResult]) -> str:
+    """Proposed sites for every utility, not just one standing in for the rest.
+
+    Existing facilities keep the utility's own colour; proposed sites are red
+    stars throughout, so the eye separates 'what is there' from 'what we add'
+    without having to re-read a legend on each panel."""
+    fig, axes = plt.subplots(2, 3, figsize=(16.5, 13))
+    order = [k for k in SERVICE_TYPES if k in voronois and k in recs]
+    for ax, key in zip(axes.ravel(), order):
+        sv, svc, rec = voronois[key], SERVICE_TYPES[key], recs[key]
+        seeds_after = np.vstack([sv.seeds, rec.new_points_m])
+        rect = clip_voronoi_to_box(compute_voronoi(seeds_after), sv.bbox)
+        polys = [p for p in (poly.intersection(sv.boundary) for poly in rect.values())
+                 if not p.is_empty and p.area > 0]
+        gpd.GeoSeries(polys, crs=CRS_METRIC).to_crs(WEB).boundary.plot(
+            ax=ax, color=svc.color, linewidth=0.5, alpha=0.85)
+        _boundary_web(sv).boundary.plot(ax=ax, color="black", linewidth=1.1)
+        _draw_generators(ax, sv, svc, size=20, zorder=5)
+        gpd.GeoSeries(gpd.points_from_xy(rec.new_points_m[:, 0], rec.new_points_m[:, 1]),
+                      crs=CRS_METRIC).to_crs(WEB).plot(
+            ax=ax, color="#d62728", markersize=210, marker="*",
+            edgecolor="black", linewidth=0.7, zorder=7)
+        _add_basemap(ax)
+        ax.set_title(f"{svc.label} — {rec.k} proposed sites\n"
+                     f"underserved {rec.before.underserved_people/1000:.0f}k → "
+                     f"{rec.after.underserved_people/1000:.0f}k people",
+                     fontsize=11.5, fontweight="bold", color=svc.color)
+        ax.set_axis_off()
+    for ax in axes.ravel()[len(order):]:
+        ax.set_axis_off()
+    fig.suptitle("Proposed new facilities for every utility — existing sites in the "
+                 "utility's colour, proposed sites as red stars",
+                 fontsize=15, fontweight="bold", y=0.975)
+    fig.legend(handles=[
+        Line2D([], [], marker="o", color="none", markerfacecolor="#555555",
+               markeredgecolor="white", markersize=9, label="existing facility"),
+        Line2D([], [], marker="*", color="none", markerfacecolor="#d62728",
+               markeredgecolor="black", markersize=16, label="proposed new site")],
+        loc="lower center", ncol=2, fontsize=11, frameon=False,
+        bbox_to_anchor=(0.5, 0.005))
+    fig.tight_layout(rect=(0, 0.035, 1, 0.955))
+    out = FIGURES_DIR / "recommendations_all_services.png"
+    fig.savefig(out, dpi=FIGURE_DPI, bbox_inches="tight")
+    plt.close(fig)
+    return str(out)
+
+
 def _zone_legend_handles(ref: ZoneRef):
     return [Patch(facecolor=c, edgecolor="#333", label=n, alpha=0.7)
             for n, c in zip(ref.names, ref.colors)]
@@ -3032,23 +3080,27 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
     h2("4.6.3 Recommendations")
     para("Population-targeted greedy placement concentrates new facilities in dense, underserved "
          "areas rather than the empty fringe. Table 4.9 reports the drop in underserved population "
-         "from adding three facilities per service, and Figures 4.11–4.13 show three examples.")
+         "from adding three facilities per service. Figure 4.11 shows the proposed sites for "
+         "all six utilities together; Figures 4.12–4.14 then show three of them at full size.")
+    figure("recommendations_all_services.png",
+           "Figure 4.11. Proposed new facilities for all six utilities — existing sites in "
+           "each utility's colour, proposed sites as red stars.", 6.2)
     table_from(["Service", "Underserved before → after (thousands)", "New sites (sections)"],
                [[SERVICE_TYPES[k].label,
                  f"{recs[k].before.underserved_people/1000:.0f} → {recs[k].after.underserved_people/1000:.0f}",
                  ", ".join(recs[k].new_zones)] for k in SERVICE_TYPES],
                "Table 4.9. Coverage improvement from the proposed facilities.")
-    figure("recommendations_fire_station.png", "Figure 4.11. Existing vs proposed fire stations.", 4.8)
-    figure("recommendations_hospital.png", "Figure 4.12. Existing vs proposed hospitals.", 4.8)
-    figure("recommendations_water_pump.png", "Figure 4.13. Existing vs proposed water sources.", 4.8)
+    figure("recommendations_fire_station.png", "Figure 4.12. Existing vs proposed fire stations.", 4.8)
+    figure("recommendations_hospital.png", "Figure 4.13. Existing vs proposed hospitals.", 4.8)
+    figure("recommendations_water_pump.png", "Figure 4.14. Existing vs proposed water sources.", 4.8)
 
     h2("4.6.4 Equity, clustering and combined access")
     para(f"Combining all services into one access index, access is moderately unequal (Gini = "
          f"{ext.gini_combined:.3f}) and strongly clustered (Moran's I = {ext.moran[0]:.3f}, "
          f"pseudo p = {ext.moran[1]:.3f}) — well- and poorly-served areas form contiguous "
          "regions. Per-section values of the combined index mirror the benefit ranking of "
-         "Table 4.8. The Lorenz curve (Figure 4.14) summarises the equity of access.")
-    figure("lorenz_access.png", "Figure 4.14. Lorenz curve of combined utility access.", 4.2)
+         "Table 4.8. The Lorenz curve (Figure 4.15) summarises the equity of access.")
+    figure("lorenz_access.png", "Figure 4.15. Lorenz curve of combined utility access.", 4.2)
     para("A sensitivity check (Table 4.10) shows the section ranking is robust: under ±25% "
          "thresholds and equal service weights the ranking barely changes (Spearman ρ ≈ 0.98).")
     table_from(["Scenario", "Rank corr. (ρ)", "Best", "Worst"],
@@ -3060,9 +3112,9 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
     para("Repeating the analysis with shortest-path distance on the Dhaka road network (rather than "
          "straight-line distance) confirms that Euclidean distance understates real travel: the "
          "median detour is about 1.5×, and the underserved share roughly doubles for several "
-         "services (Figure 4.15). This is a key finding — the true access gap is larger than a "
+         "services (Figure 4.16). This is a key finding — the true access gap is larger than a "
          "straight-line analysis suggests.")
-    figure("network_vs_euclid.png", "Figure 4.15. Underserved share: straight-line vs road network.", 5.6)
+    figure("network_vs_euclid.png", "Figure 4.16. Underserved share: straight-line vs road network.", 5.6)
 
     h2("4.6.6 Validation against the 2SFCA method")
     para("As a further check, the two-step floating catchment area (2SFCA) accessibility was "
@@ -4422,6 +4474,8 @@ def main(force_figures: bool = False, k: int = RECOMMEND_K, network: bool = Fals
         plot_all_services_panel(voronois)
     if _need(str(FIGURES_DIR / "sections_only.png"), force_figures):
         plot_sections_only(next(iter(voronois.values())).boundary, ref)
+    if _need(str(FIGURES_DIR / "recommendations_all_services.png"), force_figures):
+        plot_all_recommendations_panel(voronois, recs)
     headline_html = folium_sections_map(voronois, ref)
 
     print("[7/7] PDF report + literature review")

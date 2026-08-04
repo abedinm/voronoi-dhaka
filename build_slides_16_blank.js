@@ -57,7 +57,7 @@ const SLOT_LABELS = {
   "sections_only.png": "The eight study sections of Dhaka, with their centre points",
   "textbook_all.png": "Textbook Voronoi correctness proof (three diagrams)",
   "section_benefit.png": "Section benefit choropleth (green = well served, red = lagging)",
-  "recommendations_fire_station.png": "Fire stations: existing (blue) vs proposed (red stars)",
+  "recommendations_all_services.png": "Proposed sites for all six utilities — existing in each utility's colour, proposed as red stars",
   "lorenz_access.png": "Lorenz curve of combined utility access",
 };
 
@@ -451,9 +451,9 @@ s.addNotes("This is our headline finding. Weighting by people, not land, moves t
 
 // ================================================================ 13. RESULTS
 s = newSlide("06 · Result Analysis", "Where new facilities should go");
-framedImage(s, FIG + "recommendations_fire_station.png", 0.7, 1.7, 4.4, 5.0);
+framedImage(s, FIG + "recommendations_all_services.png", 0.6, 1.65, 6.8, 5.3);
 s.addText("Greedy placement adds each facility at the most-populated location that is still underserved.",
-  { x: 5.5, y: 1.78, w: 7.2, h: 0.55, fontFace: BF, fontSize: 15, color: INK, margin: 0 });
+  { x: 7.6, y: 1.72, w: 5.2, h: 0.9, fontFace: BF, fontSize: 13.5, color: INK, margin: 0 });
 s.addTable(
   [["Service", "Underserved before", "After 3 new sites"].map((h) => ({
     text: h, options: { bold: true, color: WHITE, fill: { color: DEEP }, fontSize: 12 } }))].concat(
@@ -464,13 +464,13 @@ s.addTable(
       { text: r[1], options: { fontSize: 13, color: MUTED, align: "center", fill: { color: i % 2 ? TINT : WHITE } } },
       { text: r[2], options: { fontSize: 13, bold: true, color: GREEN, align: "center", fill: { color: i % 2 ? TINT : WHITE } } },
     ])),
-  { x: 5.5, y: 2.55, w: 7.2, colW: [2.6, 2.3, 2.3], border: { pt: 0.5, color: LINE },
-    fontFace: BF, rowH: 0.44, valign: "middle" });
-s.addShape(pres.ShapeType.roundRect, { x: 5.5, y: 5.9, w: 7.2, h: 0.8,
+  { x: 7.6, y: 2.72, w: 5.2, colW: [2.0, 1.6, 1.6], border: { pt: 0.5, color: LINE },
+    fontFace: BF, rowH: 0.42, valign: "middle" });
+s.addShape(pres.ShapeType.roundRect, { x: 7.6, y: 5.95, w: 5.2, h: 0.95,
   fill: { color: "E6EFE6" }, line: { color: GREEN, width: 1.5 }, rectRadius: 0.08 });
 s.addText("Three fire stations alone bring 930,000 people back within reach.", {
-  x: 5.5, y: 5.9, w: 7.2, h: 0.8, align: "center", valign: "middle", fontFace: BF,
-  fontSize: 14.5, bold: true, color: GREEN, margin: 0 });
+  x: 7.7, y: 5.95, w: 5.0, h: 0.95, align: "center", valign: "middle", fontFace: BF,
+  fontSize: 13.5, bold: true, color: GREEN, margin: 0 });
 s.addNotes("Because placement targets population, proposed sites land in dense underserved areas, not empty land.");
 
 // ================================================================ 14. RESULTS

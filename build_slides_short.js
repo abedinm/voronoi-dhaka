@@ -336,9 +336,9 @@ s.addNotes("Weighting by people changes the story. The central belt is best serv
 
 // ------------------------------------------------------------------ 12. recommendations
 s = newSlide("Results", "Where new facilities should go");
-framedImage(s, FIG + "recommendations_fire_station.png", 0.7, 1.7, 4.4, 5.0);
+framedImage(s, FIG + "recommendations_all_services.png", 0.6, 1.65, 6.8, 5.3);
 s.addText("Greedy placement adds each facility at the most-populated location that is still underserved.",
-  { x: 5.5, y: 1.8, w: 7.2, h: 0.6, fontFace: BF, fontSize: 15, color: INK, margin: 0 });
+  { x: 7.6, y: 1.8, w: 5.2, h: 0.6, fontFace: BF, fontSize: 13.5, color: INK, margin: 0 });
 const recRows = [["Fire station", "1.67M", "0.74M"], ["Hospital", "1.07M", "0.61M"],
   ["Fuel station", "1.94M", "1.42M"], ["Metro station", "5.0M", "3.9M"],
   ["Bus stop", "3.0M", "2.8M"], ["Water pump", "4.7M", "4.3M"]];
@@ -350,13 +350,13 @@ s.addTable(
       { text: r[1], options: { fontSize: 13, color: MUTED, align: "center", fill: { color: i % 2 ? TINT : WHITE } } },
       { text: r[2], options: { fontSize: 13, bold: true, color: GREEN, align: "center", fill: { color: i % 2 ? TINT : WHITE } } },
     ])),
-  { x: 5.5, y: 2.6, w: 7.2, colW: [2.6, 2.3, 2.3], border: { pt: 0.5, color: LINE },
+  { x: 7.6, y: 2.6, w: 5.2, colW: [2.0, 1.6, 1.6], border: { pt: 0.5, color: LINE },
     fontFace: BF, rowH: 0.44, valign: "middle" }
 );
-s.addShape(pres.ShapeType.roundRect, { x: 5.5, y: 5.95, w: 7.2, h: 0.75,
+s.addShape(pres.ShapeType.roundRect, { x: 7.6, y: 5.95, w: 5.2, h: 0.75,
   fill: { color: "E6EFE6" }, line: { color: GREEN, width: 1.5 }, rectRadius: 0.08 });
 s.addText("Three fire stations alone bring 930,000 people back within reach.", {
-  x: 5.5, y: 5.95, w: 7.2, h: 0.75, align: "center", valign: "middle", fontFace: BF,
+  x: 7.6, y: 5.95, w: 5.2, h: 0.75, align: "center", valign: "middle", fontFace: BF,
   fontSize: 14, bold: true, color: GREEN, margin: 0 });
 s.addNotes("Because placement targets population, the proposed sites land in dense underserved areas rather than empty land.");
 
