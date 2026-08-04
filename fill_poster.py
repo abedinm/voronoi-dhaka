@@ -49,9 +49,7 @@ by_idx[3].top = Inches(2.62)
 by_idx[3].height = Inches(1.0)
 by_idx[3].width = Inches(24.0)
 fill(by_idx[3], ["Minhazul Abedin (21-44625-1)   ·   Zarin Tasnim Rayta (21-45742-3)   ·   "
-                 "Abdullah Al Noman (21-45825-3)   ·   Mehedi Hasan Aziz (19-40060-1)\n"
-                 "Supervisor: Dr. Md. Manzurul Hasan, Associate Professor, "
-                 "Department of Computer Science"],
+                 "Abdullah Al Noman (21-45825-3)   ·   Mehedi Hasan Aziz (19-40060-1)"],
      keep_first=False, size=17)
 
 # ---------------- column 1 ----------------
