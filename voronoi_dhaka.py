@@ -2431,7 +2431,7 @@ def build_poster(table, sb, ext, recs, flagship_key) -> str:
     yy = image(x3, top - 30, "section_benefit.png", colw)
     yy = text_block(x3, yy - 6, "Key findings",
         f"Central belt best served ({best}); {sb.df.iloc[-1]['section']} lags. Access is strongly "
-        f"clustered (Moran's I = {ext.moran[0]:.2f}) and moderately unequal (Gini = "
+        f"clustered (Moran's I = {ext.moran[0]:.2f}) and mildly unequal (Gini = "
         f"{ext.gini_combined:.2f}). Road-network distance roughly doubles the underserved share. "
         "Water and metro are the widest gaps; dense old Dhaka (Motijheel) is the top investment "
         "target for new hospitals and fire stations.", colw)
@@ -2847,7 +2847,7 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
         "new facility sites were selected with a greedy maximal-covering heuristic that targets "
         "the most-populated underserved locations.")
     para(
-        f"The results show that combined utility access is moderately unequal (Gini = "
+        f"The results show that combined utility access is mildly unequal (Gini = "
         f"{ext.gini_combined:.3f}) and strongly spatially clustered (Moran's I = "
         f"{ext.moran[0]:.2f}, pseudo p = {ext.moran[1]:.3f}). The central belt is best served "
         f"({best}), while {worst['section']} ({worst['benefit_score']:.0f}) and Uttara lag "
@@ -3377,7 +3377,7 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
     figure("recommendations_water_pump.png", "Figure 4.16. Existing vs proposed water sources.", 4.8)
 
     h2("4.6.4 Equity, clustering and combined access")
-    para(f"Combining all services into one access index, access is moderately unequal (Gini = "
+    para(f"Combining all services into one access index, access is mildly unequal (Gini = "
          f"{ext.gini_combined:.3f}) and strongly clustered (Moran's I = {ext.moran[0]:.3f}, "
          f"pseudo p = {ext.moran[1]:.3f}) — well- and poorly-served areas form contiguous "
          "regions. Per-section values of the combined index mirror the benefit ranking of "
@@ -4455,7 +4455,7 @@ def build_ieee_paper_docx(table, sb, ext, recs) -> str:
         f"gridded population (approximately {total_pop_m:.1f} million residents) and "
         "by service criticality. New sites are selected with a greedy maximal-covering "
         "heuristic that targets the most populated underserved locations. Results show "
-        f"that combined access is moderately unequal (Gini = {ext.gini_combined:.3f}) "
+        f"that combined access is mildly unequal (Gini = {ext.gini_combined:.3f}) "
         f"and strongly spatially clustered (Moran's I = {ext.moran[0]:.2f}, p = "
         f"{ext.moran[1]:.3f}); the central belt is best served while peripheral "
         "sections lag, and the most populous section is only moderately served, making "
@@ -4631,7 +4631,7 @@ def build_ieee_paper_docx(table, sb, ext, recs) -> str:
                 widths=[1.5, 1.8])
 
     subheading("D. Equity, Clustering and Validation")
-    p(f"Combined access across the six services is moderately unequal, with a Gini "
+    p(f"Combined access across the six services is mildly unequal, with a Gini "
       f"coefficient of {ext.gini_combined:.3f}, and strongly spatially clustered "
       f"(Moran's I = {ext.moran[0]:.2f}, pseudo p = {ext.moran[1]:.3f}), indicating "
       "that well- and poorly-served locations form contiguous regions rather than a "

@@ -244,7 +244,7 @@ def card1():
             ("Top target", "<b>Motijheel</b> — 3.1 M people, scores only 68"),
             ("Weakest service", "Water 73% of area too far · metro 67%"),
             ("Strongest", "Hospitals — only 33% too far"),
-            ("Equity", "Gini 0.165 (moderately unequal)"),
+            ("Equity", "Gini 0.165 (mildly unequal)"),
             ("Clustering", "Moran's I 0.99 → contiguous zones, not random"),
             ("Payoff", "3 new fire stations → 946,000 people back in reach"),
             ("Sensitivity", "±25% on every threshold → ranking holds, ρ ≈ 0.98"),
@@ -301,23 +301,27 @@ def card1():
 
 # ══════════════════════════════════════════════════ CARD 2 — the presentation
 SLIDES = [
-    ("1", "Title", "Assalamu alaikum. Name the topic, the team, the supervisor. 15 s."),
+    ("1", "Title", "Assalamu alaikum. Name the topic and the team. 15 s."),
     ("2", "Outline", "&ldquo;Eight parts.&rdquo; Read the headings, do not explain them. 10 s."),
     ("3", "Introduction", "Dhaka grew faster than its utilities; access is uneven and unmeasured."),
     ("4", "Objectives &amp; RQs", "Four objectives (i–iv), four questions. Point, do not read all."),
     ("5", "Literature", "Prior Dhaka work: emergency care, transit, evacuation, open space."),
-    ("6", "Research gap", "<b>All single-service and area-based.</b> We do six, weighted by people."),
-    ("7", "Data", "901 facilities, 10.7 M residents, all open licence. Name the sources."),
-    ("8", "Study area", "The eight sections. Say they are analytical zones, not wards."),
-    ("9", "Method", "The five stages: collect → partition → measure → score → recommend."),
-    ("10", "Mathematics", "Cell = intersection of half-planes ⇒ perpendicular-bisector edges."),
-    ("11", "Coverage", "Water and metro are weakest; hospitals strongest. One number each."),
-    ("12", "Benefit ranking", "<b>The key slide.</b> Area vs population flips the answer to Motijheel."),
-    ("13", "Recommendations", "Where new facilities go. 3 fire stations → 946,000 people."),
-    ("14", "Validation &amp; equity", "2SFCA, exact optimum, road network. Gini 0.165, Moran 0.99."),
-    ("15", "Limitations", "Say them yourself, plainly. It buys credibility for the Q&amp;A."),
-    ("16", "Conclusion", "Contribution + reproducible software + one line of future work."),
+    ("6", "Research gap", "<b>All did one service, by land area.</b> We do six, weighted by people."),
+    ("7", "Data", "901 facilities, 10.7 M residents, all free public data. Name the sources."),
+    ("8", "The eight areas", "Say they are our own analytical areas, not official wards."),
+    ("9", "Five steps", "Collect → divide → measure → score → recommend. Do not linger."),
+    ("10", "Why cells look so", "One sentence: closest facility wins. Point at one dot and its area."),
+    ("11", "What each covers", "Six maps, one colour each. Contrast bus stops with fire stations."),
+    ("12", "Where concentrated", "901 facilities become 110 groups. Point at Motijheel and Mirpur."),
+    ("13", "In the middle?", "Sparse services sit furthest off-centre — metro and fire worst."),
+    ("14", "Coverage", "Water and metro are weakest; hospitals strongest. One number each."),
+    ("15", "Benefit ranking", "<b>The key slide.</b> Area vs population flips the answer to Motijheel."),
+    ("16", "Recommendations", "Where new facilities go. 3 fire stations → 946,000 people."),
+    ("17", "Three checks", "Usual method, perfect answer, real roads. Own the road-network result."),
+    ("18", "Limitations", "Say them yourself, plainly. It buys credibility for the Q&amp;A."),
+    ("19", "Conclusion", "Contribution + reproducible software + one line of future work."),
 ]
+
 
 
 def card2():
@@ -346,10 +350,10 @@ def card2():
         Spacer(1, 0.18 * cm),
         Paragraph("Pacing", H),
         kv([
-            ("15 minutes", "≈50 s per slide. Slides 12–13 get 90 s each; take it from "
-             "4, 5 and 8."),
-            ("If cut to 10", "Drop 5 and 8, compress 9 + 10 into one breath. Never drop 12."),
-            ("Running late", "Skip to slide 12, then 16. Those two carry the thesis."),
+            ("15 minutes", "≈45 s per slide. Slides 15–16 get 90 s each; take it from "
+             "4, 5, 8 and 10."),
+            ("If cut to 10", "Drop 5, 8, 10 and 13; compress 11 + 12. Never drop 15."),
+            ("Running late", "Skip to slide 15, then 19. Those two carry the thesis."),
         ], FW, klabel=2.6),
 
         Paragraph("Quick-fire answers — the six you will actually get", H),
@@ -443,7 +447,7 @@ def card3():
             ("92 → 55", "Mirpur best, Bashundhara worst (score /100)"),
             ("3.1 M", "people in Motijheel — the top target"),
             ("946,000", "people recovered by 3 new fire stations"),
-            ("0.165", "Gini — moderately unequal access"),
+            ("0.165", "Gini — mildly unequal access"),
             ("×1.5", "road-network detour vs straight line"),
         ], CW, klabel=2.0),
     ]
@@ -506,5 +510,5 @@ if __name__ == "__main__":
     card("Card_1_Thesis_Report.pdf", "Thesis Report — One-Page Master Card",
          SUBTITLE, card1)
     card("Card_2_Presentation.pdf", "Defense Presentation — Slide-by-Slide Card",
-         "16 slides &nbsp;·&nbsp; " + SUBTITLE, card2)
+         "19 slides &nbsp;·&nbsp; " + SUBTITLE, card2)
     card("Card_3_Poster.pdf", "Poster Session — Standing Card", SUBTITLE, card3)

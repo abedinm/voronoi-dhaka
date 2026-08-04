@@ -491,7 +491,7 @@ s = newSlide("06 · Result Analysis", "Validation and equity");
     bold: true, color: INK, margin: 0 });
 });
 framedImage(s, FIG + "lorenz_access.png", 1.1, 4.35, 3.3, 2.3);
-statCard(s, 5.0, 4.6, 3.7, 1.75, "0.165", "Gini coefficient — moderate inequality", DEEP);
+statCard(s, 5.0, 4.6, 3.7, 1.75, "0.165", "Gini coefficient — mild inequality", DEEP);
 statCard(s, 9.0, 4.6, 3.7, 1.75, "0.99", "Moran's I — strongly clustered (p = 0.005)", TEAL);
 s.addNotes("Three checks plus the equity measures. Be upfront that road distance roughly doubles the underserved share.");
 

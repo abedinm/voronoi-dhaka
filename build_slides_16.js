@@ -11,7 +11,7 @@ pres.layout = "LAYOUT_WIDE"; // 13.33 x 7.5 in
 pres.author = "Minhazul Abedin";
 pres.title = "Providing Utility Services using Voronoi Diagrams";
 
-const FIG = "outputs/figures/";
+const FIG = "outputs/figures/plain/";   // plain-language captions
 const OUT = "outputs/Dhaka_Voronoi_Defense_16.pptx";
 
 // palette
@@ -188,9 +188,9 @@ s = newSlide("02 · Literature Review", "What has already been done");
 const lit = [
   ["Okabe et al. [16]", "2000", "Voronoi tessellations", "Foundational theory"],
   ["Church & ReVelle [6]", "1974", "Maximal covering (MCLP)", "Siting under a distance threshold"],
-  ["Luo & Wang [14]", "2003", "Two-step floating catchment", "Standard accessibility measure"],
+  ["Luo & Wang [14]", "2003", "Supply per person nearby", "The standard way others measure access"],
   ["Cui et al. [7]", "2021", "Dynamic Voronoi", "Adds facility capacity"],
-  ["Ahmed et al. [1]", "2019", "2SFCA + traffic, Dhaka", "Emergency healthcare only"],
+  ["Ahmed et al. [1]", "2019", "Emergency care access with traffic", "One service only"],
   ["Rahman et al. [17]", "2022", "Accessibility index, Dhaka", "Transit-oriented areas only"],
   ["Alam et al. [2]", "2025", "Accessibility index, Dhaka", "Public open space only"],
 ];
@@ -221,7 +221,7 @@ s.addText("What this thesis contributes", { x: 7.0, y: 1.7, w: 5.7, h: 0.35, fon
 bullets(s, [
   "Six utilities assessed together in one framework.",
   "Coverage weighted by WorldPop population and service criticality.",
-  "Population-targeted siting via greedy maximal covering.",
+  "New sites chosen to reach the most people, not to fill empty land.",
   "Validated three ways and released as reproducible software.",
 ], 7.0, 2.15, 5.7, 14);
 s.addShape(pres.ShapeType.roundRect, { x: 0.7, y: 4.75, w: 12, h: 1.5,
@@ -247,25 +247,25 @@ const dataRows = [
   ["Fire station", "amenity = fire_station", "29", "22"],
 ];
 s.addTable(
-  [["Service", "OpenStreetMap tag", "Raw", "Cleaned"].map((h) => ({
+  [["Service", "What we searched for", "Found", "After cleaning"].map((h) => ({
     text: h, options: { bold: true, color: WHITE, fill: { color: DEEP }, fontSize: 12 } }))].concat(
     dataRows.map((r, i) => r.map((c) => ({
       text: c, options: { fontSize: 12, color: INK, fill: { color: i % 2 ? TINT : WHITE } } })))),
   { x: 0.7, y: 3.5, w: 7.5, colW: [2.3, 2.95, 1.1, 1.15], border: { pt: 0.5, color: LINE },
     fontFace: BF, rowH: 0.4, valign: "middle" });
 bullets(s, [
-  "Live OpenStreetMap query via OSMnx — no synthetic points.",
+  "Downloaded live from OpenStreetMap — no made-up points.",
   "Polygons reduced to interior points; duplicates within 150 m removed.",
   "Clipped to the OSM administrative boundary of Dhaka.",
-  "Population from the WorldPop 1 km UN-adjusted raster (2020).",
+  "Population from WorldPop, a free 1 km population map (2020).",
   "Raw → cleaned is de-duplication, not data loss.",
 ], 8.5, 3.55, 4.2, 12.5);
 s.addNotes("All facility data is real and openly licensed. The raw-to-cleaned drop is duplicate mapping and out-of-boundary features.");
 
 // ================================================================ 8. DATA
-s = newSlide("04 · Data", "Study area and the eight sections");
+s = newSlide("04 · Data", "The eight areas of Dhaka");
 framedImage(s, FIG + "sections_only.png", 0.7, 1.7, 4.9, 5.0);
-s.addText("The study area is the Dhaka bounding box intersected with the OpenStreetMap administrative boundary. Within it we define eight familiar sections as a coarse Voronoi of well-known area centres.",
+s.addText("The study area is Dhaka city, taken from the OpenStreetMap city boundary. Inside it we mark out eight familiar areas — each one is everywhere closest to a well-known centre.",
   { x: 6.0, y: 1.82, w: 6.6, h: 1.1, fontFace: BF, fontSize: 15, color: INK, margin: 0 });
 [["Uttara", "e6194B"], ["Mirpur", "f58231"], ["Bashundhara", "911eb4"], ["Banani", "4363d8"],
  ["Gulshan", "3cb44b"], ["Dhanmondi", "42d4f4"], ["Khilgaon", "f032e6"], ["Motijheel", "ffe119"],
@@ -277,18 +277,18 @@ s.addText("The study area is the Dhaka bounding box intersected with the OpenStr
 });
 s.addShape(pres.ShapeType.roundRect, { x: 6.0, y: 5.85, w: 6.6, h: 0.85,
   fill: { color: TINT }, line: { color: LINE, width: 1 }, rectRadius: 0.08 });
-s.addText("Analytical zones, not official wards — stated in our Limitations.",
+s.addText("These are our own areas, not official wards — we say so in our Limitations.",
   { x: 6.0, y: 5.85, w: 6.6, h: 0.85, align: "center", valign: "middle", fontFace: BF,
     fontSize: 14, italic: true, color: MUTED, margin: 0 });
 s.addNotes("Each fine service cell takes the colour of the section its facility falls in. Be honest that these are analytical zones, not official wards.");
 
 // ================================================================ 9. METHOD
 s = newSlide("05 · Method", "A five-stage pipeline");
-[["1", "Collect", "Six services from OSM; population from WorldPop", DEEP],
- ["2", "Partition", "Exact Voronoi cells from perpendicular bisectors", TEAL],
- ["3", "Measure", "Nearest-facility distance on a 250 m grid (k-d tree)", AMBER],
- ["4", "Score", "Population- and criticality-weighted benefit index", GREEN],
- ["5", "Recommend", "Greedy maximal covering on underserved population", RED],
+[["1", "Collect", "Six services and a population map, all free public data", DEEP],
+ ["2", "Divide", "Split the city so every point belongs to its nearest facility", TEAL],
+ ["3", "Measure", "Check the distance from every 250 m point to the nearest one", AMBER],
+ ["4", "Score", "Give each area a score out of 100, based on its people", GREEN],
+ ["5", "Recommend", "Add the facility that helps the most people, then repeat", RED],
 ].forEach((st, i) => {
   const x = 0.7 + i * 2.48;
   s.addShape(pres.ShapeType.roundRect, { x, y: 1.95, w: 2.25, h: 2.5,
@@ -306,11 +306,8 @@ s = newSlide("05 · Method", "A five-stage pipeline");
 });
 s.addShape(pres.ShapeType.roundRect, { x: 0.7, y: 4.85, w: 12, h: 1.5,
   fill: { color: TINT }, line: { color: LINE, width: 1 }, rectRadius: 0.08 });
-s.addText("Everything runs in a metric projection (UTM 46N, EPSG:32646) so distances are true metres, and the whole pipeline regenerates from a single command.",
+s.addText("All distances are measured in real metres on the ground, and the whole study rebuilds from a single command.",
   { x: 1.0, y: 5.05, w: 11.4, h: 0.55, fontFace: BF, fontSize: 14, color: INK, margin: 0 });
-s.addText("Tools:  Python · NumPy · SciPy · Shapely · GeoPandas · OSMnx · rasterio · Matplotlib · pytest",
-  { x: 1.0, y: 5.62, w: 11.4, h: 0.5, fontFace: BF, fontSize: 12.5, italic: true,
-    color: MUTED, margin: 0 });
 s.addNotes("Five stages. Emphasise that all distance work happens in metres, not degrees.");
 
 // ================================================================ 10. METHOD
@@ -325,17 +322,17 @@ s.addText("Build every cell that way and the rest follows: no gaps, no overlaps,
   { x: 6.7, y: 3.6, w: 6.0, h: 0.95, fontFace: BF, fontSize: 14, color: INK, margin: 0 });
 s.addShape(pres.ShapeType.roundRect, { x: 6.7, y: 4.75, w: 6.0, h: 1.0,
   fill: { color: "E6EFE6" }, line: { color: GREEN, width: 1.5 }, rectRadius: 0.08 });
-s.addText("Verified by 29 automated tests \u2014 degree-3 vertices, exact tiling, bisector midpoints.",
+s.addText("Checked automatically 29 times over \u2014 no gaps, no overlaps, borders in the right place.",
   { x: 6.95, y: 4.9, w: 5.5, h: 0.75, fontFace: BF, fontSize: 13, bold: true,
     color: GREEN, margin: 0 });
 s.addNotes("Say the plain sentence, point at one seed and its cell, and stop.");
 
 // ============================================================ 11. THE DIAGRAMS
-s = newSlide("05 · Method", "The six Voronoi diagrams");
+s = newSlide("05 · Method", "What each service covers");
 framedImage(s, FIG + "voronoi_all_services.png", 0.6, 1.65, 6.9, 5.4);
 s.addText("One colour and one marker per utility", { x: 7.8, y: 1.75, w: 5, h: 0.35,
   fontFace: BF, fontSize: 15, bold: true, color: DEEP, margin: 0 });
-s.addText("Every cell is the region whose nearest facility of that type is the point inside it. The generator points \u2014 the facilities themselves \u2014 are drawn on every panel.",
+s.addText("Every cell is the region whose nearest facility of that type is the point inside it. The facilities themselves are drawn on every map.",
   { x: 7.8, y: 2.15, w: 5.0, h: 1.0, fontFace: BF, fontSize: 13, color: MUTED, margin: 0 });
 [["Metro station", "26", RED], ["Hospital", "286", GREEN],
  ["Water pump / source", "118", "1F77B4"], ["Fuel station", "135", AMBER],
@@ -351,20 +348,20 @@ s.addText("Every cell is the region whose nearest facility of that type is the p
 });
 s.addShape(pres.ShapeType.roundRect, { x: 7.8, y: 6.42, w: 5.0, h: 0.62,
   fill: { color: "FBEEE9" }, line: { color: AMBER, width: 1.2 }, rectRadius: 0.08 });
-s.addText("314 bus stops tessellate the centre finely; 22 fire stations give cells an order of magnitude larger.",
+s.addText("314 bus stops divide the centre finely; 22 fire stations cover areas ten times larger.",
   { x: 8.0, y: 6.5, w: 4.7, h: 0.5, fontFace: BF, fontSize: 11.5, color: INK, margin: 0 });
-s.addNotes("Each utility has its own colour and marker, and the generator points are visible on every panel. Point at fire stations versus bus stops \u2014 the cell-size contrast is the whole story.");
+s.addNotes("Each service has its own colour and marker, and the facilities themselves are visible on every map. Point at fire stations versus bus stops \u2014 the cell-size contrast is the whole story.");
 
 // ========================================================== 12. CLUSTER CENTRES
-s = newSlide("05 \u00b7 Method", "Centre point of every cluster, in every section");
+s = newSlide("05 \u00b7 Method", "Where each service is concentrated");
 framedImage(s, FIG + "cluster_centres.png", 0.6, 1.65, 4.6, 5.4);
-s.addText("901 facilities reduce to 110 cluster centres", { x: 5.6, y: 1.72, w: 7.1, h: 0.4,
+s.addText("901 facilities become 110 groups", { x: 5.6, y: 1.72, w: 7.1, h: 0.4,
   fontFace: BF, fontSize: 17, bold: true, color: DEEP, margin: 0 });
-s.addText("Within each of the eight sections, facilities lying within 1.5 km of one another are treated as a single cluster, and each cluster is drawn at its centre point. Marker size grows with the number of facilities that centre stands for, so the real service hubs in each section stand out from the scatter.",
+s.addText("Within each of the eight areas, facilities closer than 1.5 km to one another are counted as one group, and each group is marked at its centre. The bigger the marker, the more facilities it stands for \u2014 so the real service hubs stand out from the scatter.",
   { x: 5.6, y: 2.18, w: 7.1, h: 1.35, fontFace: BF, fontSize: 14, color: INK, margin: 0 });
-s.addText("Why a distance, not a cluster count", { x: 5.6, y: 3.62, w: 7.1, h: 0.4,
+s.addText("Why a distance, not a fixed number of groups", { x: 5.6, y: 3.62, w: 7.1, h: 0.4,
   fontFace: BF, fontSize: 15, bold: true, color: TEAL, margin: 0 });
-s.addText("Single-linkage clustering at a fixed 1.5 km threshold means no number of clusters has to be chosen in advance, and the result is fully deterministic \u2014 re-running the pipeline gives the same 110 centres every time.",
+s.addText("Grouping by distance means we never have to pick how many groups there should be, and the answer never changes \u2014 re-running the study gives the same 110 groups every time.",
   { x: 5.6, y: 4.05, w: 7.1, h: 1.0, fontFace: BF, fontSize: 13.5, color: MUTED, margin: 0 });
 [["Fuel station", "25"], ["Bus stop", "21"], ["Hospital", "20"],
  ["Fire station", "17"], ["Water pump", "15"], ["Metro station", "12"],
@@ -374,20 +371,20 @@ s.addText("Single-linkage clustering at a fixed 1.5 km threshold means no number
     fill: { color: TINT }, line: { color: LINE, width: 1 }, rectRadius: 0.06 });
   s.addText(r[1], { x: x + 0.12, y: y + 0.06, w: 2.0, h: 0.36, align: "center",
     fontFace: HF, fontSize: 17, bold: true, color: DEEP, margin: 0 });
-  s.addText(r[0] + " clusters", { x: x + 0.12, y: y + 0.42, w: 2.0, h: 0.26,
+  s.addText(r[0] + " groups", { x: x + 0.12, y: y + 0.42, w: 2.0, h: 0.26,
     align: "center", fontFace: BF, fontSize: 10.5, color: MUTED, margin: 0 });
 });
 s.addNotes("One centre per clump of facilities, per section. Point at the big markers in Motijheel and Mirpur \u2014 those are the real service hubs.");
 
 // ========================================================== 13. CELL CENTROIDS
-s = newSlide("05 \u00b7 Method", "Facility versus the centre of the area it serves");
+s = newSlide("05 \u00b7 Method", "Is each facility in the middle of what it covers?");
 framedImage(s, FIG + "cell_centroids.png", 0.6, 1.6, 7.6, 5.5);
 s.addText("Two different points", { x: 8.4, y: 1.68, w: 4.4, h: 0.35, fontFace: BF,
   fontSize: 16, bold: true, color: DEEP, margin: 0 });
-s.addText("The filled dot is the facility. The hollow ring is the centre of the area it serves. The line between them is the offset \u2014 a long line means the facility serves its catchment from one edge.",
+s.addText("The filled dot is the facility. The ring is the middle of the area it covers. A long line between them means the facility sits at one edge of its own area rather than in the middle.",
   { x: 8.4, y: 2.08, w: 4.4, h: 1.3, fontFace: BF, fontSize: 13, color: INK, margin: 0 });
 s.addTable(
-  [["Service", "Median offset"].map((h) => ({
+  [["Service", "Typically off-centre by"].map((h) => ({
     text: h, options: { bold: true, color: WHITE, fill: { color: DEEP }, fontSize: 11.5 } }))].concat(
     [["Metro station", "1.64 km"], ["Fire station", "1.35 km"],
      ["Fuel station", "0.41 km"], ["Water pump", "0.36 km"],
@@ -482,41 +479,40 @@ s.addText("Three fire stations alone bring 946,000 people back within reach.", {
 s.addNotes("Because placement targets population, proposed sites land in dense underserved areas, not empty land.");
 
 // ================================================================ 14. RESULTS
-s = newSlide("06 · Result Analysis", "Three ways we checked ourselves");
-[["Checked against the standard method",
-  "Our ranking broadly agrees with 2SFCA, the method the literature uses.",
-  "Spearman \u03c1 0.71\u20130.93 for scarce services; weaker where facilities cluster \u2014 we report that openly", TEAL],
- ["Checked against the perfect answer",
-  "Our fast placement method finds essentially the best possible sites.",
-  "Greedy recovers ~100% of the exhaustive maximal-covering optimum", GREEN],
- ["Checked against real roads",
-  "On Dhaka's actual road network the problem is about twice as big.",
-  "Median journey \u00d71.5 longer on a 43,000-junction graph \u2014 our headline figures are optimistic", RED],
+s = newSlide("06 · Result Analysis", "Three ways we checked our answer");
+[["We compared with the usual method",
+  "Other researchers measure access a different way. We ran their method too, and it mostly agrees with ours.",
+  "Where it disagrees, we say so — and we explain why", TEAL],
+ ["We compared with the perfect answer",
+  "Our quick method for choosing sites finds essentially the same places as working through every possibility.",
+  "So the shortcut costs us nothing", GREEN],
+ ["We compared with real roads",
+  "Straight lines ignore rivers and buildings. On Dhaka's real roads, journeys are about 1.5 times longer.",
+  "Twice as many people are too far — our figures are optimistic", RED],
 ].forEach((c, i) => {
   const x = 0.7 + i * 4.15;
-  s.addShape(pres.ShapeType.roundRect, { x, y: 1.72, w: 3.85, h: 2.75,
+  s.addShape(pres.ShapeType.roundRect, { x, y: 1.72, w: 3.85, h: 3.0,
     fill: { color: TINT }, line: { color: LINE, width: 1 }, rectRadius: 0.08 });
-  s.addText(c[0], { x: x + 0.25, y: 1.9, w: 3.4, h: 0.6, fontFace: BF, fontSize: 14.5,
-    bold: true, color: c[3], margin: 0 });
-  s.addText(c[1], { x: x + 0.25, y: 2.56, w: 3.4, h: 0.9, fontFace: BF, fontSize: 13.5,
-    color: INK, margin: 0 });
-  s.addText(c[2], { x: x + 0.25, y: 3.5, w: 3.4, h: 0.85, fontFace: BF, fontSize: 10.5,
-    color: MUTED, margin: 0 });
+  s.addText(c[0], { x: x + 0.25, y: 1.92, w: 3.4, h: 0.6, fontFace: BF,
+    fontSize: 15.5, bold: true, color: c[3], margin: 0 });
+  s.addText(c[1], { x: x + 0.25, y: 2.6, w: 3.4, h: 1.3, fontFace: BF,
+    fontSize: 13.5, color: INK, margin: 0 });
+  s.addText(c[2], { x: x + 0.25, y: 3.9, w: 3.4, h: 0.75, fontFace: BF,
+    fontSize: 12, italic: true, color: MUTED, margin: 0 });
 });
-framedImage(s, FIG + "lorenz_access.png", 1.1, 4.7, 3.3, 2.2);
-s.addShape(pres.ShapeType.roundRect, { x: 5.0, y: 4.9, w: 3.7, h: 1.75,
-  fill: { color: TINT }, line: { color: LINE, width: 1 }, rectRadius: 0.08 });
-s.addText("Access is moderately unequal", { x: 5.2, y: 5.08, w: 3.3, h: 0.5,
-  fontFace: BF, fontSize: 14.5, bold: true, color: DEEP, margin: 0 });
-s.addText("Gini = 0.165 on the combined access distribution (0 would be perfectly equal)",
-  { x: 5.2, y: 5.62, w: 3.3, h: 0.9, fontFace: BF, fontSize: 11.5, color: MUTED, margin: 0 });
-s.addShape(pres.ShapeType.roundRect, { x: 9.0, y: 4.9, w: 3.7, h: 1.75,
-  fill: { color: TINT }, line: { color: LINE, width: 1 }, rectRadius: 0.08 });
-s.addText("Badly served areas form clumps", { x: 9.2, y: 5.08, w: 3.3, h: 0.5,
-  fontFace: BF, fontSize: 14.5, bold: true, color: TEAL, margin: 0 });
-s.addText("Moran's I = 0.99 \u2014 under-service is contiguous, not scattered at random (p = 0.005)",
-  { x: 9.2, y: 5.62, w: 3.3, h: 0.9, fontFace: BF, fontSize: 11.5, color: MUTED, margin: 0 });
-s.addNotes("Lead with the plain claim in each card; the statistic underneath is the evidence, not the point. Be upfront that road distance roughly doubles the underserved share \u2014 volunteering it is better than being caught by it.");
+[["Access is uneven", "Some areas have noticeably better access to services than others.", DEEP],
+ ["The gaps sit together", "Badly served places form solid blocks — they are not scattered at random.", TEAL],
+ ["The ranking is stable", "Changing every distance limit by a quarter barely moves it.", GREEN],
+].forEach((c, i) => {
+  const x = 0.7 + i * 4.15;
+  s.addShape(pres.ShapeType.roundRect, { x, y: 5.0, w: 3.85, h: 1.75,
+    fill: { color: TINT }, line: { color: LINE, width: 1 }, rectRadius: 0.08 });
+  s.addText(c[0], { x: x + 0.25, y: 5.2, w: 3.4, h: 0.45, fontFace: BF,
+    fontSize: 16, bold: true, color: c[2], margin: 0 });
+  s.addText(c[1], { x: x + 0.25, y: 5.7, w: 3.4, h: 0.9, fontFace: BF,
+    fontSize: 12.5, color: MUTED, margin: 0 });
+});
+s.addNotes("Lead with the plain claim in each box. Be upfront that road distance roughly doubles the underserved share — volunteering it beats being caught by it. The statistic names (2SFCA, Gini, Moran's I, Spearman) are on your printed card if an examiner uses them.");
 
 // ================================================================ 15. LIMITATIONS
 s = newSlide("07 · Limitations", "What the model does not do");
@@ -527,7 +523,7 @@ bullets(s, [
   "OpenStreetMap completeness varies — counts are a lower bound.",
   "Facility capacity is not modelled (no reliable open data).",
   "Sections are analytical zones, not official ward boundaries.",
-  "Population is a modelled 1 km raster from 2020.",
+  "Population comes from a 1 km estimate made in 2020.",
   "Thresholds and weights are planning conventions, not laws.",
 ], 0.7, 2.2, 5.6, 13.5);
 s.addText("Future Work Scopes", { x: 6.9, y: 1.7, w: 5.8, h: 0.4, fontFace: BF,

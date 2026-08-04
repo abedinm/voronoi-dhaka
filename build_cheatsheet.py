@@ -137,7 +137,7 @@ findings = [
     ["Biggest opportunity", "Motijheel — 3.1M people, scores only 68"],
     ["Weakest services", "Water sources (73% of area too far), metro (67%)"],
     ["Strongest service", "Hospitals (only 33% of area too far)"],
-    ["Fairness", "Gini = 0.165 → access is moderately unequal"],
+    ["Fairness", "Gini = 0.165 → access is mildly unequal (0 = perfectly equal)"],
     ["Pattern", "Moran's I = 0.99 → good and bad areas form big clumps, not a random mix"],
     ["Fixing it", "3 new fire stations move 946,000 people back within reach"],
 ]

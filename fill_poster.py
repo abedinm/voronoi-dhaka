@@ -4,7 +4,7 @@ from pptx.util import Inches, Pt
 
 TPL = "data/templates/AIUB_FST_Poster_Template.pptx"
 OUT = "outputs/Dhaka_Voronoi_Poster_AIUB.pptx"
-FIG = "outputs/figures/"
+FIG = "outputs/figures/plain/"   # plain-language captions
 
 prs = Presentation(TPL)
 slide = prs.slides[0]
@@ -55,37 +55,43 @@ fill(by_idx[3], ["Minhazul Abedin (21-44625-1)   ·   Zarin Tasnim Rayta (21-457
 # ---------------- column 1 ----------------
 fill(by_idx[7], [
     "Dhaka has grown far faster than its utilities, leaving uneven access. We analyse six "
-    "services — metro, hospitals, water, fuel, bus stops and fire stations (901 OSM "
-    "facilities) — with exact Voronoi diagrams and WorldPop population (~10.7M people): "
-    "which areas benefit most, and where should new facilities go?"])
+    "services — metro, hospitals, water, fuel, bus stops and fire stations (901 real "
+    "locations) — against where its ~10.7M people actually live: which areas are "
+    "better off, and where should new facilities go?"])
 fill(by_idx[9], [
-    "Every facility seeds an exact Voronoi cell (perpendicular-bisector edges, verified by "
-    "29 automated tests). Nearest-facility distance is computed on a 250 m grid (k-d tree) "
-    "against per-service thresholds.",
-    "POPULATION-WEIGHTED BENEFIT",
-    "Eight named sections are scored by the share of their residents within reach of each "
-    "service, weighting hospitals, fire and water higher (WorldPop).",
-    "Access is validated against the 2SFCA method and road-network distance.",
-    "GREEDY MAXIMAL COVERING",
-    "New sites are placed at the most-populated underserved locations "
-    "(Church & ReVelle, 1974) and recover ~100% of the exact optimum."])
+    "We split the city so every point belongs to its nearest facility. Borders fall "
+    "exactly halfway between neighbours, checked automatically for gaps and overlaps. "
+    "We then measure, every 250 m, how far it is to the nearest facility.",
+    "SCORING EACH AREA BY ITS PEOPLE",
+    "Each of the eight areas scores out of 100 on how many of its residents are within "
+    "a sensible distance of each service, counting emergency services as more important.",
+    "Checked against the method other researchers use, and against real road distances.",
+    "WHERE NEW FACILITIES SHOULD GO",
+    "Each new site goes where it brings the most people back within reach."])
 delete(by_idx[11])          # chart has its own title; caption would clash
 fill(by_idx[12], [
-    "Combined access across all six utilities is moderately unequal (Gini = 0.165) and "
-    "strongly clustered (Moran's I = 0.99, p = 0.005): well- and poorly-served locations "
-    "form contiguous regions.",
-    "Section ranking is robust: ±25% thresholds or equal weights leave it almost "
-    "unchanged (Spearman ρ ≈ 0.98).",
-    "2SFCA agrees with the Voronoi ranking for scarce services (metro, water, hospital).",
-    "The Lorenz curve below summarises the equity of access."])
+    "Access is uneven, and the gaps sit together: well- and badly-served places form "
+    "solid blocks, not a random scatter.",
+    "The ranking is stable — changing every distance limit by a quarter barely moves it.",
+    "Where services are scarce, our ranking agrees with the method others use.",
+    "Well-served and badly-served places form solid blocks on the map."])
 
-# picture placeholder in column 1 -> network comparison chart
-by_idx[10].insert_picture(FIG + "network_vs_euclid.png")
+# picture placeholder in column 1 -> network comparison chart.
+# Removing the Lorenz curve freed ~5 in below Data Analysis, so this chart —
+# which carries the strongest single finding, that the real gap is about twice
+# what straight lines suggest — is enlarged into that space rather than leaving
+# the column half empty.
+delete(by_idx[10])
+slide.shapes.add_picture(FIG + "network_vs_euclid.png", Inches(1.2), Inches(21.0),
+                         width=Inches(8.6))     # aspect 1.62 -> 5.3 in tall, ends 26.3
+                                                # Methods ends 19.5, Data Analysis starts 27.1
 
-# dummy donut chart -> Lorenz curve
+# The Lorenz curve is deliberately not on the poster. A Gini of 0.165 puts the
+# curve almost on the diagonal, which reads at poster distance as "access is
+# roughly equal" and argues against the finding it is meant to support. It needs
+# a paragraph to interpret, which a poster cannot give it. It stays in the thesis,
+# where that paragraph exists.
 delete(by_idx[13])
-slide.shapes.add_picture(FIG + "lorenz_access.png", Inches(3.4), Inches(34.1),
-                         width=Inches(3.9))
 
 # ---------------- Limitations & Future Work (column 1) ----------------
 from pptx.util import Pt as _Pt
@@ -122,13 +128,13 @@ def _list_block(x, y, w, title, items, title_colour):
 
 _list_block(1.0, 39.5, 4.4, "LIMITATIONS", [
     "Straight-line distance, not travel time.",
-    "OSM completeness varies — counts are a lower bound.",
-    "Capacity not modelled; sections are analytical zones.",
+    "Map data is volunteered, so our counts are a minimum.",
+    "Facility size is not counted; the eight areas are our own.",
 ], _RGB(0xC0, 0x39, 0x2B))
 
 _list_block(5.6, 39.5, 4.4, "FUTURE WORK", [
     "Traffic-aware travel time on the road network.",
-    "Capacity-weighted Voronoi from official registries.",
+    "Weight each facility by its size, using official records.",
     "Finer population grid; transfer to other cities.",
 ], _RGB(0x2E, 0x8B, 0x57))
 
