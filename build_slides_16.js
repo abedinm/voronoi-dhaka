@@ -355,6 +355,36 @@ s.addText("314 bus stops tessellate the centre finely; 22 fire stations give cel
   { x: 8.0, y: 6.5, w: 4.7, h: 0.5, fontFace: BF, fontSize: 11.5, color: INK, margin: 0 });
 s.addNotes("Each utility has its own colour and marker, and the generator points are visible on every panel. Point at fire stations versus bus stops \u2014 the cell-size contrast is the whole story.");
 
+// ========================================================== 12. CENTRE POINTS
+s = newSlide("05 \u00b7 Method", "Centre points: clusters and cell centres");
+framedImage(s, FIG + "cluster_centres.png", 0.6, 1.65, 4.1, 5.4);
+s.addText("Centre of every cluster, in every section", { x: 5.1, y: 1.72, w: 7.6, h: 0.4,
+  fontFace: BF, fontSize: 16, bold: true, color: DEEP, margin: 0 });
+s.addText("Facilities within 1.5 km are treated as one cluster. The 901 facilities reduce to 110 cluster centres \u2014 marker size grows with how many facilities each centre stands for, so the real service hubs in each section stand out.",
+  { x: 5.1, y: 2.15, w: 7.6, h: 1.0, fontFace: BF, fontSize: 13, color: INK, margin: 0 });
+s.addText("Facility vs. the centre of the area it serves", { x: 5.1, y: 3.3, w: 7.6, h: 0.4,
+  fontFace: BF, fontSize: 16, bold: true, color: GREEN, margin: 0 });
+s.addText("The generator is where the facility stands; the cell centroid is the middle of the area it serves. A large gap means it serves its area from one edge.",
+  { x: 5.1, y: 3.72, w: 7.6, h: 0.75, fontFace: BF, fontSize: 13, color: INK, margin: 0 });
+s.addTable(
+  [["Service", "Clusters", "Median offset"].map((h) => ({
+    text: h, options: { bold: true, color: WHITE, fill: { color: DEEP }, fontSize: 12 } }))].concat(
+    [["Metro station", "12", "1.64 km"], ["Fire station", "17", "1.35 km"],
+     ["Fuel station", "25", "0.41 km"], ["Water pump", "15", "0.36 km"],
+     ["Hospital", "20", "0.21 km"], ["Bus stop", "21", "0.20 km"]].map((r, i) => [
+      { text: r[0], options: { fontSize: 12.5, bold: true, color: INK, fill: { color: i % 2 ? TINT : WHITE } } },
+      { text: r[1], options: { fontSize: 12.5, color: MUTED, align: "center", fill: { color: i % 2 ? TINT : WHITE } } },
+      { text: r[2], options: { fontSize: 12.5, bold: true, color: i < 2 ? RED : GREEN, align: "center", fill: { color: i % 2 ? TINT : WHITE } } },
+    ])),
+  { x: 5.1, y: 4.42, w: 7.6, colW: [3.2, 2.2, 2.2], border: { pt: 0.5, color: LINE },
+    fontFace: BF, rowH: 0.285, valign: "middle" });
+s.addShape(pres.ShapeType.roundRect, { x: 5.1, y: 6.55, w: 7.6, h: 0.62,
+  fill: { color: "FBEEE9" }, line: { color: AMBER, width: 1.2 }, rectRadius: 0.08 });
+s.addText("Sparse services sit furthest off-centre \u2014 another argument for where we propose new sites.",
+  { x: 5.1, y: 6.55, w: 7.6, h: 0.62, align: "center", valign: "middle", fontFace: BF,
+    fontSize: 12.5, bold: true, color: AMBER, margin: 0 });
+s.addNotes("Cluster centres summarise where each utility concentrates per section. The offset table says how well-centred facilities are inside their own catchments \u2014 metro and fire are the worst, which is consistent with them being the sparsest.");
+
 // ================================================================ 11. RESULTS
 s = newSlide("06 · Result Analysis", "Coverage differs sharply by service");
 s.addText("Share of the study area beyond each service's distance threshold", {

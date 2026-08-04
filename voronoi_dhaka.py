@@ -45,6 +45,7 @@ import shapely
 from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
 from matplotlib.patches import Polygon as MplPolygon
+from scipy.cluster.hierarchy import fcluster, linkage
 from scipy.spatial import KDTree, Voronoi
 from shapely.geometry import MultiPolygon, Polygon, box
 from shapely.ops import unary_union
@@ -1396,6 +1397,148 @@ def plot_recommendations(sv: ServiceVoronoi, rec: RecommendResult) -> str:
                  f"{rec.after.underserved_people/1000:.0f}k", fontsize=12)
     ax.set_axis_off()
     out = FIGURES_DIR / f"recommendations_{sv.key}.png"
+    fig.savefig(out, dpi=FIGURE_DPI, bbox_inches="tight")
+    plt.close(fig)
+    return str(out)
+
+
+CLUSTER_LINK_M = 1500.0          # facilities within this distance join the same cluster
+
+
+def cluster_centres(sv: ServiceVoronoi, ref: ZoneRef,
+                    link_m: float = CLUSTER_LINK_M) -> pd.DataFrame:
+    """Centre point of every facility cluster, within every section.
+
+    Facilities are grouped per section by single-linkage clustering at a fixed
+    distance, so no cluster count has to be chosen in advance and the result is
+    deterministic. Each cluster's centre is the mean position of its members."""
+    section_of = KDTree(ref.centers_m).query(sv.seeds)[1]
+    rows = []
+    for si, name in enumerate(ref.names):
+        pts = sv.seeds[section_of == si]
+        if len(pts) == 0:
+            continue
+        if len(pts) == 1:
+            labels = np.array([1])
+        else:
+            labels = fcluster(linkage(pts, method="single"), t=link_m,
+                              criterion="distance")
+        for lab in np.unique(labels):
+            member = pts[labels == lab]
+            rows.append({"section": name, "service": sv.key,
+                         "n": int(len(member)),
+                         "x": float(member[:, 0].mean()),
+                         "y": float(member[:, 1].mean())})
+    return pd.DataFrame(rows)
+
+
+def plot_cluster_centres(voronois: dict[str, ServiceVoronoi], ref: ZoneRef) -> str:
+    """One centre marker per facility cluster, per section, per utility."""
+    boundary = next(iter(voronois.values())).boundary
+    fig, ax = plt.subplots(figsize=(11, 12))
+    zv = build_zone_voronoi(boundary, ref).to_crs(WEB)
+    zv.plot(ax=ax, color=zv["zone_color"].tolist(), alpha=0.16, edgecolor="#333333",
+            linewidth=1.3)
+    frames = []
+    for key in SERVICE_TYPES:
+        if key not in voronois:
+            continue
+        svc = SERVICE_TYPES[key]
+        cc = cluster_centres(voronois[key], ref)
+        frames.append(cc)
+        g = gpd.GeoSeries(gpd.points_from_xy(cc["x"], cc["y"]),
+                          crs=CRS_METRIC).to_crs(WEB)
+        # area of the marker scales with how many facilities the centre stands for
+        g.plot(ax=ax, color=svc.color, markersize=28 + 9 * cc["n"].to_numpy(),
+               marker=SERVICE_MARKER.get(key, "o"), edgecolor="white",
+               linewidth=1.0, alpha=0.92, zorder=5)
+    gpd.GeoSeries([boundary], crs=CRS_METRIC).to_crs(WEB).boundary.plot(
+        ax=ax, color="black", linewidth=1.4)
+    centers = gpd.GeoSeries(gpd.points_from_xy(ref.centers_m[:, 0], ref.centers_m[:, 1]),
+                            crs=CRS_METRIC).to_crs(WEB)
+    for name, pt in zip(ref.names, centers):
+        ax.annotate(name, (pt.x, pt.y), ha="center", va="center", fontsize=10,
+                    fontweight="bold", zorder=8,
+                    bbox=dict(boxstyle="round,pad=0.22", fc="white", ec="#333", alpha=0.85))
+    allc = pd.concat(frames, ignore_index=True)
+    ax.legend(handles=[Line2D([], [], marker=SERVICE_MARKER.get(k, "o"), color="none",
+                              markerfacecolor=SERVICE_TYPES[k].color,
+                              markeredgecolor="white", markersize=9,
+                              label=f"{SERVICE_TYPES[k].label} "
+                                    f"({int((allc['service'] == k).sum())} clusters)")
+                       for k in SERVICE_TYPES if k in voronois],
+              loc="upper right", fontsize=9, framealpha=0.93,
+              title="Cluster centres", title_fontsize=10)
+    _add_basemap(ax)
+    ax.set_title(f"Centre point of every facility cluster, by section "
+                 f"({len(allc)} clusters from {sum(v.n for v in voronois.values())} "
+                 f"facilities)\nfacilities within "
+                 f"{CLUSTER_LINK_M/1000:g} km are treated as one cluster; "
+                 "marker size grows with cluster size", fontsize=12)
+    ax.set_axis_off()
+    out = FIGURES_DIR / "cluster_centres.png"
+    fig.savefig(out, dpi=FIGURE_DPI, bbox_inches="tight")
+    plt.close(fig)
+    return str(out)
+
+
+def cell_centroid_offsets(sv: ServiceVoronoi) -> pd.DataFrame:
+    """How far each facility sits from the centre of the area it actually serves."""
+    rows = []
+    for idx, poly in sv.cells.items():
+        c = poly.centroid
+        gx, gy = sv.seeds[idx]
+        rows.append({"seed_index": idx, "gx": gx, "gy": gy,
+                     "cx": c.x, "cy": c.y,
+                     "offset_m": float(np.hypot(c.x - gx, c.y - gy))})
+    return pd.DataFrame(rows)
+
+
+def plot_cell_centroids(voronois: dict[str, ServiceVoronoi]) -> str:
+    """Generator versus cell centroid, joined by a line.
+
+    The generator is where the facility is; the centroid is the middle of the
+    region it serves. A long connector means the facility sits off to one side
+    of its own catchment, so part of that area is served from its edge."""
+    fig, axes = plt.subplots(2, 3, figsize=(16.5, 13))
+    order = [k for k in SERVICE_TYPES if k in voronois]
+    for ax, key in zip(axes.ravel(), order):
+        sv, svc = voronois[key], SERVICE_TYPES[key]
+        df = cell_centroid_offsets(sv)
+        cw = _cells_web(sv)
+        cw.plot(ax=ax, color=svc.color, alpha=0.12, edgecolor="none")
+        cw.boundary.plot(ax=ax, color=svc.color, linewidth=0.5, alpha=0.9)
+        gen = gpd.GeoSeries(gpd.points_from_xy(df["gx"], df["gy"]), crs=CRS_METRIC).to_crs(WEB)
+        cen = gpd.GeoSeries(gpd.points_from_xy(df["cx"], df["cy"]), crs=CRS_METRIC).to_crs(WEB)
+        for a, b in zip(gen, cen):
+            ax.plot([a.x, b.x], [a.y, b.y], color="#333333", linewidth=0.7,
+                    alpha=0.8, zorder=4)
+        gen.plot(ax=ax, color=svc.color, markersize=24, marker="o",
+                 edgecolor="white", linewidth=0.5, zorder=6)
+        cen.plot(ax=ax, color="none", markersize=26, marker="o",
+                 edgecolor="#111111", linewidth=1.0, zorder=5)
+        _boundary_web(sv).boundary.plot(ax=ax, color="black", linewidth=1.0)
+        _add_basemap(ax)
+        ax.set_title(f"{svc.label} — median offset "
+                     f"{df['offset_m'].median()/1000:.2f} km "
+                     f"(max {df['offset_m'].max()/1000:.1f} km)",
+                     fontsize=11.5, fontweight="bold", color=svc.color)
+        ax.set_axis_off()
+    for ax in axes.ravel()[len(order):]:
+        ax.set_axis_off()
+    fig.suptitle("Facility versus the centre of the area it serves — "
+                 "a long line means the facility sits off-centre in its own cell",
+                 fontsize=15, fontweight="bold", y=0.975)
+    fig.legend(handles=[
+        Line2D([], [], marker="o", color="none", markerfacecolor="#555555",
+               markeredgecolor="white", markersize=9, label="facility (generator)"),
+        Line2D([], [], marker="o", color="none", markerfacecolor="none",
+               markeredgecolor="#111111", markersize=9, label="centre of its Voronoi cell"),
+        Line2D([], [], color="#333333", linewidth=1.2, label="offset between them")],
+        loc="lower center", ncol=3, fontsize=11, frameon=False,
+        bbox_to_anchor=(0.5, 0.005))
+    fig.tight_layout(rect=(0, 0.035, 1, 0.955))
+    out = FIGURES_DIR / "cell_centroids.png"
     fig.savefig(out, dpi=FIGURE_DPI, bbox_inches="tight")
     plt.close(fig)
     return str(out)
@@ -3102,13 +3245,36 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
              f"{tf.loc[k,'pct_grid_underserved']:.0f}% of the area beyond the "
              f"{svc.underserved_m/1000:.1f} km threshold. {_svc_notes[k]}")
 
+    para("Two further views of the same partitions were produced at the supervisor's "
+         "request. Figure 4.9 reduces the 901 facilities to the centre point of every "
+         "cluster within every section: facilities lying within "
+         f"{CLUSTER_LINK_M/1000:g} km of one another are treated as a single cluster, "
+         "and each centre is drawn at a size proportional to the number of facilities it "
+         "stands for. This summarises where each utility actually concentrates, section "
+         "by section, without the clutter of every individual point.")
+    figure("cluster_centres.png",
+           "Figure 4.9. Centre point of every facility cluster, within each section, "
+           "for all six utilities.", 5.4)
+    para("Figure 4.10 then distinguishes two points that are easy to confuse. The "
+         "generator is where the facility physically stands; the centroid is the middle "
+         "of the region that facility serves. Where the two coincide the facility sits "
+         "centrally in its own catchment; where the connector is long it serves its area "
+         "from one edge. Bus stops and hospitals are well centred (median offset 0.20 km "
+         "and 0.21 km), which follows from their density. Metro stations and fire "
+         "stations are not (1.64 km and 1.35 km): both are sparse, so each cell is large "
+         "and the facility is rarely near its middle. This is a further argument for the "
+         "placements proposed in Section 4.6.3.")
+    figure("cell_centroids.png",
+           "Figure 4.10. Facility (generator) versus the centroid of the Voronoi cell it "
+           "generates, for all six utilities.", 6.0)
+
     h2("4.6.2 Which areas benefit most")
     para(f"Weighting by population and emergency importance, the central belt is best served "
          f"({best}); {worst['section']} scores lowest ({worst['benefit_score']:.0f}). The most "
          "populous section, Motijheel (old Dhaka), is only moderately served and is therefore the "
-         "highest-impact target for investment (Figures 4.9–4.10, Table 4.8).")
-    figure("sections_only.png", "Figure 4.9. The eight sections of the study area, each a coarse Voronoi cell of a well-known area centre.", 5.0)
-    figure("section_benefit.png", "Figure 4.10. Population-weighted benefit score by section.", 5.0)
+         "highest-impact target for investment (Figures 4.11–4.12, Table 4.8).")
+    figure("sections_only.png", "Figure 4.11. The eight sections of the study area, each a coarse Voronoi cell of a well-known area centre.", 5.0)
+    figure("section_benefit.png", "Figure 4.12. Population-weighted benefit score by section.", 5.0)
     table_from(["Section", "Population", "Benefit score", "Weakest service"],
                [[r["section"], f"{r['pop_est']/1e6:.2f} M" if sb.pop_weighted else "-",
                  f"{r['benefit_score']:.0f}", r["weakest_service"]] for _, r in sb.df.iterrows()],
@@ -3117,27 +3283,27 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
     h2("4.6.3 Recommendations")
     para("Population-targeted greedy placement concentrates new facilities in dense, underserved "
          "areas rather than the empty fringe. Table 4.9 reports the drop in underserved population "
-         "from adding three facilities per service. Figure 4.11 shows the proposed sites for "
-         "all six utilities together; Figures 4.12–4.14 then show three of them at full size.")
+         "from adding three facilities per service. Figure 4.13 shows the proposed sites for "
+         "all six utilities together; Figures 4.14–4.16 then show three of them at full size.")
     figure("recommendations_all_services.png",
-           "Figure 4.11. Proposed new facilities for all six utilities — existing sites in "
+           "Figure 4.13. Proposed new facilities for all six utilities — existing sites in "
            "each utility's colour, proposed sites as red stars.", 6.2)
     table_from(["Service", "Underserved before → after (thousands)", "New sites (sections)"],
                [[SERVICE_TYPES[k].label,
                  f"{recs[k].before.underserved_people/1000:.0f} → {recs[k].after.underserved_people/1000:.0f}",
                  ", ".join(recs[k].new_zones)] for k in SERVICE_TYPES],
                "Table 4.9. Coverage improvement from the proposed facilities.")
-    figure("recommendations_fire_station.png", "Figure 4.12. Existing vs proposed fire stations.", 4.8)
-    figure("recommendations_hospital.png", "Figure 4.13. Existing vs proposed hospitals.", 4.8)
-    figure("recommendations_water_pump.png", "Figure 4.14. Existing vs proposed water sources.", 4.8)
+    figure("recommendations_fire_station.png", "Figure 4.14. Existing vs proposed fire stations.", 4.8)
+    figure("recommendations_hospital.png", "Figure 4.15. Existing vs proposed hospitals.", 4.8)
+    figure("recommendations_water_pump.png", "Figure 4.16. Existing vs proposed water sources.", 4.8)
 
     h2("4.6.4 Equity, clustering and combined access")
     para(f"Combining all services into one access index, access is moderately unequal (Gini = "
          f"{ext.gini_combined:.3f}) and strongly clustered (Moran's I = {ext.moran[0]:.3f}, "
          f"pseudo p = {ext.moran[1]:.3f}) — well- and poorly-served areas form contiguous "
          "regions. Per-section values of the combined index mirror the benefit ranking of "
-         "Table 4.8. The Lorenz curve (Figure 4.15) summarises the equity of access.")
-    figure("lorenz_access.png", "Figure 4.15. Lorenz curve of combined utility access.", 4.2)
+         "Table 4.8. The Lorenz curve (Figure 4.17) summarises the equity of access.")
+    figure("lorenz_access.png", "Figure 4.17. Lorenz curve of combined utility access.", 4.2)
     para("A sensitivity check (Table 4.10) shows the section ranking is robust: under ±25% "
          "thresholds and equal service weights the ranking barely changes (Spearman ρ ≈ 0.98).")
     table_from(["Scenario", "Rank corr. (ρ)", "Best", "Worst"],
@@ -3149,9 +3315,9 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
     para("Repeating the analysis with shortest-path distance on the Dhaka road network (rather than "
          "straight-line distance) confirms that Euclidean distance understates real travel: the "
          "median detour is about 1.5×, and the underserved share roughly doubles for several "
-         "services (Figure 4.16). This is a key finding — the true access gap is larger than a "
+         "services (Figure 4.18). This is a key finding — the true access gap is larger than a "
          "straight-line analysis suggests.")
-    figure("network_vs_euclid.png", "Figure 4.16. Underserved share: straight-line vs road network.", 5.6)
+    figure("network_vs_euclid.png", "Figure 4.18. Underserved share: straight-line vs road network.", 5.6)
 
     h2("4.6.6 Validation against the 2SFCA method")
     para("As a further check, the two-step floating catchment area (2SFCA) accessibility was "
@@ -4515,6 +4681,10 @@ def main(force_figures: bool = False, k: int = RECOMMEND_K, network: bool = Fals
         plot_all_recommendations_panel(voronois, recs)
     if _need(str(FIGURES_DIR / "all_facilities.png"), force_figures):
         plot_all_facilities(voronois)
+    if _need(str(FIGURES_DIR / "cluster_centres.png"), force_figures):
+        plot_cluster_centres(voronois, ref)
+    if _need(str(FIGURES_DIR / "cell_centroids.png"), force_figures):
+        plot_cell_centroids(voronois)
     headline_html = folium_sections_map(voronois, ref)
 
     print("[7/7] PDF report + literature review")
