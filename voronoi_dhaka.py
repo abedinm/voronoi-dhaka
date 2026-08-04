@@ -379,13 +379,13 @@ class Sketch:
 
 
 SKETCHES: dict[str, Sketch] = {
-    "PB": Sketch("P.B", np.array([
+    "PB": Sketch("Example 1", np.array([
         [2.1, 2.7], [6.8, 1.9], [4.9, 5.6], [1.4, 7.8],
         [8.3, 6.9], [3.7, 8.9], [7.1, 4.1]]), (0.0, 0.0, 10.0, 10.0)),
-    "MR": Sketch("M.R", np.array([
+    "MR": Sketch("Example 2", np.array([
         [1.5, 1.6], [8.4, 1.4], [9.1, 7.9], [2.3, 8.7],
         [4.6, 4.9], [6.3, 6.4]]), (0.0, 0.0, 10.0, 10.0)),
-    "PHIRUZ": Sketch("Phiruz", np.array([
+    "PHIRUZ": Sketch("Example 3", np.array([
         [1.2, 3.1], [3.7, 1.6], [5.9, 4.3], [8.4, 2.2],
         [10.8, 3.8]]), (0.0, 0.0, 12.0, 6.0)),
 }
@@ -3964,7 +3964,7 @@ def build_pdf_report(voronois, coverages, table, recs, flagship_key, sb, ext, li
     # --- 3. textbook ---
     story += [PageBreak(), Paragraph("3. Textbook Voronoi (correctness proof)", h1),
               Paragraph(
-        "Before analysing Dhaka, three hand-sketches (P.B, M.R, Phiruz) are redrawn "
+        "Before analysing Dhaka, three worked examples are redrawn "
         "as mathematically correct Voronoi diagrams: seeds in general position, "
         "straight perpendicular-bisector edges, and exactly three cells meeting at "
         "every vertex (red circles). The blue overlay proves one edge is the "
