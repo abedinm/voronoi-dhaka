@@ -170,12 +170,15 @@ fill(by_idx[27], [
     "for continuous guidance, and the Faculty of Science and Technology for its support. "
     "Facility data © OpenStreetMap contributors; population from WorldPop; basemaps © "
     "CARTO and Google."])
-slide.shapes.add_picture(FIG + "voronoi_all_services.png", Inches(20.6), Inches(16.6),
-                         width=Inches(8.9))     # aspect 1.13 -> ~7.9 in tall
-slide.shapes.add_picture(FIG + "recommendations_all_services.png", Inches(20.6), Inches(25.2),
+# Column 3 holds 29.7 in; these three total 27.4 in. The single-utility hospital
+# map is dropped, and voronoi_all_services with it — cell_centroids already shows
+# the same per-utility coloured cells and generators, plus the centre points.
+slide.shapes.add_picture(FIG + "cell_centroids.png", Inches(20.6), Inches(16.6),
+                         width=Inches(8.9))     # aspect 1.23 -> ~7.2 in tall
+slide.shapes.add_picture(FIG + "recommendations_all_services.png", Inches(20.6), Inches(24.8),
                          width=Inches(8.9))     # aspect 1.10 -> ~8.1 in tall
-slide.shapes.add_picture(FIG + "voronoi_hospital.png", Inches(20.6), Inches(34.0),
-                         width=Inches(8.9))     # aspect 0.71 -> ~12.5 in tall
+slide.shapes.add_picture(FIG + "cluster_centres.png", Inches(20.6), Inches(33.7),
+                         width=Inches(8.9))     # aspect 0.74 -> ~12.1 in tall
 
 prs.save(OUT)
 print("saved", OUT)
