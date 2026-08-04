@@ -321,29 +321,28 @@ s.addText("Tools:  Python · NumPy · SciPy · Shapely · GeoPandas · OSMnx · 
 s.addNotes("Five stages. Emphasise that all distance work happens in metres, not degrees.");
 
 // ================================================================ 10. METHOD
-s = newSlide("05 · Method", "The mathematics behind it");
+s = newSlide("05 · Method", "Why the cells look the way they do");
 framedImage(s, FIG + "textbook_all.png", 0.7, 1.7, 5.6, 4.9);
-s.addText("Voronoi construction", { x: 6.7, y: 1.75, w: 6, h: 0.35, fontFace: BF,
-  fontSize: 15, bold: true, color: DEEP, margin: 0 });
-s.addText("H(p,q) = { x : |x−p| ≤ |x−q| }", { x: 6.7, y: 2.12, w: 6, h: 0.35,
-  fontFace: HF, fontSize: 15, italic: true, color: INK, margin: 0 });
-s.addText("V(p) = B ∩ ⋂ H(p,q),   q ∈ N(p)", { x: 6.7, y: 2.5, w: 6, h: 0.35,
-  fontFace: HF, fontSize: 15, italic: true, color: INK, margin: 0 });
-s.addText("Each cell is an intersection of half-planes, so every interior edge is a true perpendicular bisector and exactly three cells meet at each vertex.",
-  { x: 6.7, y: 2.92, w: 6, h: 0.8, fontFace: BF, fontSize: 13, color: MUTED, margin: 0 });
-s.addText("Benefit index", { x: 6.7, y: 3.82, w: 6, h: 0.35, fontFace: BF,
-  fontSize: 15, bold: true, color: GREEN, margin: 0 });
-s.addText("B_s = 100 · ( Σ w_j · f_{s,j} ) / ( Σ w_j )", { x: 6.7, y: 4.18, w: 6, h: 0.35,
-  fontFace: HF, fontSize: 15, italic: true, color: INK, margin: 0 });
-s.addText("f is the population-weighted fraction of section s within reach of service j; w weights hospitals and fire ×2, water ×1.5.",
-  { x: 6.7, y: 4.58, w: 6, h: 0.75, fontFace: BF, fontSize: 13, color: MUTED, margin: 0 });
-s.addShape(pres.ShapeType.roundRect, { x: 6.7, y: 5.45, w: 6.0, h: 1.15,
+s.addText("A Voronoi cell is everywhere that is closer to one facility than to any other.",
+  { x: 6.7, y: 1.75, w: 6.0, h: 0.75, fontFace: BF, fontSize: 17, bold: true,
+    color: DEEP, margin: 0 });
+s.addText("The border between two facilities is the line where you are exactly equally far from both. That line is always straight, and always cuts the join between them at a right angle.",
+  { x: 6.7, y: 2.62, w: 6.0, h: 1.0, fontFace: BF, fontSize: 14, color: INK, margin: 0 });
+s.addText("Build every cell that way and the rest follows: no gaps, no overlaps, and exactly three cells meeting at each corner.",
+  { x: 6.7, y: 3.6, w: 6.0, h: 0.95, fontFace: BF, fontSize: 14, color: INK, margin: 0 });
+s.addShape(pres.ShapeType.roundRect, { x: 6.7, y: 4.62, w: 6.0, h: 1.0,
+  fill: { color: TINT }, line: { color: LINE, width: 1 }, rectRadius: 0.08 });
+s.addText("Formally", { x: 6.95, y: 4.72, w: 2.0, h: 0.28, fontFace: BF, fontSize: 11,
+  bold: true, color: MUTED, charSpacing: 1, margin: 0 });
+s.addText("H(p,q) = { x : |x\u2212p| \u2264 |x\u2212q| }        V(p) = B \u2229 H(p,q) for every neighbour q",
+  { x: 6.95, y: 5.02, w: 5.6, h: 0.5, fontFace: HF, fontSize: 12, italic: true,
+    color: INK, margin: 0 });
+s.addShape(pres.ShapeType.roundRect, { x: 6.7, y: 5.75, w: 6.0, h: 0.9,
   fill: { color: "E6EFE6" }, line: { color: GREEN, width: 1.5 }, rectRadius: 0.08 });
-s.addText("Verified by 29 automated tests", { x: 6.95, y: 5.6, w: 5.5, h: 0.32,
-  fontFace: BF, fontSize: 14, bold: true, color: GREEN, margin: 0 });
-s.addText("Degree-3 vertices, exact tiling and bisector midpoints all checked automatically.",
-  { x: 6.95, y: 5.94, w: 5.6, h: 0.55, fontFace: BF, fontSize: 12, color: INK, margin: 0 });
-s.addNotes("Left: the three textbook cases we verified before touching Dhaka. Right: the two equations that define the whole method.");
+s.addText("Verified by 29 automated tests \u2014 degree-3 vertices, exact tiling, bisector midpoints.",
+  { x: 6.95, y: 5.85, w: 5.5, h: 0.7, fontFace: BF, fontSize: 12.5, bold: true,
+    color: GREEN, margin: 0 });
+s.addNotes("Say the plain sentence, point at one seed and its cell, and stop. The formal line is there if a board member wants it \u2014 backup slide 18 has the full construction and complexity.");
 
 // ============================================================ 11. THE DIAGRAMS
 s = newSlide("05 · Method", "The six Voronoi diagrams");
@@ -447,25 +446,41 @@ s.addText("Three fire stations alone bring 930,000 people back within reach.", {
 s.addNotes("Because placement targets population, proposed sites land in dense underserved areas, not empty land.");
 
 // ================================================================ 14. RESULTS
-s = newSlide("06 · Result Analysis", "Validation and equity");
-[["2SFCA", "Against the standard supply–demand method", "ρ = 0.93 metro & water; 0.71 hospitals", TEAL],
- ["Exact optimum", "Greedy vs exhaustive maximal covering", "Greedy recovers ~100% of optimal", GREEN],
- ["Road network", "Shortest paths on a 43k-node graph", "Detour ×1.5 — underserved doubles", RED],
+s = newSlide("06 · Result Analysis", "Three ways we checked ourselves");
+[["Checked against the standard method",
+  "Our ranking broadly agrees with 2SFCA, the method the literature uses.",
+  "Spearman \u03c1 0.71\u20130.93 for scarce services; weaker where facilities cluster \u2014 we report that openly", TEAL],
+ ["Checked against the perfect answer",
+  "Our fast placement method finds essentially the best possible sites.",
+  "Greedy recovers ~100% of the exhaustive maximal-covering optimum", GREEN],
+ ["Checked against real roads",
+  "On Dhaka's actual road network the problem is about twice as big.",
+  "Median journey \u00d71.5 longer on a 43,000-junction graph \u2014 our headline figures are optimistic", RED],
 ].forEach((c, i) => {
   const x = 0.7 + i * 4.15;
-  s.addShape(pres.ShapeType.roundRect, { x, y: 1.75, w: 3.85, h: 2.35,
+  s.addShape(pres.ShapeType.roundRect, { x, y: 1.72, w: 3.85, h: 2.75,
     fill: { color: TINT }, line: { color: LINE, width: 1 }, rectRadius: 0.08 });
-  s.addText(c[0], { x: x + 0.25, y: 1.93, w: 3.4, h: 0.4, fontFace: BF, fontSize: 17,
+  s.addText(c[0], { x: x + 0.25, y: 1.9, w: 3.4, h: 0.6, fontFace: BF, fontSize: 14.5,
     bold: true, color: c[3], margin: 0 });
-  s.addText(c[1], { x: x + 0.25, y: 2.4, w: 3.4, h: 0.65, fontFace: BF, fontSize: 12,
+  s.addText(c[1], { x: x + 0.25, y: 2.56, w: 3.4, h: 0.9, fontFace: BF, fontSize: 13.5,
+    color: INK, margin: 0 });
+  s.addText(c[2], { x: x + 0.25, y: 3.5, w: 3.4, h: 0.85, fontFace: BF, fontSize: 10.5,
     color: MUTED, margin: 0 });
-  s.addText(c[2], { x: x + 0.25, y: 3.1, w: 3.4, h: 0.85, fontFace: BF, fontSize: 13,
-    bold: true, color: INK, margin: 0 });
 });
-framedImage(s, FIG + "lorenz_access.png", 1.1, 4.35, 3.3, 2.3);
-statCard(s, 5.0, 4.6, 3.7, 1.75, "0.165", "Gini coefficient — moderate inequality", DEEP);
-statCard(s, 9.0, 4.6, 3.7, 1.75, "0.99", "Moran's I — strongly clustered (p = 0.005)", TEAL);
-s.addNotes("Three checks plus the equity measures. Be upfront that road distance roughly doubles the underserved share.");
+framedImage(s, FIG + "lorenz_access.png", 1.1, 4.7, 3.3, 2.2);
+s.addShape(pres.ShapeType.roundRect, { x: 5.0, y: 4.9, w: 3.7, h: 1.75,
+  fill: { color: TINT }, line: { color: LINE, width: 1 }, rectRadius: 0.08 });
+s.addText("Access is moderately unequal", { x: 5.2, y: 5.08, w: 3.3, h: 0.5,
+  fontFace: BF, fontSize: 14.5, bold: true, color: DEEP, margin: 0 });
+s.addText("Gini = 0.165 on the combined access distribution (0 would be perfectly equal)",
+  { x: 5.2, y: 5.62, w: 3.3, h: 0.9, fontFace: BF, fontSize: 11.5, color: MUTED, margin: 0 });
+s.addShape(pres.ShapeType.roundRect, { x: 9.0, y: 4.9, w: 3.7, h: 1.75,
+  fill: { color: TINT }, line: { color: LINE, width: 1 }, rectRadius: 0.08 });
+s.addText("Badly served areas form clumps", { x: 9.2, y: 5.08, w: 3.3, h: 0.5,
+  fontFace: BF, fontSize: 14.5, bold: true, color: TEAL, margin: 0 });
+s.addText("Moran's I = 0.99 \u2014 under-service is contiguous, not scattered at random (p = 0.005)",
+  { x: 9.2, y: 5.62, w: 3.3, h: 0.9, fontFace: BF, fontSize: 11.5, color: MUTED, margin: 0 });
+s.addNotes("Lead with the plain claim in each card; the statistic underneath is the evidence, not the point. Be upfront that road distance roughly doubles the underserved share \u2014 volunteering it is better than being caught by it. Backup slide 19 has the per-service numbers.");
 
 // ================================================================ 15. LIMITATIONS
 s = newSlide("07 · Limitations", "What the model does not do");
@@ -521,5 +536,74 @@ s.addShape(pres.ShapeType.roundRect, { x: 6.8, y: 6.3, w: 5.9, h: 0.8,
 s.addText("Thank you  —  Questions?", { x: 6.8, y: 6.3, w: 5.9, h: 0.8, align: "center",
   valign: "middle", fontFace: HF, fontSize: 20, bold: true, color: WHITE, margin: 0 });
 s.addNotes("Four findings; everything regenerates from one command. Thank you — we are happy to take questions.");
+
+// ============================================================== 18-19. BACKUP
+// Not presented. Kept so a technical question can be answered from a slide
+// rather than from memory.
+function backupSlide(title) {
+  const s = newSlide("BACKUP  \u00b7  NOT PRESENTED", title);
+  s.addShape(pres.ShapeType.roundRect, { x: 11.35, y: 0.38, w: 1.45, h: 0.4,
+    fill: { color: "FBEEE9" }, line: { color: AMBER, width: 1 }, rectRadius: 0.06 });
+  s.addText("BACKUP", { x: 11.35, y: 0.38, w: 1.45, h: 0.4, align: "center",
+    valign: "middle", fontFace: BF, fontSize: 10, bold: true, color: AMBER,
+    charSpacing: 1, margin: 0 });
+  return s;
+}
+
+s = backupSlide("The Voronoi construction in full");
+[["Half-plane", "H(p,q) = { x : |x\u2212p| \u2264 |x\u2212q| } \u2014 the points at least as close to p as to q. Its boundary is the perpendicular bisector of pq, by definition."],
+ ["Cell", "V(p) = B \u2229 H(p,q) intersected over every Delaunay neighbour q of p, clipped to the study boundary B. Every interior edge is therefore a true bisector."],
+ ["Vertices", "A Voronoi vertex is equidistant from three facilities, so three cells meet there. Four would require four points on a common circle \u2014 excluded by general position, which we assert in code."],
+ ["Complexity", "O(n log n) to build the diagram; O(log n) per nearest-facility query using a k-d tree [Bentley, 1975]. Whole pipeline runs in minutes on a laptop."],
+ ["Projection", "All geometry in EPSG:32646 (UTM 46N) so distances are true metres. Degrees would distort both area and distance at this latitude."],
+ ["Benefit index", "B_s = 100 \u00b7 ( \u03a3 w_j \u00b7 f_{s,j} ) / ( \u03a3 w_j ), where f is the population-weighted fraction of section s within reach of service j, and w weights hospitals and fire \u00d72, water \u00d71.5."],
+].forEach((r, i) => {
+  const y = 1.62 + i * 0.9;
+  s.addShape(pres.ShapeType.roundRect, { x: 0.7, y, w: 2.35, h: 0.78,
+    fill: { color: TINT }, line: { color: LINE, width: 1 }, rectRadius: 0.06 });
+  s.addText(r[0], { x: 0.7, y, w: 2.35, h: 0.78, align: "center", valign: "middle",
+    fontFace: BF, fontSize: 13, bold: true, color: DEEP, margin: 0 });
+  s.addText(r[1], { x: 3.25, y: y + 0.03, w: 9.4, h: 0.78, fontFace: BF, fontSize: 12,
+    color: INK, margin: 0, valign: "middle" });
+});
+s.addNotes("Only open this if a board member presses on the geometry or the complexity.");
+
+s = backupSlide("Validation detail, service by service");
+s.addText("Spearman rank correlation between our Voronoi-based ranking and 2SFCA",
+  { x: 0.7, y: 1.6, w: 8, h: 0.35, fontFace: BF, fontSize: 13, color: MUTED, margin: 0 });
+s.addTable(
+  [["Service", "Spearman \u03c1", "Reading"].map((h) => ({
+    text: h, options: { bold: true, color: WHITE, fill: { color: DEEP }, fontSize: 12 } }))].concat(
+    [["Metro station", "0.93", "strong agreement \u2014 scarce, widely spaced"],
+     ["Water pump / source", "0.93", "strong agreement \u2014 scarce, widely spaced"],
+     ["Hospital", "0.71", "good agreement"],
+     ["Fuel station", "0.58", "moderate"],
+     ["Bus stop", "0.31", "weak \u2014 dense and clustered"],
+     ["Fire station", "0.12", "weak \u2014 2SFCA also penalises clustering"]].map((r, i) => [
+      { text: r[0], options: { fontSize: 12.5, bold: true, color: INK, fill: { color: i % 2 ? TINT : WHITE } } },
+      { text: r[1], options: { fontSize: 12.5, bold: true, color: DEEP, align: "center", fill: { color: i % 2 ? TINT : WHITE } } },
+      { text: r[2], options: { fontSize: 12, color: MUTED, fill: { color: i % 2 ? TINT : WHITE } } },
+    ])),
+  { x: 0.7, y: 2.05, w: 8.0, colW: [2.6, 1.5, 3.9], border: { pt: 0.5, color: LINE },
+    fontFace: BF, rowH: 0.42, valign: "middle" });
+s.addShape(pres.ShapeType.roundRect, { x: 0.7, y: 5.15, w: 8.0, h: 1.5,
+  fill: { color: "FBEEE9" }, line: { color: AMBER, width: 1.3 }, rectRadius: 0.08 });
+s.addText("Why the weak ones are not a failure", { x: 0.95, y: 5.3, w: 7.5, h: 0.35,
+  fontFace: BF, fontSize: 13.5, bold: true, color: AMBER, margin: 0 });
+s.addText("2SFCA measures supply per head within a catchment, so it also penalises facilities being bunched together. Voronoi measures distance to the nearest one. For dense services the two answer different questions \u2014 they complement rather than contradict.",
+  { x: 0.95, y: 5.68, w: 7.6, h: 0.9, fontFace: BF, fontSize: 11.5, color: INK, margin: 0 });
+[["Greedy vs exact", "Greedy placement recovers ~100% of the exhaustive maximal-covering optimum (Church & ReVelle, 1974)."],
+ ["Road network", "43,000-junction OSMnx drive graph, multi-source Dijkstra. Median detour \u00d71.5; underserved share roughly doubles."],
+ ["Sensitivity", "\u00b125% on every threshold, and equal service weights, both leave the section ranking essentially unchanged (\u03c1 \u2248 0.98)."],
+].forEach((c, i) => {
+  const y = 1.95 + i * 1.6;
+  s.addShape(pres.ShapeType.roundRect, { x: 9.0, y, w: 3.7, h: 1.4,
+    fill: { color: TINT }, line: { color: LINE, width: 1 }, rectRadius: 0.08 });
+  s.addText(c[0], { x: 9.2, y: y + 0.14, w: 3.3, h: 0.35, fontFace: BF, fontSize: 13,
+    bold: true, color: TEAL, margin: 0 });
+  s.addText(c[1], { x: 9.2, y: y + 0.5, w: 3.35, h: 0.85, fontFace: BF, fontSize: 11,
+    color: MUTED, margin: 0 });
+});
+s.addNotes("Only open this if pressed on why the fire-station correlation is low.");
 
 pres.writeFile({ fileName: OUT }).then((f) => console.log("saved", f));
