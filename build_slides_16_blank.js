@@ -54,7 +54,7 @@ function newSlide(kicker, title, opts = {}) {
 // Empty, labelled slot where a figure should be dropped in.
 const SLOT_LABELS = {
   "voronoi_all_services.png": "Six Voronoi diagrams — one per utility, each in its own colour with generator points",
-  "zones_dhaka_flagship.png": "Voronoi map of Dhaka coloured by the eight sections",
+  "sections_only.png": "The eight study sections of Dhaka, with their centre points",
   "textbook_all.png": "Textbook Voronoi correctness proof (three diagrams)",
   "section_benefit.png": "Section benefit choropleth (green = well served, red = lagging)",
   "recommendations_fire_station.png": "Fire stations: existing (blue) vs proposed (red stars)",
@@ -182,7 +182,7 @@ s.addText("Problem statement", { x: 0.95, y: 4.73, w: 6, h: 0.35, fontFace: BF,
   fontSize: 14, bold: true, color: AMBER, margin: 0 });
 s.addText("Planners lack a city-wide, evidence-based picture of which neighbourhoods are underserved across the utilities that matter to daily life and safety.",
   { x: 0.95, y: 5.1, w: 6.15, h: 1.1, fontFace: BF, fontSize: 14, color: INK, margin: 0 });
-framedImage(s, FIG + "zones_dhaka_flagship.png", 7.9, 1.7, 4.8, 4.9);
+framedImage(s, FIG + "sections_only.png", 7.9, 1.7, 4.8, 4.9);
 s.addNotes("Dhaka's utilities have not kept pace with its growth, and no open evidence base exists for siting decisions.");
 
 // ================================================================ 4. INTRO
@@ -297,7 +297,7 @@ s.addNotes("All facility data is real and openly licensed. The raw-to-cleaned dr
 
 // ================================================================ 8. DATA
 s = newSlide("04 · Data", "Study area and the eight sections");
-framedImage(s, FIG + "zones_dhaka_flagship.png", 0.7, 1.7, 4.9, 5.0);
+framedImage(s, FIG + "sections_only.png", 0.7, 1.7, 4.9, 5.0);
 s.addText("The study area is the Dhaka bounding box intersected with the OpenStreetMap administrative boundary. Within it we define eight familiar sections as a coarse Voronoi of well-known area centres.",
   { x: 6.0, y: 1.82, w: 6.6, h: 1.1, fontFace: BF, fontSize: 15, color: INK, margin: 0 });
 [["Uttara", "e6194B"], ["Mirpur", "f58231"], ["Bashundhara", "911eb4"], ["Banani", "4363d8"],

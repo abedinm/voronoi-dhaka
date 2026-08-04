@@ -154,7 +154,7 @@ s.addText("Research problem", { x: 0.95, y: 4.78, w: 6, h: 0.35, fontFace: BF,
   fontSize: 14, bold: true, color: AMBER, margin: 0 });
 s.addText("Existing Dhaka studies examine one service at a time and weight coverage by land area, not by the people actually affected.",
   { x: 0.95, y: 5.15, w: 6.1, h: 1.0, fontFace: BF, fontSize: 14, color: INK, margin: 0 });
-framedImage(s, FIG + "zones_dhaka_flagship.png", 7.9, 1.7, 4.8, 4.9);
+framedImage(s, FIG + "sections_only.png", 7.9, 1.7, 4.8, 4.9);
 s.addNotes("Dhaka's utilities have not kept pace with its growth. Prior studies look at a single service and measure over area rather than population.");
 
 // ------------------------------------------------------------------ 4. objectives
@@ -331,7 +331,7 @@ s.addNotes("Water and metro have the widest gaps by area. Hospitals look best he
 
 // ------------------------------------------------------------------ 10. sections
 s = newSlide("Results", "Dhaka in eight coloured sections");
-framedImage(s, FIG + "zones_dhaka_flagship.png", 0.7, 1.7, 4.9, 5.0);
+framedImage(s, FIG + "sections_only.png", 0.7, 1.7, 4.9, 5.0);
 s.addText("Every facility seeds a Voronoi cell; each cell takes the colour of the named area its seed falls in. Dashed lines are the coarse eight-section partition.",
   { x: 6.0, y: 1.85, w: 6.6, h: 1.0, fontFace: BF, fontSize: 15, color: INK, margin: 0 });
 const secs = [["Uttara", "e6194B"], ["Mirpur", "f58231"], ["Bashundhara", "911eb4"],

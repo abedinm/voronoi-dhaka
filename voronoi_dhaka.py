@@ -1406,6 +1406,42 @@ def _zone_legend_handles(ref: ZoneRef):
             for n, c in zip(ref.names, ref.colors)]
 
 
+def plot_sections_only(boundary, ref: ZoneRef) -> str:
+    """The eight study sections on their own — no service tessellation.
+
+    `plot_zone_colored_voronoi` colours one service's cells by the section they
+    fall in, so it always carries some service's name in its title. That is the
+    wrong figure to show when the subject is the study area itself: the sections
+    are defined by their own centres and do not depend on any utility."""
+    zv = build_zone_voronoi(boundary, ref).to_crs(WEB)
+    fig, ax = plt.subplots(figsize=(11, 12))
+    zv.plot(ax=ax, color=zv["zone_color"].tolist(), alpha=0.50,
+            edgecolor="#222222", linewidth=1.6)
+    gpd.GeoSeries([boundary], crs=CRS_METRIC).to_crs(WEB).boundary.plot(
+        ax=ax, color="black", linewidth=1.6)
+    centers = gpd.GeoSeries(gpd.points_from_xy(ref.centers_m[:, 0], ref.centers_m[:, 1]),
+                            crs=CRS_METRIC).to_crs(WEB)
+    centers.plot(ax=ax, color="#111111", markersize=42, marker="o",
+                 edgecolor="white", linewidth=1.4, zorder=6)
+    for name, pt in zip(ref.names, centers):
+        ax.annotate(name, (pt.x, pt.y), xytext=(0, 13), textcoords="offset points",
+                    ha="center", va="bottom", fontsize=12, fontweight="bold", zorder=7,
+                    bbox=dict(boxstyle="round,pad=0.25", fc="white", ec="#333", alpha=0.85))
+    _add_basemap(ax)
+    ax.legend(handles=[Line2D([], [], marker="o", color="none",
+                              markerfacecolor="#111111", markeredgecolor="white",
+                              markersize=9, label="section centre (Voronoi generator)")],
+              loc="upper right", fontsize=9, framealpha=0.92)
+    ax.set_title("Study area — the eight sections of Dhaka\n"
+                 "a coarse Voronoi of eight well-known area centres, "
+                 "independent of any utility", fontsize=13)
+    ax.set_axis_off()
+    out = FIGURES_DIR / "sections_only.png"
+    fig.savefig(out, dpi=FIGURE_DPI, bbox_inches="tight")
+    plt.close(fig)
+    return str(out)
+
+
 def plot_zone_colored_voronoi(sv: ServiceVoronoi, ref: ZoneRef, flagship: bool = False) -> str:
     svc = SERVICE_TYPES[sv.key]
     zgdf = color_cells_by_zone(sv, ref).to_crs(WEB)
@@ -2986,7 +3022,7 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
          f"({best}); {worst['section']} scores lowest ({worst['benefit_score']:.0f}). The most "
          "populous section, Motijheel (old Dhaka), is only moderately served and is therefore the "
          "highest-impact target for investment (Figures 4.9–4.10, Table 4.8).")
-    figure("zones_dhaka_flagship.png", "Figure 4.9. Voronoi coloured by the eight sections.", 5.0)
+    figure("sections_only.png", "Figure 4.9. The eight sections of the study area, each a coarse Voronoi cell of a well-known area centre.", 5.0)
     figure("section_benefit.png", "Figure 4.10. Population-weighted benefit score by section.", 5.0)
     table_from(["Section", "Population", "Benefit score", "Weakest service"],
                [[r["section"], f"{r['pop_est']/1e6:.2f} M" if sb.pop_weighted else "-",
@@ -4384,6 +4420,8 @@ def main(force_figures: bool = False, k: int = RECOMMEND_K, network: bool = Fals
         plot_zone_colored_voronoi(voronois[flagship_key], ref, flagship=True)
     if _need(str(FIGURES_DIR / "voronoi_all_services.png"), force_figures):
         plot_all_services_panel(voronois)
+    if _need(str(FIGURES_DIR / "sections_only.png"), force_figures):
+        plot_sections_only(next(iter(voronois.values())).boundary, ref)
     headline_html = folium_sections_map(voronois, ref)
 
     print("[7/7] PDF report + literature review")
