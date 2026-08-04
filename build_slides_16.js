@@ -84,38 +84,31 @@ function statCard(slide, x, y, w, h, value, label, color) {
 // ================================================================ 1. TITLE
 let s = pres.addSlide();
 s.background = { color: NAVY };
-s.addImage({ path: "data/templates/aiub_logo.png", x: 6.17, y: 0.3, w: 1.0, h: 1.0 });
+s.addImage({ path: "data/templates/aiub_logo.png", x: 6.17, y: 1.0, w: 1.0, h: 1.0 });
 s.addText("AMERICAN INTERNATIONAL UNIVERSITY-BANGLADESH", {
-  x: 0.5, y: 1.4, w: 12.3, h: 0.3, align: "center", fontFace: BF, fontSize: 12,
+  x: 0.5, y: 2.1, w: 12.3, h: 0.3, align: "center", fontFace: BF, fontSize: 12,
   bold: true, color: "8FB3D9", charSpacing: 1.5, margin: 0 });
 s.addText("Faculty of Science and Technology  ·  Department of Computer Science", {
-  x: 0.5, y: 1.72, w: 12.3, h: 0.3, align: "center", fontFace: BF, fontSize: 12,
+  x: 0.5, y: 2.42, w: 12.3, h: 0.3, align: "center", fontFace: BF, fontSize: 12,
   color: "AEC4DD", margin: 0 });
 s.addText("Providing Utility Services using Voronoi Diagrams", {
-  x: 0.6, y: 2.28, w: 12.1, h: 0.7, align: "center", fontFace: HF, fontSize: 32,
+  x: 0.6, y: 2.98, w: 12.1, h: 0.7, align: "center", fontFace: HF, fontSize: 32,
   bold: true, color: WHITE, margin: 0 });
 s.addText("Some Analyses, Recommendations, along with a Case Study for Dhaka City", {
-  x: 0.8, y: 3.02, w: 11.7, h: 0.5, align: "center", fontFace: BF, fontSize: 16,
+  x: 0.8, y: 3.72, w: 11.7, h: 0.5, align: "center", fontFace: BF, fontSize: 16,
   italic: true, color: "CADCFC", margin: 0 });
 [["Minhazul Abedin", "21-44625-1"], ["Zarin Tasnim Rayta", "21-45742-3"],
  ["Abdullah Al Noman", "21-45825-3"], ["Mehedi Hasan Aziz", "19-40060-1"],
 ].forEach((t, i) => {
   const x = 0.75 + i * 3.05;
-  s.addShape(pres.ShapeType.roundRect, { x, y: 3.95, w: 2.85, h: 0.72,
+  s.addShape(pres.ShapeType.roundRect, { x, y: 4.65, w: 2.85, h: 0.72,
     fill: { color: "16385C" }, line: { color: "2C5680", width: 1 }, rectRadius: 0.08 });
-  s.addText(t[0], { x, y: 4.02, w: 2.85, h: 0.32, align: "center", fontFace: BF,
+  s.addText(t[0], { x, y: 4.72, w: 2.85, h: 0.32, align: "center", fontFace: BF,
     fontSize: 13, bold: true, color: WHITE, margin: 0 });
-  s.addText(t[1], { x, y: 4.33, w: 2.85, h: 0.28, align: "center", fontFace: BF,
+  s.addText(t[1], { x, y: 5.03, w: 2.85, h: 0.28, align: "center", fontFace: BF,
     fontSize: 11, color: "8FB3D9", margin: 0 });
 });
-s.addText("Supervised by", { x: 0.5, y: 5.0, w: 12.3, h: 0.3, align: "center",
-  fontFace: BF, fontSize: 12, color: "8FB3D9", margin: 0 });
-s.addText("Dr. Md. Manzurul Hasan", { x: 0.5, y: 5.3, w: 12.3, h: 0.4, align: "center",
-  fontFace: HF, fontSize: 20, bold: true, color: WHITE, margin: 0 });
-s.addText("Associate Professor, Department of Computer Science", {
-  x: 0.5, y: 5.73, w: 12.3, h: 0.3, align: "center", fontFace: BF, fontSize: 12,
-  color: "AEC4DD", margin: 0 });
-s.addText("Fall 2025-2026  ·  Defense: 06.07.2026", { x: 0.5, y: 6.55, w: 12.3, h: 0.3,
+s.addText("Fall 2025-2026  ·  Defense: 06.07.2026", { x: 0.5, y: 6.05, w: 12.3, h: 0.3,
   align: "center", fontFace: BF, fontSize: 12, italic: true, color: "8FB3D9", margin: 0 });
 s.addNotes("Assalamu Alaikum. We present our thesis on providing utility services using Voronoi diagrams, with a case study of Dhaka City.");
 
@@ -342,7 +335,7 @@ s.addShape(pres.ShapeType.roundRect, { x: 6.7, y: 5.75, w: 6.0, h: 0.9,
 s.addText("Verified by 29 automated tests \u2014 degree-3 vertices, exact tiling, bisector midpoints.",
   { x: 6.95, y: 5.85, w: 5.5, h: 0.7, fontFace: BF, fontSize: 12.5, bold: true,
     color: GREEN, margin: 0 });
-s.addNotes("Say the plain sentence, point at one seed and its cell, and stop. The formal line is there if a board member wants it \u2014 backup slide 18 has the full construction and complexity.");
+s.addNotes("Say the plain sentence, point at one seed and its cell, and stop. The formal line is there if a board member wants it.");
 
 // ============================================================ 11. THE DIAGRAMS
 s = newSlide("05 · Method", "The six Voronoi diagrams");
@@ -480,7 +473,7 @@ s.addText("Badly served areas form clumps", { x: 9.2, y: 5.08, w: 3.3, h: 0.5,
   fontFace: BF, fontSize: 14.5, bold: true, color: TEAL, margin: 0 });
 s.addText("Moran's I = 0.99 \u2014 under-service is contiguous, not scattered at random (p = 0.005)",
   { x: 9.2, y: 5.62, w: 3.3, h: 0.9, fontFace: BF, fontSize: 11.5, color: MUTED, margin: 0 });
-s.addNotes("Lead with the plain claim in each card; the statistic underneath is the evidence, not the point. Be upfront that road distance roughly doubles the underserved share \u2014 volunteering it is better than being caught by it. Backup slide 19 has the per-service numbers.");
+s.addNotes("Lead with the plain claim in each card; the statistic underneath is the evidence, not the point. Be upfront that road distance roughly doubles the underserved share \u2014 volunteering it is better than being caught by it.");
 
 // ================================================================ 15. LIMITATIONS
 s = newSlide("07 · Limitations", "What the model does not do");
@@ -536,76 +529,5 @@ s.addShape(pres.ShapeType.roundRect, { x: 6.8, y: 6.3, w: 5.9, h: 0.8,
 s.addText("Thank you  —  Questions?", { x: 6.8, y: 6.3, w: 5.9, h: 0.8, align: "center",
   valign: "middle", fontFace: HF, fontSize: 20, bold: true, color: WHITE, margin: 0 });
 s.addNotes("Four findings; everything regenerates from one command. Thank you — we are happy to take questions.");
-
-// ============================================================== 18-19. BACKUP
-// Not presented. Kept so a technical question can be answered from a slide
-// rather than from memory.
-function backupSlide(title) {
-  const s = newSlide("BACKUP  \u00b7  NOT PRESENTED", title);
-  s.addShape(pres.ShapeType.roundRect, { x: 11.35, y: 0.38, w: 1.45, h: 0.4,
-    fill: { color: "FBEEE9" }, line: { color: AMBER, width: 1 }, rectRadius: 0.06 });
-  s.addText("BACKUP", { x: 11.35, y: 0.38, w: 1.45, h: 0.4, align: "center",
-    valign: "middle", fontFace: BF, fontSize: 10, bold: true, color: AMBER,
-    charSpacing: 1, margin: 0 });
-  // deliberately NOT hidden: LibreOffice drops hidden slides from the PDF export,
-  // and the printed PDF is the fallback if the laptop fails.
-  return s;
-}
-
-s = backupSlide("The Voronoi construction in full");
-[["Half-plane", "H(p,q) = { x : |x\u2212p| \u2264 |x\u2212q| } \u2014 the points at least as close to p as to q. Its boundary is the perpendicular bisector of pq, by definition."],
- ["Cell", "V(p) = B \u2229 H(p,q) intersected over every Delaunay neighbour q of p, clipped to the study boundary B. Every interior edge is therefore a true bisector."],
- ["Vertices", "A Voronoi vertex is equidistant from three facilities, so three cells meet there. Four would require four points on a common circle \u2014 excluded by general position, which we assert in code."],
- ["Complexity", "O(n log n) to build the diagram; O(log n) per nearest-facility query using a k-d tree [Bentley, 1975]. Whole pipeline runs in minutes on a laptop."],
- ["Projection", "All geometry in EPSG:32646 (UTM 46N) so distances are true metres. Degrees would distort both area and distance at this latitude."],
- ["Benefit index", "B_s = 100 \u00b7 ( \u03a3 w_j \u00b7 f_{s,j} ) / ( \u03a3 w_j ), where f is the population-weighted fraction of section s within reach of service j, and w weights hospitals and fire \u00d72, water \u00d71.5."],
-].forEach((r, i) => {
-  const y = 1.62 + i * 0.9;
-  s.addShape(pres.ShapeType.roundRect, { x: 0.7, y, w: 2.35, h: 0.78,
-    fill: { color: TINT }, line: { color: LINE, width: 1 }, rectRadius: 0.06 });
-  s.addText(r[0], { x: 0.7, y, w: 2.35, h: 0.78, align: "center", valign: "middle",
-    fontFace: BF, fontSize: 13, bold: true, color: DEEP, margin: 0 });
-  s.addText(r[1], { x: 3.25, y: y + 0.03, w: 9.4, h: 0.78, fontFace: BF, fontSize: 12,
-    color: INK, margin: 0, valign: "middle" });
-});
-s.addNotes("Only open this if a board member presses on the geometry or the complexity.");
-
-s = backupSlide("Validation detail, service by service");
-s.addText("Spearman rank correlation between our Voronoi-based ranking and 2SFCA",
-  { x: 0.7, y: 1.6, w: 8, h: 0.35, fontFace: BF, fontSize: 13, color: MUTED, margin: 0 });
-s.addTable(
-  [["Service", "Spearman \u03c1", "Reading"].map((h) => ({
-    text: h, options: { bold: true, color: WHITE, fill: { color: DEEP }, fontSize: 12 } }))].concat(
-    [["Metro station", "0.93", "strong agreement \u2014 scarce, widely spaced"],
-     ["Water pump / source", "0.93", "strong agreement \u2014 scarce, widely spaced"],
-     ["Hospital", "0.71", "good agreement"],
-     ["Fuel station", "0.58", "moderate"],
-     ["Bus stop", "0.31", "weak \u2014 dense and clustered"],
-     ["Fire station", "0.12", "weak \u2014 2SFCA also penalises clustering"]].map((r, i) => [
-      { text: r[0], options: { fontSize: 12.5, bold: true, color: INK, fill: { color: i % 2 ? TINT : WHITE } } },
-      { text: r[1], options: { fontSize: 12.5, bold: true, color: DEEP, align: "center", fill: { color: i % 2 ? TINT : WHITE } } },
-      { text: r[2], options: { fontSize: 12, color: MUTED, fill: { color: i % 2 ? TINT : WHITE } } },
-    ])),
-  { x: 0.7, y: 2.05, w: 8.0, colW: [2.6, 1.5, 3.9], border: { pt: 0.5, color: LINE },
-    fontFace: BF, rowH: 0.42, valign: "middle" });
-s.addShape(pres.ShapeType.roundRect, { x: 0.7, y: 5.15, w: 8.0, h: 1.5,
-  fill: { color: "FBEEE9" }, line: { color: AMBER, width: 1.3 }, rectRadius: 0.08 });
-s.addText("Why the weak ones are not a failure", { x: 0.95, y: 5.3, w: 7.5, h: 0.35,
-  fontFace: BF, fontSize: 13.5, bold: true, color: AMBER, margin: 0 });
-s.addText("2SFCA measures supply per head within a catchment, so it also penalises facilities being bunched together. Voronoi measures distance to the nearest one. For dense services the two answer different questions \u2014 they complement rather than contradict.",
-  { x: 0.95, y: 5.68, w: 7.6, h: 0.9, fontFace: BF, fontSize: 11.5, color: INK, margin: 0 });
-[["Greedy vs exact", "Greedy placement recovers ~100% of the exhaustive maximal-covering optimum (Church & ReVelle, 1974)."],
- ["Road network", "43,000-junction OSMnx drive graph, multi-source Dijkstra. Median detour \u00d71.5; underserved share roughly doubles."],
- ["Sensitivity", "\u00b125% on every threshold, and equal service weights, both leave the section ranking essentially unchanged (\u03c1 \u2248 0.98)."],
-].forEach((c, i) => {
-  const y = 1.95 + i * 1.6;
-  s.addShape(pres.ShapeType.roundRect, { x: 9.0, y, w: 3.7, h: 1.4,
-    fill: { color: TINT }, line: { color: LINE, width: 1 }, rectRadius: 0.08 });
-  s.addText(c[0], { x: 9.2, y: y + 0.14, w: 3.3, h: 0.35, fontFace: BF, fontSize: 13,
-    bold: true, color: TEAL, margin: 0 });
-  s.addText(c[1], { x: 9.2, y: y + 0.5, w: 3.35, h: 0.85, fontFace: BF, fontSize: 11,
-    color: MUTED, margin: 0 });
-});
-s.addNotes("Only open this if pressed on why the fire-station correlation is low.");
 
 pres.writeFile({ fileName: OUT }).then((f) => console.log("saved", f));
