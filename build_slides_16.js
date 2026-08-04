@@ -345,6 +345,31 @@ s.addText("Degree-3 vertices, exact tiling and bisector midpoints all checked au
   { x: 6.95, y: 5.94, w: 5.6, h: 0.55, fontFace: BF, fontSize: 12, color: INK, margin: 0 });
 s.addNotes("Left: the three textbook cases we verified before touching Dhaka. Right: the two equations that define the whole method.");
 
+// ============================================================ 11. THE DIAGRAMS
+s = newSlide("05 · Method", "The six Voronoi diagrams");
+framedImage(s, FIG + "voronoi_all_services.png", 0.6, 1.65, 6.9, 5.4);
+s.addText("One colour and one marker per utility", { x: 7.8, y: 1.75, w: 5, h: 0.35,
+  fontFace: BF, fontSize: 15, bold: true, color: DEEP, margin: 0 });
+s.addText("Every cell is the region whose nearest facility of that type is the point inside it. The generator points \u2014 the facilities themselves \u2014 are drawn on every panel.",
+  { x: 7.8, y: 2.15, w: 5.0, h: 1.0, fontFace: BF, fontSize: 13, color: MUTED, margin: 0 });
+[["Metro station", "26", RED], ["Hospital", "286", GREEN],
+ ["Water pump / source", "118", "1F77B4"], ["Fuel station", "135", AMBER],
+ ["Bus stop", "314", "9467BD"], ["Fire station", "22", "8C564B"],
+].forEach((r, i) => {
+  const y = 3.25 + i * 0.52;
+  s.addShape(pres.ShapeType.ellipse, { x: 7.85, y: y + 0.09, w: 0.22, h: 0.22,
+    fill: { color: r[2] } });
+  s.addText(r[0], { x: 8.2, y, w: 3.1, h: 0.4, fontFace: BF, fontSize: 13,
+    color: INK, margin: 0 });
+  s.addText(r[1] + " points", { x: 11.2, y, w: 1.6, h: 0.4, fontFace: BF,
+    fontSize: 13, bold: true, color: r[2], align: "right", margin: 0 });
+});
+s.addShape(pres.ShapeType.roundRect, { x: 7.8, y: 6.42, w: 5.0, h: 0.62,
+  fill: { color: "FBEEE9" }, line: { color: AMBER, width: 1.2 }, rectRadius: 0.08 });
+s.addText("314 bus stops tessellate the centre finely; 22 fire stations give cells an order of magnitude larger.",
+  { x: 8.0, y: 6.5, w: 4.7, h: 0.5, fontFace: BF, fontSize: 11.5, color: INK, margin: 0 });
+s.addNotes("Each utility has its own colour and marker, and the generator points are visible on every panel. Point at fire stations versus bus stops \u2014 the cell-size contrast is the whole story.");
+
 // ================================================================ 11. RESULTS
 s = newSlide("06 · Result Analysis", "Coverage differs sharply by service");
 s.addText("Share of the study area beyond each service's distance threshold", {

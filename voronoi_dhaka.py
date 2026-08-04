@@ -42,6 +42,7 @@ import numpy as np
 import osmnx as ox
 import pandas as pd
 import shapely
+from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
 from matplotlib.patches import Polygon as MplPolygon
 from scipy.spatial import KDTree, Voronoi
@@ -1256,36 +1257,117 @@ def _boundary_web(sv): return gpd.GeoSeries([sv.boundary], crs=CRS_METRIC).to_cr
 def _seeds_web(sv): return sv.seeds_gdf().to_crs(WEB)
 
 
+# Distinct marker per utility, so the generators stay separable in greyscale too.
+SERVICE_MARKER: dict[str, str] = {
+    "metro_station": "s",       # square
+    "hospital": "P",            # plus
+    "water_pump": "o",          # circle
+    "fuel": "^",                # triangle
+    "bus_stop": "D",            # diamond
+    "fire_station": "*",        # star
+}
+
+
+def _cells_web(sv: ServiceVoronoi) -> gpd.GeoDataFrame:
+    """Every Voronoi cell as a GeoDataFrame in web mercator, keyed by seed index."""
+    idx = sorted(sv.cells)
+    return gpd.GeoDataFrame({"seed_index": idx},
+                            geometry=[sv.cells[i] for i in idx],
+                            crs=CRS_METRIC).to_crs(WEB)
+
+
+def _draw_generators(ax, sv: ServiceVoronoi, svc, size: float = 55,
+                     zorder: int = 6) -> None:
+    """Plot the generator points — the facilities the cells are built around.
+
+    These are the defining objects of a Voronoi diagram, so they are drawn large,
+    in the utility's colour, with a white halo that keeps them legible over both
+    the cell tint and the street basemap."""
+    _seeds_web(sv).plot(ax=ax, color=svc.color, markersize=size,
+                        marker=SERVICE_MARKER.get(sv.key, "o"), edgecolor="white",
+                        linewidth=0.5 if size < 40 else 1.1, zorder=zorder)
+
+
 def plot_service_voronoi(sv: ServiceVoronoi, cov: CoverageResult) -> str:
+    """Per-utility map: cells tinted in that utility's own colour.
+
+    The companion `zones_<key>.png` colours the same cells by section instead —
+    the two answer different questions ("which utility is this?" vs "which section
+    is this?") and are both referenced in Chapter 4."""
     svc = SERVICE_TYPES[sv.key]
     ref = zone_reference()
-    zgdf = color_cells_by_zone(sv, ref).to_crs(WEB)
+    cells = _cells_web(sv)
     fig, ax = plt.subplots(figsize=(10, 11))
-    # cells coloured by their named section (flagship style)
-    zgdf.plot(ax=ax, color=zgdf["zone_color"].tolist(), alpha=0.55,
-              edgecolor="#333333", linewidth=0.4)
-    under = zgdf[zgdf["seed_index"].isin(cov.underserved_cells)]
+    # cells in the utility's own colour, edges bold enough to read as a tessellation
+    cells.plot(ax=ax, color=svc.color, alpha=0.18, edgecolor="none")
+    cells.boundary.plot(ax=ax, color=svc.color, linewidth=0.9, alpha=0.95)
+    # outline, not fill: a translucent red wash over the utility tint muddies both
+    under = cells[cells["seed_index"].isin(cov.underserved_cells)]
     if len(under):
-        under.boundary.plot(ax=ax, color="#b30000", linewidth=2.0)
-    # bold dashed section boundaries + labels
+        under.boundary.plot(ax=ax, color="#b30000", linewidth=2.2, zorder=4)
+    # section boundaries kept for orientation, but de-emphasised
     build_zone_voronoi(sv.boundary, ref).to_crs(WEB).boundary.plot(
-        ax=ax, color="#111111", linewidth=1.4, linestyle=(0, (5, 3)))
-    # facilities in this utility's own colour
-    _seeds_web(sv).plot(ax=ax, color=svc.color, markersize=16, marker="o",
-                        edgecolor="white", linewidth=0.5, zorder=5)
+        ax=ax, color="#444444", linewidth=1.1, linestyle=(0, (5, 3)), alpha=0.75)
+    _draw_generators(ax, sv, svc)
     _boundary_web(sv).boundary.plot(ax=ax, color="black", linewidth=1.3)
     centers = gpd.GeoSeries(gpd.points_from_xy(ref.centers_m[:, 0], ref.centers_m[:, 1]),
                             crs=CRS_METRIC).to_crs(WEB)
     for name, pt in zip(ref.names, centers):
-        ax.annotate(name, (pt.x, pt.y), ha="center", va="center", fontsize=10,
+        ax.annotate(name, (pt.x, pt.y), ha="center", va="center", fontsize=9,
                     fontweight="bold", zorder=7,
-                    bbox=dict(boxstyle="round,pad=0.2", fc="white", ec="#333", alpha=0.8))
+                    bbox=dict(boxstyle="round,pad=0.2", fc="white", ec="#666", alpha=0.75))
+    ax.legend(handles=[Line2D([], [], marker=SERVICE_MARKER.get(sv.key, "o"),
+                              color="none", markerfacecolor=svc.color,
+                              markeredgecolor="white", markersize=10,
+                              label=f"{svc.label} ({sv.n} generator points)"),
+                       Patch(facecolor=svc.color, alpha=0.20, edgecolor=svc.color,
+                             label="Voronoi cell (nearest-facility region)"),
+                       Line2D([], [], color="#b30000", linewidth=2.2,
+                              label=f"underserved cell (> {svc.underserved_m / 1000:g} km)")],
+              loc="upper right", fontsize=8, framealpha=0.92)
     _add_basemap(ax)
-    ax.set_title(f"Dhaka {svc.label} — Voronoi coverage ({sv.n} facilities)\n"
-                 f"cells coloured by section · {svc.label.lower()} sites in "
-                 "service colour · red outline = underserved", fontsize=12)
+    ax.set_title(f"Dhaka {svc.label} — Voronoi diagram ({sv.n} generator points)\n"
+                 f"every cell is the region nearest to one {svc.label.lower()}, "
+                 f"drawn in this utility's colour", fontsize=12)
     ax.set_axis_off()
     out = FIGURES_DIR / f"voronoi_{sv.key}.png"
+    fig.savefig(out, dpi=FIGURE_DPI, bbox_inches="tight")
+    plt.close(fig)
+    return str(out)
+
+
+def plot_all_services_panel(voronois: dict[str, ServiceVoronoi]) -> str:
+    """All six utilities side by side, each in its own colour with its generators.
+
+    Overlaying six tessellations on one axes is unreadable, so the comparison is
+    made as small multiples on a shared extent — the colour and the marker shape
+    identify the utility, and every cell's generator is visible."""
+    fig, axes = plt.subplots(2, 3, figsize=(16.5, 13))
+    order = [k for k in SERVICE_TYPES if k in voronois]
+    for ax, key in zip(axes.ravel(), order):
+        sv, svc = voronois[key], SERVICE_TYPES[key]
+        cw = _cells_web(sv)
+        cw.plot(ax=ax, color=svc.color, alpha=0.18, edgecolor="none")
+        cw.boundary.plot(ax=ax, color=svc.color, linewidth=0.6, alpha=0.95)
+        _boundary_web(sv).boundary.plot(ax=ax, color="black", linewidth=1.1)
+        _draw_generators(ax, sv, svc, size=26, zorder=5)
+        _add_basemap(ax)
+        ax.set_title(f"{svc.label} — {sv.n} generator points",
+                     fontsize=12, fontweight="bold", color=svc.color)
+        ax.set_axis_off()
+    for ax in axes.ravel()[len(order):]:
+        ax.set_axis_off()
+    fig.suptitle("Voronoi diagram of each utility service in Dhaka — one colour and "
+                 "marker per utility, generator points shown",
+                 fontsize=15, fontweight="bold", y=0.975)
+    fig.legend(handles=[Line2D([], [], marker=SERVICE_MARKER.get(k, "o"), color="none",
+                               markerfacecolor=SERVICE_TYPES[k].color,
+                               markeredgecolor="white", markersize=11,
+                               label=SERVICE_TYPES[k].label) for k in order],
+               loc="lower center", ncol=len(order), fontsize=10, frameon=False,
+               bbox_to_anchor=(0.5, 0.005))
+    fig.tight_layout(rect=(0, 0.035, 1, 0.955))
+    out = FIGURES_DIR / "voronoi_all_services.png"
     fig.savefig(out, dpi=FIGURE_DPI, bbox_inches="tight")
     plt.close(fig)
     return str(out)
@@ -2837,8 +2919,16 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
          "tiles its bounding box exactly (Figure 4.1).")
     figure("textbook_all.png", "Figure 4.1. Textbook Voronoi correctness verification.", 5.8)
     para("With the geometry verified, the pipeline builds a Voronoi partition, coverage grid and "
-         "section scores for each of the six services in turn; the resulting maps are presented "
+         "section scores for each of the six services in turn. Figure 4.2 places all six "
+         "diagrams side by side: each utility is drawn in its own colour and marker, and the "
+         "generator points — the facilities the cells are built around — are shown explicitly, "
+         "so the six partitions can be compared directly. The contrast in cell size is the "
+         "clearest signal in the figure: 314 bus stops tessellate the centre finely, while 22 "
+         "fire stations produce cells an order of magnitude larger. The maps are then presented "
          "service by service in Section 4.5.1.")
+    figure("voronoi_all_services.png",
+           "Figure 4.2. Voronoi diagram of each utility service, one colour and marker per "
+           "utility, with generator points shown.", 6.2)
     h2("4.5 Evaluation and Testing")
     para("As a spatial-analysis system, testing centred on correctness rather than predictive "
          "accuracy. A suite of 29 automated tests verifies the geometry (exact tiling, degree-three "
@@ -2884,8 +2974,8 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
     for _svc_i, k in enumerate(SERVICE_TYPES):
         svc = SERVICE_TYPES[k]
         figure(f"voronoi_{k}.png",
-               f"Figure 4.{_svc_i + 2}. {svc.label} — Voronoi coverage over Dhaka, cells "
-               "coloured by section.", 4.4)
+               f"Figure 4.{_svc_i + 3}. {svc.label} — Voronoi diagram over Dhaka, cells and "
+               "generator points in this utility's own colour.", 4.4)
         para(f"{svc.label}. {int(tf.loc[k,'n_facilities'])} facilities; mean cell "
              f"{tf.loc[k,'mean_cell_km2']:.2f} km² (largest {tf.loc[k,'max_cell_km2']:.1f} km²); "
              f"{tf.loc[k,'pct_grid_underserved']:.0f}% of the area beyond the "
@@ -2895,9 +2985,9 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
     para(f"Weighting by population and emergency importance, the central belt is best served "
          f"({best}); {worst['section']} scores lowest ({worst['benefit_score']:.0f}). The most "
          "populous section, Motijheel (old Dhaka), is only moderately served and is therefore the "
-         "highest-impact target for investment (Figures 4.8–4.9, Table 4.8).")
-    figure("zones_dhaka_flagship.png", "Figure 4.8. Voronoi coloured by the eight sections.", 5.0)
-    figure("section_benefit.png", "Figure 4.9. Population-weighted benefit score by section.", 5.0)
+         "highest-impact target for investment (Figures 4.9–4.10, Table 4.8).")
+    figure("zones_dhaka_flagship.png", "Figure 4.9. Voronoi coloured by the eight sections.", 5.0)
+    figure("section_benefit.png", "Figure 4.10. Population-weighted benefit score by section.", 5.0)
     table_from(["Section", "Population", "Benefit score", "Weakest service"],
                [[r["section"], f"{r['pop_est']/1e6:.2f} M" if sb.pop_weighted else "-",
                  f"{r['benefit_score']:.0f}", r["weakest_service"]] for _, r in sb.df.iterrows()],
@@ -2906,23 +2996,23 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
     h2("4.6.3 Recommendations")
     para("Population-targeted greedy placement concentrates new facilities in dense, underserved "
          "areas rather than the empty fringe. Table 4.9 reports the drop in underserved population "
-         "from adding three facilities per service, and Figures 4.10–4.12 show three examples.")
+         "from adding three facilities per service, and Figures 4.11–4.13 show three examples.")
     table_from(["Service", "Underserved before → after (thousands)", "New sites (sections)"],
                [[SERVICE_TYPES[k].label,
                  f"{recs[k].before.underserved_people/1000:.0f} → {recs[k].after.underserved_people/1000:.0f}",
                  ", ".join(recs[k].new_zones)] for k in SERVICE_TYPES],
                "Table 4.9. Coverage improvement from the proposed facilities.")
-    figure("recommendations_fire_station.png", "Figure 4.10. Existing vs proposed fire stations.", 4.8)
-    figure("recommendations_hospital.png", "Figure 4.11. Existing vs proposed hospitals.", 4.8)
-    figure("recommendations_water_pump.png", "Figure 4.12. Existing vs proposed water sources.", 4.8)
+    figure("recommendations_fire_station.png", "Figure 4.11. Existing vs proposed fire stations.", 4.8)
+    figure("recommendations_hospital.png", "Figure 4.12. Existing vs proposed hospitals.", 4.8)
+    figure("recommendations_water_pump.png", "Figure 4.13. Existing vs proposed water sources.", 4.8)
 
     h2("4.6.4 Equity, clustering and combined access")
     para(f"Combining all services into one access index, access is moderately unequal (Gini = "
          f"{ext.gini_combined:.3f}) and strongly clustered (Moran's I = {ext.moran[0]:.3f}, "
          f"pseudo p = {ext.moran[1]:.3f}) — well- and poorly-served areas form contiguous "
          "regions. Per-section values of the combined index mirror the benefit ranking of "
-         "Table 4.8. The Lorenz curve (Figure 4.13) summarises the equity of access.")
-    figure("lorenz_access.png", "Figure 4.13. Lorenz curve of combined utility access.", 4.2)
+         "Table 4.8. The Lorenz curve (Figure 4.14) summarises the equity of access.")
+    figure("lorenz_access.png", "Figure 4.14. Lorenz curve of combined utility access.", 4.2)
     para("A sensitivity check (Table 4.10) shows the section ranking is robust: under ±25% "
          "thresholds and equal service weights the ranking barely changes (Spearman ρ ≈ 0.98).")
     table_from(["Scenario", "Rank corr. (ρ)", "Best", "Worst"],
@@ -2934,9 +3024,9 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
     para("Repeating the analysis with shortest-path distance on the Dhaka road network (rather than "
          "straight-line distance) confirms that Euclidean distance understates real travel: the "
          "median detour is about 1.5×, and the underserved share roughly doubles for several "
-         "services (Figure 4.14). This is a key finding — the true access gap is larger than a "
+         "services (Figure 4.15). This is a key finding — the true access gap is larger than a "
          "straight-line analysis suggests.")
-    figure("network_vs_euclid.png", "Figure 4.14. Underserved share: straight-line vs road network.", 5.6)
+    figure("network_vs_euclid.png", "Figure 4.15. Underserved share: straight-line vs road network.", 5.6)
 
     h2("4.6.6 Validation against the 2SFCA method")
     para("As a further check, the two-step floating catchment area (2SFCA) accessibility was "
@@ -4292,6 +4382,8 @@ def main(force_figures: bool = False, k: int = RECOMMEND_K, network: bool = Fals
         folium_service_map(sv, cov, recs[key])
     if _need(str(FIGURES_DIR / "zones_dhaka_flagship.png"), force_figures):
         plot_zone_colored_voronoi(voronois[flagship_key], ref, flagship=True)
+    if _need(str(FIGURES_DIR / "voronoi_all_services.png"), force_figures):
+        plot_all_services_panel(voronois)
     headline_html = folium_sections_map(voronois, ref)
 
     print("[7/7] PDF report + literature review")
