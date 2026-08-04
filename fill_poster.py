@@ -137,8 +137,8 @@ _list_block(5.6, 39.5, 4.4, "FUTURE WORK", [
 # ---------------- column 2 ----------------
 for i in (15, 16, 17, 20, 21, 22, 23):          # dummy table, footnote, chart, pyramid, labels
     delete(by_idx[i])
-slide.shapes.add_picture(FIG + "zones_dhaka_flagship.png", Inches(10.7), Inches(4.5),
-                         width=Inches(9.0))     # -> ~14.3 in tall
+slide.shapes.add_picture(FIG + "sections_only.png", Inches(10.7), Inches(4.5),
+                         width=Inches(9.0))     # aspect 0.71 -> ~12.7 in tall
 fill(by_idx[19], [
     "The central belt is best served — Mirpur (92), Banani (90), Dhanmondi (85) — while "
     "Bashundhara (55) and Uttara (61) lag. Motijheel, the most populous section at 3.1M "
@@ -170,10 +170,12 @@ fill(by_idx[27], [
     "for continuous guidance, and the Faculty of Science and Technology for its support. "
     "Facility data © OpenStreetMap contributors; population from WorldPop; basemaps © "
     "CARTO and Google."])
-slide.shapes.add_picture(FIG + "recommendations_fire_station.png", Inches(20.6), Inches(16.6),
-                         width=Inches(8.9))     # aspect 1.62 -> ~14.4 in tall
-slide.shapes.add_picture(FIG + "voronoi_hospital.png", Inches(20.6), Inches(31.6),
-                         width=Inches(8.9))     # aspect 1.37 -> ~12.2 in tall
+slide.shapes.add_picture(FIG + "voronoi_all_services.png", Inches(20.6), Inches(16.6),
+                         width=Inches(8.9))     # aspect 1.13 -> ~7.9 in tall
+slide.shapes.add_picture(FIG + "recommendations_all_services.png", Inches(20.6), Inches(25.2),
+                         width=Inches(8.9))     # aspect 1.10 -> ~8.1 in tall
+slide.shapes.add_picture(FIG + "voronoi_hospital.png", Inches(20.6), Inches(34.0),
+                         width=Inches(8.9))     # aspect 0.71 -> ~12.5 in tall
 
 prs.save(OUT)
 print("saved", OUT)
