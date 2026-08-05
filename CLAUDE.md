@@ -1,7 +1,12 @@
 # Voronoi Dhaka — thesis project context
 
 Claude Code loads this file automatically. It is the standing brief for this
-repository; `DEFENSE_PROMPT.md` is the extra prompt to paste on defense day.
+repository.
+
+**Read `PROJECT_STATE.md` next.** It records what has already been decided, what
+the supervisor has already asked for, and what was tried and rejected — so
+nothing settled gets reopened. `DEFENSE_PROMPT.md` holds two prompts: one for
+defense day, one for editing the slides and poster.
 
 ## What this is
 
