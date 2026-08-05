@@ -273,12 +273,13 @@ _heading2b = _textbox(10.6, 35.4, 9.0, 1.3)
 _h2br = _heading2b.text_frame.paragraphs[0].add_run()
 # Not "(cont.)" — column 2 is read before column 3, so a continuation marker
 # would point forward at a section the reader has not reached yet.
-_h2br.text = "Where Services Concentrate"
+_h2br.text = "Service Hubs in Each Area"
 _h2br.font.size = _Pt(40)
 _h2br.font.bold = True
 _h2br.font.color.rgb = _RGB(0x00, 0x5B, 0xBB)
 _figure_with_caption("cluster_centres.png", 36.9, 7.9,
-                     "Where each service concentrates, area by area.",
+                     "Each marker is a group of nearby facilities; the bigger it is, the "
+                     "more facilities it stands for.",
                      x=11.1, w=8.0)
 
 # Column 3 ends References -> Acknowledgement -> Conclusion, with nothing after.
