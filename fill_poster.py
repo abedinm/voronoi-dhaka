@@ -190,10 +190,18 @@ for _i, (_big, _small) in enumerate(_KEY_NUMBERS):
 # ---------------- column 2 ----------------
 for i in (15, 16, 17, 20, 21, 22, 23):          # dummy table, footnote, chart, pyramid, labels
     delete(by_idx[i])
+# The eight-areas map defines the study area; it is setup, not a result, and had
+# been sitting above the Results heading with no section of its own.
+_heading2a = _textbox(10.6, 4.3, 9.0, 1.3)
+_h2ar = _heading2a.text_frame.paragraphs[0].add_run()
+_h2ar.text = "Study Area"
+_h2ar.font.size = _Pt(40)
+_h2ar.font.bold = True
+_h2ar.font.color.rgb = _RGB(0x00, 0x5B, 0xBB)
 # NOTE: the plain-caption version of this figure is aspect 0.625, not 0.707 —
 # its title wraps to fewer lines. Size it by the height we need, not the width.
-slide.shapes.add_picture(FIG + "sections_only.png", Inches(11.7), Inches(4.5),
-                         width=Inches(7.0))     # 11.2 in tall, ends 15.7
+slide.shapes.add_picture(FIG + "sections_only.png", Inches(11.5), Inches(5.8),
+                         width=Inches(7.4))     # 11.8 in tall, ends 17.6
 fill(by_idx[19], [
     "The central belt is best served — Mirpur (92), Banani (90), Dhanmondi (85) — while "
     "Bashundhara (55) and Uttara (61) lag. Motijheel, the most populous section at 3.1M "
@@ -242,10 +250,10 @@ _c3r.font.bold = True
 _c3r.font.color.rgb = _RGB(0x00, 0x5B, 0xBB)
 
 
-def _figure_with_caption(png, y, height, caption):
-    """Place a column-3 figure and say what it shows."""
-    slide.shapes.add_picture(FIG + png, Inches(20.6), Inches(y), width=Inches(8.9))
-    tb = _textbox(20.6, y + height + 0.05, 8.9, 0.75)
+def _figure_with_caption(png, y, height, caption, x=20.6, w=8.9):
+    """Place a figure and say what it shows."""
+    slide.shapes.add_picture(FIG + png, Inches(x), Inches(y), width=Inches(w))
+    tb = _textbox(x, y + height + 0.05, w, 0.75)
     r = tb.text_frame.paragraphs[0].add_run()
     r.text = caption
     r.font.size = _Pt(17)
@@ -261,14 +269,15 @@ _figure_with_caption("recommendations_all_services.png", 14.3, 8.1,
 # The third figure moves to the foot of column 2. Column 3 has to end with
 # References, Acknowledgement and then Conclusion, and all three plus three
 # figures do not fit in one column.
-_figure_with_caption("cluster_centres.png", 36.0, 8.8,
-                     "Where each service concentrates, area by area.")
-for _sh in slide.shapes:           # that figure and caption belong in column 2
-    if _sh.left is not None and abs(_sh.top / 914400 - 36.0) < 0.01:
-        _sh.left = Inches(10.6)
-    if _sh.left is not None and abs(_sh.top / 914400 - 44.85) < 0.2 and _sh.has_text_frame \
-            and _sh.text_frame.text.startswith("Where each service"):
-        _sh.left = Inches(10.6)
+_heading2b = _textbox(10.6, 35.4, 9.0, 1.3)
+_h2br = _heading2b.text_frame.paragraphs[0].add_run()
+_h2br.text = "Results in Detail (cont.)"
+_h2br.font.size = _Pt(40)
+_h2br.font.bold = True
+_h2br.font.color.rgb = _RGB(0x00, 0x5B, 0xBB)
+_figure_with_caption("cluster_centres.png", 36.9, 7.9,
+                     "Where each service concentrates, area by area.",
+                     x=11.1, w=8.0)
 
 # Column 3 ends References -> Acknowledgement -> Conclusion, with nothing after.
 by_idx[26].top = Inches(23.8)      # References — overflows its box by ~0.6 in
@@ -283,11 +292,11 @@ for _sh in slide.shapes:           # the thin rule that sat between them
 
 # Shrinking the map above Results freed space, but Results is a fixed-position
 # placeholder and did not move into it. At 28 pt it needs the room.
-by_idx[19].top = Inches(16.9)      # Results — map above now ends at 15.7
+by_idx[19].top = Inches(18.4)      # Results — map above now ends at 17.6
 for _sh in slide.shapes:           # the rule that sat between the map and Results
     if (_sh.left is not None and 10.0 < _sh.left / 914400 < 19.4
             and abs(_sh.top / 914400 - 18.6) < 0.4 and _sh.height / 914400 < 1.0):
-        _sh.top = Inches(16.2)
+        _sh.top = Inches(17.9)
 
 # fill() only resizes the first run of each paragraph, and several template
 # paragraphs carry more than one run — the numbered reference entries in
