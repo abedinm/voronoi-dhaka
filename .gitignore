@@ -16,6 +16,8 @@ cache/
 
 # Thesis bundle (build artifacts; rebuildable from voronoi_dhaka.py)
 *.zip
+# the defense-day kit is meant to be downloadable straight from GitHub
+!DEFENSE_KIT.zip
 THESIS/*.pdf
 THESIS/*.docx
 THESIS/*.pptx
