@@ -157,78 +157,87 @@ SUB_LINE = ("Providing Utility Services using Voronoi Diagrams — A Case Study 
 # ═══════════════════════════════════════════ 1. how the thesis was done
 def note():
     left = [
-        Paragraph("The question", H),
+        Paragraph("What we asked", H),
         Paragraph(
-            "Dhaka has grown far faster than the services its residents depend on, and no "
-            "public study had measured how unevenly. We asked two things: <b>which parts "
-            "of the city are worse served</b>, and <b>where should new facilities go</b> — "
-            "across six services at once, not one at a time.", B),
-
-        Paragraph("The data", H),
+            "Dhaka has grown much faster than its hospitals, fire stations and water "
+            "points. Everyone knows some parts of the city are better served than "
+            "others. But nobody had actually measured it.", B),
         Paragraph(
-            "901 real facilities — hospitals, fire stations, water points, metro stations, "
-            "bus stops, fuel stations — taken live from OpenStreetMap. Population from "
-            "WorldPop's 1 km grid: 10.7 million residents. Nothing is synthetic. Duplicates "
-            "within 150 m were removed and everything clipped to the city boundary; the "
-            "drop from raw to cleaned counts is de-duplication, not data loss.", B),
+            "So we asked two things. <b>Which parts of Dhaka are worse off? And where "
+            "should new facilities be built?</b>", B),
 
-        Paragraph("The method", H),
+        Paragraph("What we used", H),
         Paragraph(
-            "For each service, every point in Dhaka is assigned to its nearest facility. "
-            "The result is an exact Voronoi partition: each border is the perpendicular "
-            "bisector between two facilities, so the city is covered with no gaps and no "
-            "overlaps. Distance is then measured from every point on a 250 m grid against "
-            "a per-service threshold taken from planning practice — 2 km to a hospital, "
-            "800 m to a bus stop, a four-minute fire response. All geometry is computed in "
-            "metres, not degrees.", B),
+            "We collected 901 real places from OpenStreetMap — hospitals, fire "
+            "stations, water points, metro stations, bus stops and fuel stations. "
+            "We also used a free population map that shows where people live. Our "
+            "study area holds about 10.7 million people.", B),
+        Paragraph(
+            "None of it is made up. Where our counts drop after cleaning, that is "
+            "because the same hospital was on the map three times and we removed the "
+            "copies.", B),
 
-        Paragraph("The decision that changed the result", H),
-        box("Coverage was first measured by <b>land area</b>. That made the empty eastern "
-            "fringe look worst — but almost nobody lives there. Re-measured by "
-            "<b>population</b>, the finding reversed: dense Motijheel, 3.1 million "
-            "residents, became the highest-impact target. Empty land does not need a "
-            "hospital; crowded neighbourhoods do. This is the contribution.", CW, AMBER,
-            colors.HexColor("#FBF1E6")),
+        Paragraph("What we did", H),
+        Paragraph(
+            "For each service, we coloured every point in Dhaka by the facility "
+            "closest to it. The city splits into regions — one per facility. Each "
+            "border sits exactly halfway between two facilities. That shape is called "
+            "a Voronoi diagram.", B),
+        Paragraph(
+            "Then we put an invisible grid over the city, with a point every 250 "
+            "metres, and measured how far each point is from its nearest facility. If "
+            "it was further than a sensible distance — 2 km to a hospital, 800 m to a "
+            "bus stop — we counted that spot as badly served.", B),
+
+        Paragraph("The one thing that changed our answer", H),
+        box("At first we counted <b>how much land</b> was badly served. That made the "
+            "empty east of the city look like the worst problem — but hardly anyone "
+            "lives there. So we counted <b>how many people</b> instead. The answer "
+            "flipped. The real problem is crowded old Dhaka. Motijheel has 3.1 million "
+            "people and scores only 68 out of 100. <b>Empty land does not need a "
+            "hospital. Crowded areas do.</b>", CW, AMBER, colors.HexColor("#FBF1E6")),
     ]
 
     right = [
         Paragraph("Where new facilities should go", H),
         Paragraph(
-            "Each proposed site is placed where it brings the most underserved people back "
-            "within reach, then the calculation repeats. Candidate locations are screened "
-            "first: water bodies, wetlands, rivers, canals and drains, reservoirs, "
-            "landfills, cemeteries, military land and airport surfaces are excluded — about "
-            "a fifth of the city — so no proposal lands somewhere nothing can be built.", B),
-
-        Paragraph("Why the result can be trusted", H),
-        kv([
-            ("Against the standard method",
-             "Our ranking agrees with 2SFCA, the measure the literature uses, most strongly "
-             "where services are scarce. Where it differs we say so, and why."),
-            ("Against the exact answer",
-             "Our fast placement recovers essentially 100% of the exhaustive optimum, so the "
-             "shortcut costs nothing."),
-            ("Against real roads",
-             "On Dhaka's 43,000-junction road network journeys run about 1.5× longer and the "
-             "underserved share roughly doubles. We report this rather than hide it: our "
-             "headline figures are optimistic."),
-            ("Against our own choices",
-             "Changing every distance threshold by ±25%, or weighting all six services "
-             "equally, leaves the ranking of areas essentially unchanged."),
-        ], CW, klabel=2.9),
-
-        Paragraph("What is new", H),
+            "We put each new facility where it brings the most people back within "
+            "reach, then work out the next one, and so on.", B),
         Paragraph(
-            "The geometry is classical — Voronoi diagrams date from 1908. The contribution "
-            "is the combination: six utilities assessed together rather than one; weighted "
-            "by real population rather than land area; validated four independent ways; and "
-            "released as software that rebuilds every figure, table and document from a "
-            "single command. Every prior Dhaka study we found examines one service, "
-            "measured by area.", B),
+            "We also check the ground first. Rivers, ponds, wetland, drains, "
+            "landfills, cemeteries, military land and airports are all ruled out — "
+            "about a fifth of the city. A good spot is no use if nothing can be built "
+            "there.", B),
 
-        box("<b>Everything here is reproducible.</b> One command regenerates the entire "
-            "study from public data. Nothing in this thesis rests on a number that cannot "
-            "be recomputed.", CW, GREEN, colors.HexColor("#EAF3ED")),
+        Paragraph("How we know the answer is sound", H),
+        kv([
+            ("We compared with the usual method",
+             "Other researchers measure access a different way. We ran their method "
+             "too. It mostly agrees with ours. Where it does not, we say so and "
+             "explain why."),
+            ("We compared with the perfect answer",
+             "Our quick way of choosing sites picks almost exactly the same places as "
+             "checking every possibility. So the shortcut costs nothing."),
+            ("We compared with real roads",
+             "Straight lines ignore rivers and buildings. On real roads, journeys are "
+             "about 1.5 times longer and <b>twice as many people are too far</b>. We "
+             "say this openly — it means our figures are on the hopeful side."),
+            ("We tested our own choices",
+             "We changed every distance limit by a quarter, and treated all six "
+             "services as equally important. The ranking of areas barely moved."),
+        ], CW, klabel=3.1),
+
+        Paragraph("What is new about it", H),
+        Paragraph(
+            "The maths is old — Voronoi diagrams are from 1908. What is new is putting "
+            "it together: six services at once instead of one, counted by people "
+            "instead of land, checked four different ways, and written as software "
+            "anyone can re-run. Every earlier Dhaka study we found looks at one "
+            "service, and counts land.", B),
+
+        box("<b>The whole study rebuilds with one command.</b> Nothing in it depends on "
+            "a number we cannot work out again from public data.", CW, GREEN,
+            colors.HexColor("#EAF3ED")),
     ]
     return left, right
 
