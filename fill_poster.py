@@ -219,19 +219,29 @@ fill(by_idx[26], [
     "Boeing, G. (2017). OSMnx. CEUS 65.",
     "Alam, I. et al. (2025). Public open space access in Dhaka. Comput. Urban Sci. 5."])
 fill(by_idx[27], [
-    "We thank our supervisor, Dr. Md. Manzurul Hasan, Associate Professor, Department of Computer Science, AIUB, "
-    "for continuous guidance, and the Faculty of Science and Technology for its support. "
-    "Facility data © OpenStreetMap contributors; population from WorldPop; basemaps © "
-    "CARTO and Google."])
-# Column 3 holds 29.7 in; these three total 27.4 in. The single-utility hospital
-# map is dropped, and voronoi_all_services with it — cell_centroids already shows
-# the same per-utility coloured cells and generators, plus the centre points.
-slide.shapes.add_picture(FIG + "cell_centroids.png", Inches(20.6), Inches(16.6),
-                         width=Inches(8.9))     # aspect 1.23 -> ~7.2 in tall
-slide.shapes.add_picture(FIG + "recommendations_all_services.png", Inches(20.6), Inches(24.8),
+    "We thank the Department of Computer Science and the Faculty of Science and "
+    "Technology, American International University-Bangladesh, for their guidance and "
+    "support. Facility data © OpenStreetMap contributors; population from WorldPop; "
+    "basemaps © CARTO and Google."])
+# Column 3 runs figures first, then References and Acknowledgement last, so that
+# reading down the column the closing sections come after the evidence rather
+# than before it. The single-utility hospital map is dropped, and
+# voronoi_all_services with it — cell_centroids already shows the same
+# per-utility coloured cells and generators, plus the centre points.
+slide.shapes.add_picture(FIG + "cell_centroids.png", Inches(20.6), Inches(4.5),
+                         width=Inches(8.9))     # aspect 1.23 -> ~7.4 in tall
+slide.shapes.add_picture(FIG + "recommendations_all_services.png", Inches(20.6), Inches(12.6),
                          width=Inches(8.9))     # aspect 1.10 -> ~8.1 in tall
-slide.shapes.add_picture(FIG + "cluster_centres.png", Inches(20.6), Inches(33.7),
-                         width=Inches(8.9))     # aspect 0.74 -> ~12.1 in tall
+slide.shapes.add_picture(FIG + "cluster_centres.png", Inches(20.6), Inches(21.4),
+                         width=Inches(8.9))     # aspect 0.74 -> ~8.8 in tall
+
+# References and Acknowledgement move from the top of the column to the bottom.
+by_idx[26].top = Inches(31.5)      # References
+by_idx[27].top = Inches(38.4)      # Acknowledgement
+for _sh in slide.shapes:           # the thin rule that sat between them
+    if (_sh.left is not None and 20.0 < _sh.left / 914400 < 21.5
+            and abs(_sh.top / 914400 - 10.5) < 0.3 and _sh.height / 914400 < 1.0):
+        _sh.top = Inches(37.7)
 
 prs.save(OUT)
 print("saved", OUT)
