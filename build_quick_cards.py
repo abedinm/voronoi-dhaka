@@ -302,25 +302,20 @@ def card1():
 # ══════════════════════════════════════════════════ CARD 2 — the presentation
 SLIDES = [
     ("1", "Title", "Assalamu alaikum. Name the topic and the team. 15 s."),
-    ("2", "Outline", "&ldquo;Eight parts.&rdquo; Read the headings, do not explain them. 10 s."),
-    ("3", "Introduction", "Dhaka grew faster than its utilities; access is uneven and unmeasured."),
-    ("4", "Objectives &amp; RQs", "Four objectives (i–iv), four questions. Point, do not read all."),
-    ("5", "Literature", "Prior Dhaka work: emergency care, transit, evacuation, open space."),
-    ("6", "Research gap", "<b>All did one service, by land area.</b> We do six, weighted by people."),
-    ("7", "Data", "901 facilities, 10.7 M residents, all free public data. Name the sources."),
-    ("8", "The eight areas", "Say they are our own analytical areas, not official wards."),
-    ("9", "Five steps", "Collect → divide → measure → score → recommend. Do not linger."),
-    ("10", "Why cells look so", "One sentence: closest facility wins. Point at one dot and its area."),
-    ("11", "What each covers", "Six maps, one colour each. Contrast bus stops with fire stations."),
-    ("12", "Where concentrated", "901 facilities become 110 groups. Point at Motijheel and Mirpur."),
-    ("13", "In the middle?", "Sparse services sit furthest off-centre — metro and fire worst."),
-    ("14", "Coverage", "Water and metro are weakest; hospitals strongest. One number each."),
-    ("15", "Benefit ranking", "<b>The key slide.</b> Area vs population flips the answer to Motijheel."),
-    ("16", "Recommendations", "Where new facilities go. 3 fire stations → 946,000 people."),
-    ("17", "Three checks", "Usual method, perfect answer, real roads. Own the road-network result."),
-    ("18", "Limitations", "Say them yourself, plainly. It buys credibility for the Q&amp;A."),
-    ("19", "Conclusion", "Contribution + reproducible software + one line of future work."),
+    ("2", "The problem", "Dhaka grew faster than its utilities; access is uneven and unmeasured."),
+    ("3", "Objectives &amp; RQs", "Four objectives (i–iv), four questions. Point, do not read all."),
+    ("4", "Literature &amp; gap", "<b>All did one service, by land area.</b> We do six, weighted by people."),
+    ("5", "Data", "901 facilities, 10.7 M residents, eight areas. All free public data."),
+    ("6", "How it works", "Nearest facility wins. Divide → measure → score → recommend."),
+    ("7", "Where services sit", "110 groups; metro and fire sit furthest off-centre."),
+    ("8", "What each covers", "Six maps. Contrast bus stops with fire stations. Water 73% too far."),
+    ("9", "Benefit ranking", "<b>The key slide.</b> Area vs population flips the answer to Motijheel."),
+    ("10", "Recommendations", "Where new facilities go. 3 fire stations → 946,000 people."),
+    ("11", "Three checks", "Usual method, perfect answer, real roads. Own the road-network result."),
+    ("12", "Limitations", "Say them yourself, plainly. It buys credibility for the Q&amp;A."),
+    ("13", "Conclusion", "Contribution + reproducible software + one line of future work."),
 ]
+
 
 
 
@@ -350,10 +345,10 @@ def card2():
         Spacer(1, 0.18 * cm),
         Paragraph("Pacing", H),
         kv([
-            ("15 minutes", "≈45 s per slide. Slides 15–16 get 90 s each; take it from "
-             "4, 5, 8 and 10."),
-            ("If cut to 10", "Drop 5, 8, 10 and 13; compress 11 + 12. Never drop 15."),
-            ("Running late", "Skip to slide 15, then 19. Those two carry the thesis."),
+            ("15 minutes", "≈60 s per slide. Slides 9–10 get 2 min between them; take it "
+             "from 3, 4 and 5."),
+            ("If cut to 10", "Compress 3, 4 and 7; move fast through 5. Never rush 9."),
+            ("Running late", "Skip to slide 9, then 13. Those two carry the thesis."),
         ], FW, klabel=2.6),
 
         Paragraph("Quick-fire answers — the six you will actually get", H),
@@ -510,5 +505,5 @@ if __name__ == "__main__":
     card("Card_1_Thesis_Report.pdf", "Thesis Report — One-Page Master Card",
          SUBTITLE, card1)
     card("Card_2_Presentation.pdf", "Defense Presentation — Slide-by-Slide Card",
-         "19 slides &nbsp;·&nbsp; " + SUBTITLE, card2)
+         "13 slides &nbsp;·&nbsp; " + SUBTITLE, card2)
     card("Card_3_Poster.pdf", "Poster Session — Standing Card", SUBTITLE, card3)
