@@ -63,6 +63,34 @@ SAY = ParagraphStyle("SAY", parent=ss["BodyText"], fontName=F, fontSize=10.5,
                      leading=15.5, textColor=INK, spaceAfter=5)
 
 
+SPEAKER = ParagraphStyle("SPK", parent=ss["BodyText"], fontName=F + "-B",
+                         fontSize=13, leading=16, textColor=colors.white,
+                         spaceAfter=0)
+
+
+def part(name, slides, window, colour):
+    """A band marking where one speaker takes over."""
+    t = Table([[Paragraph(f"{name}", SPEAKER),
+                Paragraph(f"<font color='#FFFFFF'>slides {slides} &nbsp;·&nbsp; "
+                          f"{window}</font>",
+                          ParagraphStyle("w", parent=SPEAKER, fontSize=10.5,
+                                         alignment=2))]],
+              colWidths=[(A4[0] - 3.4 * cm) * 0.55, (A4[0] - 3.4 * cm) * 0.45])
+    t.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), colour),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 9), ("RIGHTPADDING", (0, 0), (-1, -1), 9),
+        ("TOPPADDING", (0, 0), (-1, -1), 6), ("BOTTOMPADDING", (0, 0), (-1, -1), 6)]))
+    return [Spacer(1, 0.35 * cm), t, Spacer(1, 0.12 * cm)]
+
+
+def handover(to):
+    """The line that ends a speaker's part. Said out loud."""
+    return [Paragraph(f"<b>&ldquo;{to}&rdquo;</b>",
+                      ParagraphStyle("ho", parent=SAY, fontSize=10,
+                                     textColor=GREEN, spaceBefore=3))]
+
+
 def slide(n, title, minutes, cue, *lines):
     """One slide: heading, a stage direction, then what to say."""
     out = [Paragraph(f"Slide {n} &nbsp;·&nbsp; {title} "
@@ -90,18 +118,40 @@ story = [
               "Dhaka City &nbsp;·&nbsp; 13 slides in 8 minutes &nbsp;·&nbsp; "
               "Abedin · Rayta · Noman · Aziz", SUB),
 
-    box("<b>Eight minutes is tight — about thirty-seven seconds a slide.</b> Say only "
-        "what is written. Every sentence here has been cut to fit, so an extra "
-        "aside costs you the ending. Italic lines are stage directions, not "
-        "speech. Time yourself out loud at least twice.", NAVY),
+    box("<b>Eight minutes, four speakers.</b> Say only what is written — every "
+        "sentence has been cut to fit, so one extra aside costs you the ending. "
+        "Italic lines are stage directions. The green line at the end of your part "
+        "is the handover; say it out loud so the next speaker knows to move.", NAVY),
+
+    Table([[Paragraph(f"<b>{n}</b>", ParagraphStyle("t1", parent=SAY, fontSize=10)),
+            Paragraph(sl, ParagraphStyle("t2", parent=SAY, fontSize=10)),
+            Paragraph(w, ParagraphStyle("t3", parent=SAY, fontSize=10)),
+            Paragraph(r, ParagraphStyle("t4", parent=SAY, fontSize=10,
+                                        textColor=MUTED))]
+           for n, sl, w, r in [
+               ("Rayta", "1 – 4", "0:00 – 2:05", "opens; problem and the gap"),
+               ("Minhazul", "5 – 7", "2:05 – 4:25", "data and how the method works"),
+               ("Noman", "8 – 9", "4:25 – 6:15", "coverage and the key finding"),
+               ("Mehedi", "10 – 13", "6:15 – 8:00", "recommendations, checks, close"),
+           ]],
+          colWidths=[3.0 * cm, 2.0 * cm, 3.0 * cm, 8.4 * cm],
+          style=TableStyle([
+              ("ROWBACKGROUNDS", (0, 0), (-1, -1), [colors.white, TINT]),
+              ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+              ("LEFTPADDING", (0, 0), (-1, -1), 6),
+              ("TOPPADDING", (0, 0), (-1, -1), 3),
+              ("BOTTOMPADDING", (0, 0), (-1, -1), 3)])),
 ]
+
+story += part("Zarin Tasnim Rayta", "1 – 4", "0:00 – 2:05", NAVY)
 
 story += slide(
     1, "Title", "0:00 – 0:15",
     "Stand still. Do not start until the room is quiet.",
     "Assalamu alaikum. Our thesis is <b>Providing Utility Services using Voronoi "
-    "Diagrams, with a Case Study for Dhaka City</b>. I am Minhazul Abedin, with Zarin "
-    "Tasnim Rayta, Abdullah Al Noman and Mehedi Hasan Aziz.",
+    "Diagrams, with a Case Study for Dhaka City</b>. I am Zarin Tasnim Rayta, and with "
+    "me are Minhazul Abedin, Abdullah Al Noman and Mehedi Hasan Aziz. We will each take "
+    "a part.",
 )
 
 story += slide(
@@ -131,6 +181,9 @@ story += slide(
     "They share two limits. <b>Each looks at one service. And each measures how much "
     "land is covered, rather than how many people are affected.</b> That is our gap.",
 )
+
+story += handover("Minhazul will take you through our data and method.")
+story += part("Minhazul Abedin", "5 – 7", "2:05 – 4:25", TEAL)
 
 story += slide(
     5, "Real, openly licensed data", "2:05 – 2:45",
@@ -165,6 +218,9 @@ story += slide(
     "a kilometre off — and those are exactly the sparse services.",
 )
 
+story += handover("Noman will now show what we found.")
+story += part("Abdullah Al Noman", "8 – 9", "4:25 – 6:15", GREEN)
+
 story += slide(
     8, "What each service covers", "4:25 – 5:00",
     "Point at bus stops, then fire stations. Two numbers only.",
@@ -186,6 +242,9 @@ story += slide(
     "<b>Empty land does not need a hospital. Crowded neighbourhoods do.</b> That one "
     "change — counting people instead of land — is the contribution of this thesis.",
 )
+
+story += handover("Mehedi will finish with our recommendations.")
+story += part("Mehedi Hasan Aziz", "10 – 13", "6:15 – 8:00", AMBER)
 
 story += slide(
     10, "Where new facilities should go", "6:15 – 7:00",
