@@ -112,29 +112,6 @@ s.addText("Fall 2025-2026  ·  Defense: 06.07.2026", { x: 0.5, y: 6.05, w: 12.3,
   align: "center", fontFace: BF, fontSize: 12, italic: true, color: "8FB3D9", margin: 0 });
 s.addNotes("Assalamu Alaikum. We present our thesis on providing utility services using Voronoi diagrams, with a case study of Dhaka City.");
 
-// ================================================================ 2. OUTLINE
-s = newSlide("Overview", "How this presentation is organised");
-const agenda = [
-  ["01", "The problem", "Why utility access in Dhaka needs measuring"],
-  ["02", "What was missing", "What others did, and what we add"],
-  ["03", "Data", "901 real facilities, 10.7M residents"],
-  ["04", "How it works", "Nearest facility wins — and how we score it"],
-  ["05", "Results", "Coverage, which areas benefit, where to build"],
-  ["06", "Checks & limits", "How we tested it, and what it cannot do"],
-];
-agenda.forEach((a, i) => {
-  const x = 0.7 + (i % 2) * 6.2, y = 1.85 + Math.floor(i / 2) * 1.55;
-  s.addShape(pres.ShapeType.roundRect, { x, y, w: 5.9, h: 1.25,
-    fill: { color: TINT }, line: { color: LINE, width: 1 }, rectRadius: 0.08 });
-  s.addText(a[0], { x: x + 0.25, y: y + 0.2, w: 0.8, h: 0.8, fontFace: HF,
-    fontSize: 26, bold: true, color: TEAL, margin: 0 });
-  s.addText(a[1], { x: x + 1.15, y: y + 0.22, w: 4.5, h: 0.4, fontFace: BF,
-    fontSize: 17, bold: true, color: INK, margin: 0 });
-  s.addText(a[2], { x: x + 1.15, y: y + 0.68, w: 4.6, h: 0.4, fontFace: BF,
-    fontSize: 12, color: MUTED, margin: 0 });
-});
-s.addNotes("Six parts. Read the headings, do not explain them.");
-
 // ================================================================ 3. INTRO
 s = newSlide("01 · Introduction", "Dhaka grew faster than its utilities");
 bullets(s, [
@@ -208,55 +185,32 @@ s.addText("Every Dhaka study covers one service, and measures how much land is c
   { x: 1.0, y: 5.55, w: 11.4, h: 1.1, fontFace: BF, fontSize: 15, color: INK, margin: 0 });
 s.addNotes("Table, then the green box. The gap is the only thing they need to remember from this slide.");
 
-// ================================================================ 7. DATA
+// ============================================== 6. DATA (+ the eight areas)
 s = newSlide("04 · Data", "Real, openly licensed data");
-statCard(s, 0.7, 1.72, 2.9, 1.45, "901", "facilities mapped", DEEP);
-statCard(s, 3.85, 1.72, 2.9, 1.45, "6", "utility services", TEAL);
-statCard(s, 7.0, 1.72, 2.9, 1.45, "10.7M", "residents covered", AMBER);
-statCard(s, 10.15, 1.72, 2.55, 1.45, "8", "named sections", GREEN);
+statCard(s, 0.7, 1.62, 1.9, 1.3, "901", "facilities", DEEP);
+statCard(s, 2.75, 1.62, 1.9, 1.3, "6", "services", TEAL);
+statCard(s, 4.8, 1.62, 1.9, 1.3, "10.7M", "residents", AMBER);
 const dataRows = [
-  ["Metro station", "railway = station | halt", "36", "26"],
-  ["Hospital", "amenity = hospital", "451", "286"],
-  ["Water pump / source", "man_made = water_well …", "487", "118"],
-  ["Fuel station", "amenity = fuel", "219", "135"],
-  ["Bus stop", "highway = bus_stop", "559", "314"],
-  ["Fire station", "amenity = fire_station", "29", "22"],
+  ["Metro station", "36", "26"], ["Hospital", "451", "286"],
+  ["Water pump / source", "487", "118"], ["Fuel station", "219", "135"],
+  ["Bus stop", "559", "314"], ["Fire station", "29", "22"],
 ];
 s.addTable(
-  [["Service", "What we searched for", "Found", "After cleaning"].map((h) => ({
+  [["Service", "Found", "After cleaning"].map((h) => ({
     text: h, options: { bold: true, color: WHITE, fill: { color: DEEP }, fontSize: 12 } }))].concat(
     dataRows.map((r, i) => r.map((c) => ({
       text: c, options: { fontSize: 12, color: INK, fill: { color: i % 2 ? TINT : WHITE } } })))),
-  { x: 0.7, y: 3.5, w: 7.5, colW: [2.3, 2.95, 1.1, 1.15], border: { pt: 0.5, color: LINE },
-    fontFace: BF, rowH: 0.4, valign: "middle" });
+  { x: 0.7, y: 3.15, w: 6.0, colW: [3.0, 1.5, 1.5], border: { pt: 0.5, color: LINE },
+    fontFace: BF, rowH: 0.335, valign: "middle" });   // 7 rows -> ends 5.5
 bullets(s, [
   "Downloaded live from OpenStreetMap — no made-up points.",
-  "Polygons reduced to interior points; duplicates within 150 m removed.",
-  "Clipped to the OSM administrative boundary of Dhaka.",
-  "Population from WorldPop, a free 1 km population map (2020).",
-  "Raw → cleaned is de-duplication, not data loss.",
-], 8.5, 3.55, 4.2, 12.5);
-s.addNotes("All facility data is real and openly licensed. The raw-to-cleaned drop is duplicate mapping and out-of-boundary features.");
-
-// ================================================================ 8. DATA
-s = newSlide("04 · Data", "The eight areas of Dhaka");
-framedImage(s, FIG + "sections_only.png", 0.7, 1.7, 4.9, 5.0);
-s.addText("The study area is Dhaka city, taken from the OpenStreetMap city boundary. Inside it we mark out eight familiar areas — each one is everywhere closest to a well-known centre.",
-  { x: 6.0, y: 1.82, w: 6.6, h: 1.1, fontFace: BF, fontSize: 15, color: INK, margin: 0 });
-[["Uttara", "e6194B"], ["Mirpur", "f58231"], ["Bashundhara", "911eb4"], ["Banani", "4363d8"],
- ["Gulshan", "3cb44b"], ["Dhanmondi", "42d4f4"], ["Khilgaon", "f032e6"], ["Motijheel", "ffe119"],
-].forEach((z, i) => {
-  const x = 6.0 + (i % 2) * 3.35, y = 3.15 + Math.floor(i / 2) * 0.6;
-  s.addShape(pres.ShapeType.ellipse, { x, y: y + 0.04, w: 0.26, h: 0.26, fill: { color: z[1] } });
-  s.addText(z[0], { x: x + 0.36, y, w: 2.8, h: 0.34, fontFace: BF, fontSize: 15,
-    bold: true, color: INK, margin: 0 });
-});
-s.addShape(pres.ShapeType.roundRect, { x: 6.0, y: 5.85, w: 6.6, h: 0.85,
-  fill: { color: TINT }, line: { color: LINE, width: 1 }, rectRadius: 0.08 });
-s.addText("These are our own areas, not official wards — we say so in our Limitations.",
-  { x: 6.0, y: 5.85, w: 6.6, h: 0.85, align: "center", valign: "middle", fontFace: BF,
-    fontSize: 14, italic: true, color: MUTED, margin: 0 });
-s.addNotes("Each fine service cell takes the colour of the section its facility falls in. Be honest that these are analytical zones, not official wards.");
+  "Duplicates within 150 m removed and clipped to the city boundary, so found → cleaned is de-duplication, not data loss.",
+  "Population from WorldPop, a free 1 km map (2020).",
+], 0.7, 5.65, 6.2, 11.5);
+framedImage(s, FIG + "sections_only.png", 7.1, 1.6, 5.6, 4.6);
+s.addText("We compare eight familiar areas. Each one is everywhere closest to a well-known centre — our own areas, not official wards.",
+  { x: 7.1, y: 6.3, w: 5.6, h: 0.9, fontFace: BF, fontSize: 13, color: INK, margin: 0 });
+s.addNotes("Left: the data and how it was cleaned. Right: the eight areas we compare. Say the areas are ours, not official wards, before anyone asks.");
 
 // ================================================ 9. METHOD (pipeline + why)
 s = newSlide("05 · Method", "How it works");
