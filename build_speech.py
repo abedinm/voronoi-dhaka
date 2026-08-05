@@ -59,8 +59,8 @@ SL = ParagraphStyle("SL", parent=ss["Heading2"], fontName=F + "-B", fontSize=11,
                     leading=13, textColor=TEAL, spaceBefore=13, spaceAfter=1)
 CUE = ParagraphStyle("CUE", parent=ss["BodyText"], fontName=F + "-I", fontSize=8.5,
                      leading=11, textColor=AMBER, spaceAfter=4)
-SAY = ParagraphStyle("SAY", parent=ss["BodyText"], fontName=F, fontSize=10.5,
-                     leading=15.5, textColor=INK, spaceAfter=5)
+SAY = ParagraphStyle("SAY", parent=ss["BodyText"], fontName=F, fontSize=12,
+                     leading=20, textColor=INK, spaceAfter=7)
 
 
 SPEAKER = ParagraphStyle("SPK", parent=ss["BodyText"], fontName=F + "-B",
@@ -91,12 +91,32 @@ def handover(to):
                                      textColor=GREEN, spaceBefore=3))]
 
 
+def _sentences(text):
+    """Split a spoken line into one sentence per printed line.
+
+    A nervous speaker runs out of air inside long sentences. One sentence per
+    line means every full stop is a place to breathe, and the eye never has to
+    find its way back into the middle of a clause. Fragments whose bold tags do
+    not balance are left joined rather than broken."""
+    import re
+    parts, buf = [], ""
+    for piece in re.split(r'(?<=[.?]) +(?=[A-Z<])', text):
+        buf = (buf + " " + piece).strip() if buf else piece
+        if buf.count("<b>") == buf.count("</b>"):
+            parts.append(buf)
+            buf = ""
+    if buf:
+        parts.append(buf)
+    return parts
+
+
 def slide(n, title, minutes, cue, *lines):
     """One slide: heading, a stage direction, then what to say."""
     out = [Paragraph(f"Slide {n} &nbsp;·&nbsp; {title} "
                      f"<font size=9 color='#5B6B7A'>({minutes})</font>", SL),
            Paragraph("▸ " + cue, CUE)]
-    out += [Paragraph(t, SAY) for t in lines]
+    for t in lines:
+        out += [Paragraph(x, SAY) for x in _sentences(t)]
     return out
 
 
@@ -118,10 +138,16 @@ story = [
               "Dhaka City &nbsp;·&nbsp; 13 slides in 8 minutes &nbsp;·&nbsp; "
               "Abedin · Rayta · Noman · Aziz", SUB),
 
-    box("<b>Eight minutes, four speakers.</b> Say only what is written — every "
-        "sentence has been cut to fit, so one extra aside costs you the ending. "
-        "Italic lines are stage directions. The green line at the end of your part "
-        "is the handover; say it out loud so the next speaker knows to move. <b>Every part is written short on purpose</b> — the word counts sit under their time windows, so a slow, clear delivery still lands inside eight minutes. Do not fill the gap with extra words.", NAVY),
+    box("<b>Before you start.</b> Stand still. Feet apart. Breathe out slowly and "
+        "fully — longer out than in, three times. A slow breath out is what settles "
+        "a tight chest; breathing in harder makes it worse.<br/><br/>"
+        "<b>One sentence per line.</b> Every full stop below is a place to stop and "
+        "breathe. Take it. A pause sounds calm and considered from the other side of "
+        "the room — it never sounds like hesitation.<br/><br/>"
+        "<b>If you lose your place</b>, stop, look at the slide, and say "
+        "&ldquo;so — what this shows is…&rdquo;. That buys you four seconds and "
+        "reads as deliberate. Nobody in the room knows what you meant to say next.",
+        NAVY),
 
     Table([[Paragraph(f"<b>{n}</b>", ParagraphStyle("t1", parent=SAY, fontSize=10)),
             Paragraph(sl, ParagraphStyle("t2", parent=SAY, fontSize=10)),
@@ -186,21 +212,24 @@ story += part("Minhazul Abedin", "5 – 6", "2:05 – 3:35", TEAL)
 story += slide(
     5, "Real, openly licensed data", "2:05 – 2:45",
     "Numbers, then the areas. Say the areas are yours before anyone asks.",
-    "All our data is real and openly licensed — nine hundred and one facilities from "
-    "OpenStreetMap, and ten point seven million residents from WorldPop.",
-    "On the right are the eight areas we compare. <b>They are our own areas, not "
-    "official wards</b> — that is in our limitations.",
+    "All our data is real. None of it is made up.",
+    "Nine hundred and one facilities, from OpenStreetMap.",
+    "Ten point seven million residents, from WorldPop.",
+    "On the right are the eight areas we compare.",
+    "<b>They are our own areas, not official wards.</b> That is in our limitations.",
 )
 
 story += slide(
     6, "How it works", "2:45 – 3:35",
     "Say the definition slowly. Then the four steps, briskly.",
-    "The method rests on one idea. <b>A Voronoi cell is everywhere that is closer to "
-    "one facility than to any other.</b> Every border sits exactly halfway between two "
-    "facilities.",
-    "Four steps. Divide the city so each point belongs to its nearest facility. Measure "
-    "that distance on a grid. Score each area by how many of its <b>residents</b> are "
-    "within reach. Then add the facility that helps the most people, and repeat.",
+    "The method rests on one idea.",
+    "<b>Every point in the city belongs to its nearest facility.</b>",
+    "Each border sits exactly halfway between two of them.",
+    "From that, four steps.",
+    "One — divide the city that way.",
+    "Two — measure how far each point is from its facility.",
+    "Three — score each area by how many of its <b>residents</b> are within reach.",
+    "Four — add the facility that helps the most people, then repeat.",
     "Twenty-nine automated tests confirm no gaps and no overlaps.",
 )
 
