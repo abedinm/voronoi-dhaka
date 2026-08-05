@@ -258,16 +258,28 @@ _figure_with_caption("cell_centroids.png", 5.9, 7.4,
 _figure_with_caption("recommendations_all_services.png", 14.3, 8.1,
                      "Proposed new sites for every service, placed to reach the most "
                      "people.")
-_figure_with_caption("cluster_centres.png", 23.3, 8.8,
+# The third figure moves to the foot of column 2. Column 3 has to end with
+# References, Acknowledgement and then Conclusion, and all three plus three
+# figures do not fit in one column.
+_figure_with_caption("cluster_centres.png", 36.0, 8.8,
                      "Where each service concentrates, area by area.")
+for _sh in slide.shapes:           # that figure and caption belong in column 2
+    if _sh.left is not None and abs(_sh.top / 914400 - 36.0) < 0.01:
+        _sh.left = Inches(10.6)
+    if _sh.left is not None and abs(_sh.top / 914400 - 44.85) < 0.2 and _sh.has_text_frame \
+            and _sh.text_frame.text.startswith("Where each service"):
+        _sh.left = Inches(10.6)
 
-# References and Acknowledgement move from the top of the column to the bottom.
-by_idx[26].top = Inches(33.5)      # References — overflows its box by ~0.6 in
-by_idx[27].top = Inches(41.0)      # Acknowledgement — References needs the room
+# Column 3 ends References -> Acknowledgement -> Conclusion, with nothing after.
+by_idx[26].top = Inches(23.8)      # References — overflows its box by ~0.6 in
+by_idx[27].top = Inches(31.0)      # Acknowledgement — References overruns its box
+by_idx[24].left = Inches(20.4)     # Conclusion moves out of column 2
+by_idx[24].top = Inches(35.8)
+by_idx[24].width = Inches(9.2)
 for _sh in slide.shapes:           # the thin rule that sat between them
     if (_sh.left is not None and 20.0 < _sh.left / 914400 < 21.5
             and abs(_sh.top / 914400 - 10.5) < 0.3 and _sh.height / 914400 < 1.0):
-        _sh.top = Inches(40.3)
+        _sh.top = Inches(30.3)
 
 # Shrinking the map above Results freed space, but Results is a fixed-position
 # placeholder and did not move into it. At 28 pt it needs the room.
@@ -290,6 +302,13 @@ for _idx in (7, 9, 12, 19, 24, 26, 27):
             continue                      # leave the 40 pt section heading alone
         for _r in _para.runs:
             _r.font.size = _Pt(BODY_PT)
+
+# The rule that sat under Conclusion in column 2 now falls inside the figure
+# that replaced it, drawing a line across the middle of the map.
+for _sh in slide.shapes:
+    if (_sh.left is not None and 10.0 < _sh.left / 914400 < 19.4
+            and abs(_sh.top / 914400 - 43.1) < 0.3 and _sh.height / 914400 < 1.0):
+        _sh.top = Inches(45.9)
 
 prs.save(OUT)
 print("saved", OUT)
