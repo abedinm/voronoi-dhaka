@@ -70,3 +70,78 @@ straight from the GitHub web interface — it is 66 MB and needs no git at all.
 Whichever you do, also put `DEFENSE_KIT.zip` on a USB stick and email it to
 yourself. Do not let a network be the only thing standing between you and your
 slides.
+
+---
+
+# Second prompt — when you want to EDIT the slides, poster or cheat sheets
+
+The first prompt above is for the day itself. Use this one instead when you want
+to change something. Paste everything between the lines.
+
+---
+
+I am preparing my thesis defense and I want to change my slides / poster / cheat
+sheets. Read CLAUDE.md in this repository first.
+
+**The single most important rule: never edit the .pptx or .pdf files directly.**
+They are generated. Editing them by hand is silently undone the next time
+anything rebuilds. Always edit the source script and rebuild:
+
+| To change | Edit | Which rebuilds |
+|---|---|---|
+| The 13 defense slides | `build_slides_16.js` | `outputs/Dhaka_Voronoi_Defense_16.pptx` |
+| The poster | `fill_poster.py` | `outputs/Dhaka_Voronoi_Poster_AIUB.pptx` |
+| The one-page cards | `build_quick_cards.py` | `outputs/Card_*.pdf` |
+| The method note and combined cheat sheet | `build_defense_kit.py` | `outputs/kit/*.pdf` |
+| Figure captions in the talk and poster | `build_plain_figures.py` | `outputs/figures/plain/` |
+
+**Do not run `voronoi_dhaka.py`.** It needs geopandas, osmnx and rasterio and
+will fail on this machine. You do not need it — every figure is already built and
+committed under `outputs/figures/`. That also means figure captions can only be
+changed if the geo stack is installed; if I ask for that, tell me it is not
+possible here rather than half-doing it.
+
+**After every change, verify by looking, not by reading the code.** Rebuild, then
+convert the slide to an image and actually inspect it. This project has produced
+a long run of layout bugs that were invisible in the source: text boxes that
+overflow their declared height, images placed on top of captions, tables running
+off the bottom of a slide, and a figure that silently vanished during an edit. If
+you tell me something is fixed without having looked at the render, you are
+probably wrong.
+
+**Keep the numbers consistent.** Results are hard-coded in several scripts — the
+deck, the poster, the cheat sheet and the cards. If a figure changes, grep for
+the old value across all of them before saying you are done.
+
+Start by telling me which of these you can actually run on this machine, then ask
+me what I want to change.
+
+---
+
+## What you need installed on Windows
+
+Only three packages — the heavy geospatial stack is not required:
+
+```bash
+npm install -g pptxgenjs
+pip install python-pptx reportlab matplotlib
+```
+
+Rebuild commands:
+
+```bash
+node build_slides_16.js
+python fill_poster.py
+python build_quick_cards.py
+python build_defense_kit.py
+```
+
+To export a PDF, or to render a slide as an image so Claude can check its work,
+install LibreOffice and use:
+
+```bash
+soffice --headless --convert-to pdf outputs/Dhaka_Voronoi_Defense_16.pptx
+```
+
+Without LibreOffice you can still edit and rebuild the `.pptx`, but you will have
+to eyeball the result in PowerPoint yourself rather than have Claude verify it.
