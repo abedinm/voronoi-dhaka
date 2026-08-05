@@ -271,7 +271,9 @@ _figure_with_caption("recommendations_all_services.png", 14.3, 8.1,
 # figures do not fit in one column.
 _heading2b = _textbox(10.6, 35.4, 9.0, 1.3)
 _h2br = _heading2b.text_frame.paragraphs[0].add_run()
-_h2br.text = "Results in Detail (cont.)"
+# Not "(cont.)" — column 2 is read before column 3, so a continuation marker
+# would point forward at a section the reader has not reached yet.
+_h2br.text = "Where Services Concentrate"
 _h2br.font.size = _Pt(40)
 _h2br.font.bold = True
 _h2br.font.color.rgb = _RGB(0x00, 0x5B, 0xBB)
