@@ -2,9 +2,12 @@
 """The spoken script for the defense — outputs/kit/Defense_Speech.pdf.
 
 Written to be said aloud, not read silently: short sentences, no clause stacks,
-and the numbers spelled the way you would say them. Roughly 15 minutes at a
-normal speaking pace, with the timing marked so you can tell mid-talk whether
-you are ahead or behind.
+and the numbers spelled the way you would say them.
+
+Budgeted for EIGHT minutes across thirteen slides — about thirty-seven seconds
+each. Most slides get one or two sentences; slide 9 carries the contribution and
+is given more than double the average. The timings are cumulative so you can tell
+mid-talk whether you are ahead or behind.
 
 Run:  python build_speech.py
 """
@@ -84,203 +87,150 @@ def box(text, color=TEAL, fill=TINT):
 story = [
     Paragraph("Defense Speech", H1),
     Paragraph("Providing Utility Services using Voronoi Diagrams — A Case Study for "
-              "Dhaka City &nbsp;·&nbsp; 13 slides, about 15 minutes &nbsp;·&nbsp; "
+              "Dhaka City &nbsp;·&nbsp; 13 slides in 8 minutes &nbsp;·&nbsp; "
               "Abedin · Rayta · Noman · Aziz", SUB),
 
-    box("<b>Read this out loud twice before the day.</b> It is written to be spoken, "
-        "not recited — if a sentence feels wrong in your mouth, change it. The "
-        "italic lines are stage directions, not speech.", NAVY),
+    box("<b>Eight minutes is tight — about thirty-seven seconds a slide.</b> Say only "
+        "what is written. Every sentence here has been cut to fit, so an extra "
+        "aside costs you the ending. Italic lines are stage directions, not "
+        "speech. Time yourself out loud at least twice.", NAVY),
 ]
 
 story += slide(
-    1, "Title", "0:00 – 0:20",
+    1, "Title", "0:00 – 0:15",
     "Stand still. Do not start until the room is quiet.",
-    "Assalamu alaikum. Thank you for your time this morning.",
-    "Our thesis is <b>Providing Utility Services using Voronoi Diagrams, with a Case "
-    "Study for Dhaka City</b>. I am Minhazul Abedin, and with me are Zarin Tasnim "
-    "Rayta, Abdullah Al Noman and Mehedi Hasan Aziz.",
+    "Assalamu alaikum. Our thesis is <b>Providing Utility Services using Voronoi "
+    "Diagrams, with a Case Study for Dhaka City</b>. I am Minhazul Abedin, with Zarin "
+    "Tasnim Rayta, Abdullah Al Noman and Mehedi Hasan Aziz.",
 )
 
 story += slide(
-    2, "The problem", "0:20 – 1:40",
-    "Point at the dense centre of the map, then at the empty east.",
+    2, "The problem", "0:15 – 1:00",
+    "Point at the dense centre, then at the empty east.",
     "Dhaka has grown far faster than the services its people depend on.",
-    "On this map you can see every hospital, fire station, water point, metro station, "
-    "bus stop and fuel station we could find — nine hundred and one of them. Look at "
-    "how they pile up in the centre, and how quickly they thin out toward the edges.",
-    "Everyone in this city knows some areas are better served than others. But nobody "
-    "had measured it. There is no public study that says which areas are worse off, or "
-    "by how much.",
-    "So we asked two questions. <b>Which parts of Dhaka are worse served — and where "
-    "should new facilities go?</b>",
+    "This map shows every hospital, fire station, water point, metro station, bus stop "
+    "and fuel station we could find — nine hundred and one. They pile up in the centre "
+    "and thin out at the edges.",
+    "Everyone knows some areas are better served. Nobody had measured it. So we asked: "
+    "<b>which parts of Dhaka are worse served, and where should new facilities go?</b>",
 )
 
 story += slide(
-    3, "Objectives and research questions", "1:40 – 2:40",
-    "Do not read all eight items. Point at the columns and say these three sentences.",
-    "Our objectives and our research questions are on this slide.",
-    "In short: build an exact model of which area each facility serves, measure how "
-    "many people fall outside a reasonable distance, rank the areas, and recommend "
-    "where to build.",
-    "The four questions on the right map directly onto our results section, and I will "
-    "answer each of them in turn.",
+    3, "Objectives and research questions", "1:00 – 1:25",
+    "Do not read the items. One sentence, then move.",
+    "Our objectives and questions are here: model which area each facility serves, "
+    "measure how many people fall outside a reasonable distance, rank the areas, and "
+    "recommend where to build.",
 )
 
 story += slide(
-    4, "What others did — and what was missing", "2:40 – 4:00",
-    "Walk the table quickly. Slow down on the green box — that is the whole slide.",
-    "Voronoi diagrams themselves are old — Okabe's standard text is from 2000, and the "
-    "placement problem we use goes back to Church and ReVelle in 1974.",
-    "Closer to home, several studies have looked at access in Dhaka. Ahmed and "
-    "colleagues studied emergency healthcare. Rahman and colleagues studied public "
-    "transport. Alam and colleagues studied open space.",
-    "Every one of them shares two limits. <b>Each looks at a single service. And each "
-    "measures how much land is covered, rather than how many people are affected.</b>",
-    "That is our gap. We assess six services together, and we weight them by "
-    "population. As you will see on slide nine, that second change is what reverses "
-    "the answer.",
+    4, "What others did — and what was missing", "1:25 – 2:05",
+    "Do not walk the table. Go straight to the green box.",
+    "Several studies have looked at access in Dhaka — emergency healthcare, public "
+    "transport, open space.",
+    "They share two limits. <b>Each looks at one service. And each measures how much "
+    "land is covered, rather than how many people are affected.</b> That is our gap.",
 )
 
 story += slide(
-    5, "Real, openly licensed data", "4:00 – 5:20",
-    "Left side first, then the map. Say the areas are yours before anyone asks.",
-    "All of our data is real and openly licensed. Nothing is simulated.",
-    "The facilities come from OpenStreetMap — nine hundred and one of them after "
-    "cleaning. The table shows what we searched for and what survived. Where the "
-    "numbers drop, that is de-duplication: OpenStreetMap often maps one hospital three "
-    "times, as a point, a building and a boundary. It is not data loss.",
-    "Population comes from WorldPop, a free one-kilometre population map. Our study "
-    "area holds about ten point seven million people.",
-    "On the right are the eight areas we compare. I want to be clear that <b>these are "
-    "our own analytical areas, not official wards</b> — we tried the official "
-    "boundaries and found them incomplete. That is stated in our limitations.",
+    5, "Real, openly licensed data", "2:05 – 2:45",
+    "Numbers, then the areas. Say the areas are yours before anyone asks.",
+    "All our data is real and openly licensed. Nine hundred and one facilities from "
+    "OpenStreetMap, and ten point seven million residents from WorldPop.",
+    "Where the counts drop, that is de-duplication, not data loss.",
+    "On the right are the eight areas we compare — <b>our own analytical areas, not "
+    "official wards</b>. That is stated in our limitations.",
 )
 
 story += slide(
-    6, "How it works", "5:20 – 7:00",
-    "Say the top line slowly. Then the four steps. Point at the worked examples.",
-    "Here is the method, and it rests on one idea.",
-    "<b>A Voronoi cell is everywhere that is closer to one facility than to any "
-    "other.</b> The border between two facilities is the line where you are exactly "
-    "equally far from both.",
-    "From that, four steps. First we divide — every point in Dhaka belongs to its "
-    "nearest facility. Second we measure — from every point on a two hundred and fifty "
-    "metre grid, how far is that facility? Third we score — each area gets a mark out "
-    "of a hundred, based on how many of its <b>residents</b> are within reach. Fourth "
-    "we recommend — we add the facility that helps the most people, and repeat.",
-    "On the right are three worked examples we drew by hand first, to check the "
-    "geometry. Twenty-nine automated tests confirm there are no gaps, no overlaps, and "
-    "that every border sits exactly halfway between two facilities.",
+    6, "How it works", "2:45 – 3:45",
+    "Say the definition slowly. Then the four steps, briskly.",
+    "The method rests on one idea. <b>A Voronoi cell is everywhere that is closer to "
+    "one facility than to any other.</b> Every border sits exactly halfway between two "
+    "facilities.",
+    "Four steps. Divide the city so each point belongs to its nearest facility. Measure "
+    "that distance on a two hundred and fifty metre grid. Score each area out of a "
+    "hundred by how many of its <b>residents</b> are within reach. Then add the facility "
+    "that helps the most people, and repeat.",
+    "Twenty-nine automated tests confirm no gaps and no overlaps.",
 )
 
 story += slide(
-    7, "Where services sit, and whether they sit well", "7:00 – 8:20",
-    "Left map, then right panel. The offset numbers are the point.",
-    "Two views of the same city.",
-    "On the left, we grouped facilities that sit within one and a half kilometres of "
-    "each other. Nine hundred and one facilities become a hundred and ten groups. The "
-    "bigger the marker, the more facilities behind it — so you can see immediately "
-    "where each service has real hubs.",
-    "On the right, a different question: <b>is each facility in the middle of the area "
-    "it covers?</b> The filled dot is the facility. The ring is the centre of its area. "
-    "A long line between them means it serves its area from one edge.",
-    "Bus stops and hospitals are well centred — about two hundred metres off. Metro "
-    "stations and fire stations are not: one point six kilometres and one point three. "
-    "Those are the sparse services, and that is a second piece of evidence pointing at "
-    "the same conclusion.",
+    7, "Where services sit, and whether they sit well", "3:45 – 4:25",
+    "One sentence each side. The offsets are the point.",
+    "On the left, facilities within one and a half kilometres are grouped — nine "
+    "hundred and one become a hundred and ten hubs.",
+    "On the right, a different question: is each facility in the middle of what it "
+    "covers? Bus stops and hospitals are well centred. Metro and fire stations sit over "
+    "a kilometre off — and those are exactly the sparse services.",
 )
 
 story += slide(
-    8, "What each service covers", "8:20 – 9:40",
-    "Point at bus stops, then at fire stations. The contrast does the work.",
-    "Here are all six services, each in its own colour.",
-    "Look at the difference in scale. Three hundred and fourteen bus stops divide the "
-    "centre finely. Twenty-two fire stations cover areas ten times larger.",
-    "The bars on the right show the share of the city that is too far from each "
-    "service. Water points are worst at seventy-three per cent. Metro stations, "
-    "sixty-seven. Hospitals look best, at thirty-three.",
-    "Hold on to that last one, because the next slide changes it.",
+    8, "What each service covers", "4:25 – 5:00",
+    "Point at bus stops, then fire stations. Two numbers only.",
+    "All six services, each in its own colour. Three hundred and fourteen bus stops "
+    "divide the centre finely; twenty-two fire stations cover areas ten times larger.",
+    "Water points are worst — seventy-three per cent of the city too far. Hospitals look "
+    "best at thirty-three. Hold on to that, because the next slide changes it.",
 )
 
 story += slide(
-    9, "Which areas benefit most", "9:40 – 11:20",
+    9, "Which areas benefit most", "5:00 – 6:15",
     "SLOW DOWN. This is the contribution. Pause after 'reversed'.",
     "This is our headline finding.",
     "We first measured coverage by <b>land area</b>. Measured that way, the empty "
-    "eastern edge of the city looked worst. But almost nobody lives there.",
-    "So we measured it again by <b>population</b>. And the answer reversed.",
-    "Measured by people, the real problem is dense old Dhaka. Motijheel has three "
-    "point one million residents and scores only sixty-eight. Mirpur, at ninety-two, "
-    "is our best-served area; Bashundhara, at fifty-five, our worst.",
-    "<b>Empty land does not need a hospital. Crowded neighbourhoods do.</b> That single "
-    "change — counting people instead of land — is the contribution of this thesis, "
-    "and it is why our recommendations differ from what a conventional analysis would "
-    "produce.",
+    "eastern edge looked worst — but almost nobody lives there.",
+    "So we measured again by <b>population</b>. And the answer reversed.",
+    "The real problem is dense old Dhaka. Motijheel has three point one million "
+    "residents and scores only sixty-eight.",
+    "<b>Empty land does not need a hospital. Crowded neighbourhoods do.</b> That one "
+    "change — counting people instead of land — is the contribution of this thesis.",
 )
 
 story += slide(
-    10, "Where new facilities should go", "11:20 – 12:30",
-    "Point at the red stars. End on the 946,000.",
-    "So where should new facilities go?",
-    "The red stars are our proposed sites. Each one is placed where it brings the most "
-    "underserved people back within reach, and then the calculation repeats.",
-    "We also screen the sites. Water bodies, wetlands, rivers, canals and drains, "
-    "reservoirs, landfills, cemeteries, military land and airport surfaces are all "
-    "excluded — about a fifth of the city. A site that scores well is no use if nothing "
-    "can be built on it.",
-    "The effect is concrete. <b>Three new fire stations alone bring nine hundred and "
-    "forty-six thousand people back within reach.</b>",
+    10, "Where new facilities should go", "6:15 – 7:00",
+    "Point at the red stars. End on the number.",
+    "The red stars are our proposed sites, each placed where it brings the most "
+    "underserved people back within reach.",
+    "We also screen them — water, wetland, drainage, military and airport land are all "
+    "excluded. A site is no use if nothing can be built on it.",
+    "<b>Three new fire stations alone bring nine hundred and forty-six thousand people "
+    "back within reach.</b>",
 )
 
 story += slide(
-    11, "Three ways we checked our answer", "12:30 – 13:40",
-    "Volunteer the road-network result. Do not wait to be asked.",
-    "We checked our answer three ways.",
-    "First, against the method other researchers use. Our ranking broadly agrees with "
-    "it, most strongly where services are scarce. Where it disagrees, we say so, and "
-    "we explain why.",
-    "Second, against the perfect answer. Our fast method for choosing sites finds "
-    "essentially the same places as working through every possibility. So the shortcut "
-    "costs us nothing.",
-    "Third, against real roads. Straight lines ignore rivers and buildings. On Dhaka's "
-    "real road network, journeys run about one and a half times longer, and <b>the "
-    "number of people who are too far roughly doubles</b>. I want to be direct about "
-    "that: it means our headline figures are optimistic, and we report it rather than "
-    "hide it.",
+    11, "Three ways we checked our answer", "7:00 – 7:35",
+    "Volunteer the road result. Do not wait to be asked.",
+    "Three checks. Our ranking agrees with the standard method. Our fast placement "
+    "matches the exhaustive best answer.",
+    "And on Dhaka's real road network, journeys run about one and a half times longer "
+    "and <b>the number of people too far roughly doubles</b>. That means our headline "
+    "figures are optimistic, and we report it rather than hide it.",
 )
 
 story += slide(
-    12, "What the model does not do", "13:40 – 14:30",
-    "Say these plainly and without apology. Then pivot to future work.",
-    "There are things this model does not do, and I would rather state them myself.",
-    "We measured straight-line distance, not travel time. Our map data is volunteered, "
-    "so our facility counts are a minimum, not a complete list. We did not count "
-    "facility size — a small clinic counts the same as a large hospital. And our eight "
-    "areas are our own, not official boundaries.",
-    "Each of those has a matching next step: traffic-aware travel time on the road "
-    "network, weighting each facility by its capacity using official records, and a "
-    "finer population grid.",
+    12, "What the model does not do", "7:35 – 7:50",
+    "Plainly, without apology. Do not elaborate.",
+    "Straight-line distance, not travel time. Volunteered map data, so our counts are a "
+    "minimum. Facility size not counted. And our eight areas are our own.",
+    "Each has a matching next step, listed on the slide.",
 )
 
 story += slide(
-    13, "What the study delivers", "14:30 – 15:00",
+    13, "What the study delivers", "7:50 – 8:00",
     "Stop. Do not keep talking into the questions.",
-    "To close.",
-    "We have produced a map of who is served and who is not, across six services at "
-    "once. A ranking of areas by the people affected, not by empty land — the first "
-    "for Dhaka that we know of. And a list of where to build, with the number of people "
-    "each site would help.",
-    "All of it is reproducible. One command rebuilds every figure, table and document "
-    "in this thesis from public data.",
-    "<b>That concludes our presentation. Thank you — we are happy to take your "
-    "questions.</b>",
+    "We deliver a map of who is served and who is not across six services, a ranking by "
+    "the people affected rather than by empty land, and a list of where to build — all "
+    "reproducible from one command.",
+    "<b>Thank you. We are happy to take your questions.</b>",
 )
 
 story += [
     Spacer(1, 0.4 * cm),
-    box("<b>If you are running late:</b> the two slides that carry the thesis are "
-        "<b>9</b> (people, not land) and <b>13</b> (what it delivers). Everything else "
-        "can be compressed. Never rush slide 9.", AMBER, colors.HexColor("#FBF1E6")),
+    box("<b>If you fall behind:</b> slides 3, 4 and 12 can each be cut to a single "
+        "sentence without losing anything a board needs. <b>Never rush slide 9</b> — it "
+        "is the only slide that cannot be recovered later. If you reach slide 9 by five "
+        "minutes you are on time.", AMBER, colors.HexColor("#FBF1E6")),
     box("<b>When questions start:</b> let them finish, pause for one beat, then answer. "
         "If you do not know, say &ldquo;we did not test that — it is outside our scope, "
         "and the way we would approach it is…&rdquo;. Never invent a number. The "
