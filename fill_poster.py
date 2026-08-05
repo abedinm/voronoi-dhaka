@@ -82,9 +82,11 @@ fill(by_idx[12], [
 # what straight lines suggest — is enlarged into that space rather than leaving
 # the column half empty.
 delete(by_idx[10])
-slide.shapes.add_picture(FIG + "network_vs_euclid.png", Inches(1.2), Inches(21.0),
-                         width=Inches(8.6))     # aspect 1.62 -> 5.3 in tall, ends 26.3
-                                                # Methods ends 19.5, Data Analysis starts 27.1
+# The Methods text overflows its declared 19.5 in box by roughly 1.5 in, so the
+# chart starts at 21.8 rather than butting up against the box height.
+slide.shapes.add_picture(FIG + "network_vs_euclid.png", Inches(1.5), Inches(21.8),
+                         width=Inches(8.0))     # aspect 1.62 -> 4.9 in tall, ends 26.7
+                                                # Data Analysis starts 27.1
 
 # The Lorenz curve is deliberately not on the poster. A Gini of 0.165 puts the
 # curve almost on the diagonal, which reads at poster distance as "access is
@@ -95,6 +97,8 @@ delete(by_idx[13])
 
 # ---------------- Limitations & Future Work (column 1) ----------------
 from pptx.util import Pt as _Pt
+from pptx.enum.shapes import MSO_SHAPE
+from pptx.enum.text import PP_ALIGN
 from pptx.dml.color import RGBColor as _RGB
 
 def _textbox(x, y, w, h):
@@ -137,6 +141,51 @@ _list_block(5.6, 39.5, 4.4, "FUTURE WORK", [
     "Weight each facility by its size, using official records.",
     "Finer population grid; transfer to other cities.",
 ], _RGB(0x2E, 0x8B, 0x57))
+
+# ---------------- Key numbers (column 1, where the Lorenz curve was) ----------
+# A poster is read standing up and in a hurry. The gap left by the Lorenz curve
+# is given to the six figures someone can absorb without reading a paragraph.
+_kn_head = _textbox(1.0, 33.7, 9.0, 0.9)
+_kr = _kn_head.text_frame.paragraphs[0].add_run()
+_kr.text = "Key Numbers"
+_kr.font.size = _Pt(34)
+_kr.font.bold = True
+_kr.font.color.rgb = _RGB(0x00, 0x5B, 0xBB)
+
+_KEY_NUMBERS = [
+    ("901",     "facilities, six services"),
+    ("10.7M",   "residents in the study area"),
+    ("8",       "areas compared"),
+    ("92 → 55", "best to worst area score"),
+    ("3.1M",    "people in Motijheel, our top target"),
+    ("946,000", "people reached by 3 fire stations"),
+]
+for _i, (_big, _small) in enumerate(_KEY_NUMBERS):
+    _x = 1.0 + (_i % 3) * 3.05
+    _y = 34.8 + (_i // 3) * 1.75
+    _tile = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE,
+                                   Inches(_x), Inches(_y), Inches(2.85), Inches(1.55))
+    _tile.fill.solid()
+    _tile.fill.fore_color.rgb = _RGB(0xED, 0xF3, 0xF7)
+    _tile.line.color.rgb = _RGB(0xC6, 0xD3, 0xDC)
+    _tile.line.width = _Pt(1)
+    _tile.shadow.inherit = False
+    _tf = _tile.text_frame
+    _tf.word_wrap = True
+    _tf.margin_left = _tf.margin_right = Inches(0.08)
+    _p1 = _tf.paragraphs[0]
+    _p1.alignment = PP_ALIGN.CENTER
+    _r1 = _p1.add_run()
+    _r1.text = _big
+    _r1.font.size = _Pt(40)
+    _r1.font.bold = True
+    _r1.font.color.rgb = _RGB(0x0E, 0x2A, 0x47)
+    _p2 = _tf.add_paragraph()
+    _p2.alignment = PP_ALIGN.CENTER
+    _r2 = _p2.add_run()
+    _r2.text = _small
+    _r2.font.size = _Pt(15)
+    _r2.font.color.rgb = _RGB(0x5B, 0x6B, 0x7A)
 
 # ---------------- column 2 ----------------
 for i in (15, 16, 17, 20, 21, 22, 23):          # dummy table, footnote, chart, pyramid, labels
