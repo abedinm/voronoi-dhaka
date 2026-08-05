@@ -314,6 +314,11 @@ for _idx in (7, 9, 12, 19, 24, 26, 27):
             continue                      # leave the 40 pt section heading alone
         for _r in _para.runs:
             _r.font.size = _Pt(BODY_PT)
+        # A justified paragraph short enough to wrap onto a second line has its
+        # first line stretched across a handful of words, leaving visible gaps.
+        # Left-align those; long paragraphs still justify cleanly.
+        if len(_para.text.strip()) < 60:
+            _para.alignment = PP_ALIGN.LEFT
 
 # The rule that sat under Conclusion in column 2 now falls inside the figure
 # that replaced it, drawing a line across the middle of the map.
