@@ -57,7 +57,7 @@ fill(by_idx[7], [
     "Dhaka has grown far faster than its utilities, leaving uneven access. We analyse six "
     "services — metro, hospitals, water, fuel, bus stops and fire stations (901 real "
     "locations) — against where its ~10.7M people actually live: which areas are "
-    "better off, and where should new facilities go?"])
+    "better off, and where should new facilities go?"], size=28)
 fill(by_idx[9], [
     "We split the city so every point belongs to its nearest facility. Borders fall "
     "exactly halfway between neighbours, checked automatically for gaps and overlaps. "
@@ -67,14 +67,14 @@ fill(by_idx[9], [
     "a sensible distance of each service, counting emergency services as more important.",
     "Checked against the method other researchers use, and against real road distances.",
     "WHERE NEW FACILITIES SHOULD GO",
-    "Each new site goes where it brings the most people back within reach."])
+    "Each new site goes where it brings the most people back within reach."], size=28)
 delete(by_idx[11])          # chart has its own title; caption would clash
 fill(by_idx[12], [
     "Access is uneven, and the gaps sit together: well- and badly-served places form "
     "solid blocks, not a random scatter.",
     "The ranking is stable — changing every distance limit by a quarter barely moves it.",
     "Where services are scarce, our ranking agrees with the method others use.",
-    "Well-served and badly-served places form solid blocks on the map."])
+    "Well-served and badly-served places form solid blocks on the map."], size=28)
 
 # picture placeholder in column 1 -> network comparison chart.
 # Removing the Lorenz curve freed ~5 in below Data Analysis, so this chart —
@@ -190,15 +190,17 @@ for _i, (_big, _small) in enumerate(_KEY_NUMBERS):
 # ---------------- column 2 ----------------
 for i in (15, 16, 17, 20, 21, 22, 23):          # dummy table, footnote, chart, pyramid, labels
     delete(by_idx[i])
-slide.shapes.add_picture(FIG + "sections_only.png", Inches(10.7), Inches(4.5),
-                         width=Inches(9.0))     # aspect 0.71 -> ~12.7 in tall
+# NOTE: the plain-caption version of this figure is aspect 0.625, not 0.707 —
+# its title wraps to fewer lines. Size it by the height we need, not the width.
+slide.shapes.add_picture(FIG + "sections_only.png", Inches(11.7), Inches(4.5),
+                         width=Inches(7.0))     # 11.2 in tall, ends 15.7
 fill(by_idx[19], [
     "The central belt is best served — Mirpur (92), Banani (90), Dhanmondi (85) — while "
     "Bashundhara (55) and Uttara (61) lag. Motijheel, the most populous section at 3.1M "
     "residents, scores only 68, making it the highest-impact investment target.",
     "Water sources (73% of area) and metro (67%) show the widest gaps; hospitals the "
     "narrowest (33%). Three targeted sites per service cut the underserved population "
-    "sharply — fire 1.67M → 0.73M, hospitals 1.07M → 0.61M."], size=17)
+    "sharply — fire 1.67M → 0.73M, hospitals 1.07M → 0.61M."], size=28)
 slide.shapes.add_picture(FIG + "section_benefit.png", Inches(11.6), Inches(25.2),
                          width=Inches(7.4))     # -> ~9.5 in tall
 fill(by_idx[24], [
@@ -207,7 +209,7 @@ fill(by_idx[24], [
     "The centre is well served and the periphery lags; dense old Dhaka is the top "
     "priority for hospitals and fire stations; straight-line analysis understates the "
     "true gap.",
-    "Fully reproducible: python voronoi_dhaka.py"], size=17)
+    "Fully reproducible: python voronoi_dhaka.py"], size=28)
 
 # ---------------- column 3 ----------------
 fill(by_idx[26], [
@@ -217,12 +219,12 @@ fill(by_idx[26], [
     "Ahmed, S. et al. (2019). Emergency healthcare access in Dhaka. PLOS ONE 14(9).",
     "Tatem, A. (2017). WorldPop, open data for spatial demography. Sci. Data 4.",
     "Boeing, G. (2017). OSMnx. CEUS 65.",
-    "Alam, I. et al. (2025). Public open space access in Dhaka. Comput. Urban Sci. 5."])
+    "Alam, I. et al. (2025). Public open space access in Dhaka. Comput. Urban Sci. 5."], size=28)
 fill(by_idx[27], [
     "We thank the Department of Computer Science and the Faculty of Science and "
     "Technology, American International University-Bangladesh, for their guidance and "
     "support. Facility data © OpenStreetMap contributors; population from WorldPop; "
-    "basemaps © CARTO and Google."])
+    "basemaps © CARTO and Google."], size=28)
 # Column 3 runs figures first, then References and Acknowledgement last, so that
 # reading down the column the closing sections come after the evidence rather
 # than before it. The single-utility hospital map is dropped, and
@@ -261,11 +263,33 @@ _figure_with_caption("cluster_centres.png", 23.3, 8.8,
 
 # References and Acknowledgement move from the top of the column to the bottom.
 by_idx[26].top = Inches(33.5)      # References — overflows its box by ~0.6 in
-by_idx[27].top = Inches(40.3)      # Acknowledgement
+by_idx[27].top = Inches(41.0)      # Acknowledgement — References needs the room
 for _sh in slide.shapes:           # the thin rule that sat between them
     if (_sh.left is not None and 20.0 < _sh.left / 914400 < 21.5
             and abs(_sh.top / 914400 - 10.5) < 0.3 and _sh.height / 914400 < 1.0):
-        _sh.top = Inches(39.6)
+        _sh.top = Inches(40.3)
+
+# Shrinking the map above Results freed space, but Results is a fixed-position
+# placeholder and did not move into it. At 28 pt it needs the room.
+by_idx[19].top = Inches(16.9)      # Results — map above now ends at 15.7
+for _sh in slide.shapes:           # the rule that sat between the map and Results
+    if (_sh.left is not None and 10.0 < _sh.left / 914400 < 19.4
+            and abs(_sh.top / 914400 - 18.6) < 0.4 and _sh.height / 914400 < 1.0):
+        _sh.top = Inches(16.2)
+
+# fill() only resizes the first run of each paragraph, and several template
+# paragraphs carry more than one run — the numbered reference entries in
+# particular. Normalise every body run so no section is left at a stray size.
+BODY_PT = 28
+for _idx in (7, 9, 12, 19, 24, 26, 27):
+    _tf = by_idx[_idx].text_frame
+    for _pi, _para in enumerate(_tf.paragraphs):
+        if _pi == 0 and _para.text.strip() in (
+                "Introduction", "Methods", "Data Analysis", "Results",
+                "Conclusion", "References", "Acknowledgement"):
+            continue                      # leave the 40 pt section heading alone
+        for _r in _para.runs:
+            _r.font.size = _Pt(BODY_PT)
 
 prs.save(OUT)
 print("saved", OUT)
