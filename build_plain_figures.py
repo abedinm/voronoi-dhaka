@@ -220,6 +220,35 @@ def textbook_all():
     return _save(fig, "textbook_all.png")
 
 
+
+# ────────────────────────────────── 6. the idea itself, as simply as it can be drawn
+def simple_idea():
+    """Five facilities, five regions. No labels, no legend, no proof marks.
+
+    The one picture that has to land in a second: colour every spot by the
+    facility nearest to it."""
+    from scipy.spatial import Voronoi
+    from shapely.geometry import box as shp_box
+
+    pts = np.array([[2.0, 6.6], [7.6, 7.4], [4.8, 4.0], [1.8, 1.6], [8.0, 2.0]])
+    cells = V.clip_voronoi_to_box(Voronoi(pts), (0.0, 0.0, 10.0, 9.0))
+    colours = ["#F2B6B6", "#B6D4F2", "#C4E5C0", "#F7DFA8", "#D9C3E8"]
+    fig, ax = plt.subplots(figsize=(9, 8.1))
+    for i in sorted(cells):
+        poly = cells[i].intersection(shp_box(0, 0, 10, 9))
+        if poly.is_empty:
+            continue
+        xs, ys = poly.exterior.xy
+        ax.fill(xs, ys, color=colours[i % len(colours)], zorder=1)
+        ax.plot(xs, ys, color="#333333", linewidth=2.4, zorder=3)
+    ax.scatter(pts[:, 0], pts[:, 1], s=520, c="#0E2A47", zorder=5,
+               edgecolors="white", linewidths=3)
+    ax.set_xlim(0, 10); ax.set_ylim(0, 9)
+    ax.set_aspect("equal"); ax.set_axis_off()
+    fig.tight_layout(pad=0.2)
+    return _save(fig, "simple_idea.png")
+
+
 # ─────────────────────────────────────────────────────────────────────── driver
 # figures whose wording is already plain — copied across unchanged
 COPY_AS_IS = ["all_facilities.png", "section_benefit.png",
@@ -236,6 +265,7 @@ if __name__ == "__main__":
     cluster_centres(vs, ref)
     sections_only(b, ref)
     textbook_all()
+    simple_idea()
     for n in COPY_AS_IS:
         src = V.FIGURES_DIR / n
         if src.exists():
