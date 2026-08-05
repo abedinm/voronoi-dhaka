@@ -228,20 +228,44 @@ fill(by_idx[27], [
 # than before it. The single-utility hospital map is dropped, and
 # voronoi_all_services with it — cell_centroids already shows the same
 # per-utility coloured cells and generators, plus the centre points.
-slide.shapes.add_picture(FIG + "cell_centroids.png", Inches(20.6), Inches(4.5),
-                         width=Inches(8.9))     # aspect 1.23 -> ~7.4 in tall
-slide.shapes.add_picture(FIG + "recommendations_all_services.png", Inches(20.6), Inches(12.6),
-                         width=Inches(8.9))     # aspect 1.10 -> ~8.1 in tall
-slide.shapes.add_picture(FIG + "cluster_centres.png", Inches(20.6), Inches(21.4),
-                         width=Inches(8.9))     # aspect 0.74 -> ~8.8 in tall
+# The three figures had no heading above them, so a reader could not tell which
+# section they answered. They now sit under a heading of their own, each with a
+# one-line caption, at the sizes used elsewhere on the poster: 40 pt headings,
+# 17 pt body.
+_c3 = _textbox(20.4, 4.4, 9.2, 1.3)
+_c3r = _c3.text_frame.paragraphs[0].add_run()
+_c3r.text = "Results in Detail"
+_c3r.font.size = _Pt(40)
+_c3r.font.bold = True
+_c3r.font.color.rgb = _RGB(0x00, 0x5B, 0xBB)
+
+
+def _figure_with_caption(png, y, height, caption):
+    """Place a column-3 figure and say what it shows."""
+    slide.shapes.add_picture(FIG + png, Inches(20.6), Inches(y), width=Inches(8.9))
+    tb = _textbox(20.6, y + height + 0.05, 8.9, 0.75)
+    r = tb.text_frame.paragraphs[0].add_run()
+    r.text = caption
+    r.font.size = _Pt(17)
+    r.font.color.rgb = _RGB(0x1C, 0x2B, 0x39)
+
+
+_figure_with_caption("cell_centroids.png", 5.9, 7.4,
+                     "Facilities sit off-centre in the areas they cover — worst for "
+                     "metro and fire stations.")
+_figure_with_caption("recommendations_all_services.png", 14.3, 8.1,
+                     "Proposed new sites for every service, placed to reach the most "
+                     "people.")
+_figure_with_caption("cluster_centres.png", 23.3, 8.8,
+                     "Where each service concentrates, area by area.")
 
 # References and Acknowledgement move from the top of the column to the bottom.
-by_idx[26].top = Inches(31.5)      # References
-by_idx[27].top = Inches(38.4)      # Acknowledgement
+by_idx[26].top = Inches(33.5)      # References — overflows its box by ~0.6 in
+by_idx[27].top = Inches(40.3)      # Acknowledgement
 for _sh in slide.shapes:           # the thin rule that sat between them
     if (_sh.left is not None and 20.0 < _sh.left / 914400 < 21.5
             and abs(_sh.top / 914400 - 10.5) < 0.3 and _sh.height / 914400 < 1.0):
-        _sh.top = Inches(37.7)
+        _sh.top = Inches(39.6)
 
 prs.save(OUT)
 print("saved", OUT)
