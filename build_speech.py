@@ -121,7 +121,7 @@ story = [
     box("<b>Eight minutes, four speakers.</b> Say only what is written — every "
         "sentence has been cut to fit, so one extra aside costs you the ending. "
         "Italic lines are stage directions. The green line at the end of your part "
-        "is the handover; say it out loud so the next speaker knows to move.", NAVY),
+        "is the handover; say it out loud so the next speaker knows to move. <b>Every part is written short on purpose</b> — the word counts sit under their time windows, so a slow, clear delivery still lands inside eight minutes. Do not fill the gap with extra words.", NAVY),
 
     Table([[Paragraph(f"<b>{n}</b>", ParagraphStyle("t1", parent=SAY, fontSize=10)),
             Paragraph(sl, ParagraphStyle("t2", parent=SAY, fontSize=10)),
@@ -130,9 +130,9 @@ story = [
                                         textColor=MUTED))]
            for n, sl, w, r in [
                ("Rayta", "1 – 4", "0:00 – 2:05", "opens; problem and the gap"),
-               ("Minhazul", "5 – 7", "2:05 – 4:25", "data and how the method works"),
-               ("Noman", "8 – 9", "4:25 – 6:15", "coverage and the key finding"),
-               ("Mehedi", "10 – 13", "6:15 – 8:00", "recommendations, checks, close"),
+               ("Minhazul", "5 – 6", "2:05 – 3:35", "the data, and how the method works"),
+               ("Noman", "7 – 9", "3:35 – 5:55", "what we found, and the key finding"),
+               ("Mehedi", "10 – 13", "5:55 – 8:00", "recommendations, checks, close"),
            ]],
           colWidths=[3.0 * cm, 2.0 * cm, 3.0 * cm, 8.4 * cm],
           style=TableStyle([
@@ -158,9 +158,8 @@ story += slide(
     2, "The problem", "0:15 – 1:00",
     "Point at the dense centre, then at the empty east.",
     "Dhaka has grown far faster than the services its people depend on.",
-    "This map shows every hospital, fire station, water point, metro station, bus stop "
-    "and fuel station we could find — nine hundred and one. They pile up in the centre "
-    "and thin out at the edges.",
+    "This map shows nine hundred and one facilities across six services. They pile up "
+    "in the centre and thin out at the edges.",
     "Everyone knows some areas are better served. Nobody had measured it. So we asked: "
     "<b>which parts of Dhaka are worse served, and where should new facilities go?</b>",
 )
@@ -168,9 +167,8 @@ story += slide(
 story += slide(
     3, "Objectives and research questions", "1:00 – 1:25",
     "Do not read the items. One sentence, then move.",
-    "Our objectives and questions are here: model which area each facility serves, "
-    "measure how many people fall outside a reasonable distance, rank the areas, and "
-    "recommend where to build.",
+    "Our objectives are here: model which area each facility serves, measure how many "
+    "people fall outside a reasonable distance, then recommend where to build.",
 )
 
 story += slide(
@@ -183,33 +181,34 @@ story += slide(
 )
 
 story += handover("Minhazul will take you through our data and method.")
-story += part("Minhazul Abedin", "5 – 7", "2:05 – 4:25", TEAL)
+story += part("Minhazul Abedin", "5 – 6", "2:05 – 3:35", TEAL)
 
 story += slide(
     5, "Real, openly licensed data", "2:05 – 2:45",
     "Numbers, then the areas. Say the areas are yours before anyone asks.",
-    "All our data is real and openly licensed. Nine hundred and one facilities from "
+    "All our data is real and openly licensed — nine hundred and one facilities from "
     "OpenStreetMap, and ten point seven million residents from WorldPop.",
-    "Where the counts drop, that is de-duplication, not data loss.",
-    "On the right are the eight areas we compare — <b>our own analytical areas, not "
-    "official wards</b>. That is stated in our limitations.",
+    "On the right are the eight areas we compare. <b>They are our own areas, not "
+    "official wards</b> — that is in our limitations.",
 )
 
 story += slide(
-    6, "How it works", "2:45 – 3:45",
+    6, "How it works", "2:45 – 3:35",
     "Say the definition slowly. Then the four steps, briskly.",
     "The method rests on one idea. <b>A Voronoi cell is everywhere that is closer to "
     "one facility than to any other.</b> Every border sits exactly halfway between two "
     "facilities.",
     "Four steps. Divide the city so each point belongs to its nearest facility. Measure "
-    "that distance on a two hundred and fifty metre grid. Score each area out of a "
-    "hundred by how many of its <b>residents</b> are within reach. Then add the facility "
-    "that helps the most people, and repeat.",
+    "that distance on a grid. Score each area by how many of its <b>residents</b> are "
+    "within reach. Then add the facility that helps the most people, and repeat.",
     "Twenty-nine automated tests confirm no gaps and no overlaps.",
 )
 
+story += handover("Noman will now show what we found.")
+story += part("Abdullah Al Noman", "7 – 9", "3:35 – 5:55", GREEN)
+
 story += slide(
-    7, "Where services sit, and whether they sit well", "3:45 – 4:25",
+    7, "Where services sit, and whether they sit well", "3:35 – 4:10",
     "One sentence each side. The offsets are the point.",
     "On the left, facilities within one and a half kilometres are grouped — nine "
     "hundred and one become a hundred and ten hubs.",
@@ -218,11 +217,8 @@ story += slide(
     "a kilometre off — and those are exactly the sparse services.",
 )
 
-story += handover("Noman will now show what we found.")
-story += part("Abdullah Al Noman", "8 – 9", "4:25 – 6:15", GREEN)
-
 story += slide(
-    8, "What each service covers", "4:25 – 5:00",
+    8, "What each service covers", "4:10 – 4:45",
     "Point at bus stops, then fire stations. Two numbers only.",
     "All six services, each in its own colour. Three hundred and fourteen bus stops "
     "divide the centre finely; twenty-two fire stations cover areas ten times larger.",
@@ -231,7 +227,7 @@ story += slide(
 )
 
 story += slide(
-    9, "Which areas benefit most", "5:00 – 6:15",
+    9, "Which areas benefit most", "4:45 – 5:55",
     "SLOW DOWN. This is the contribution. Pause after 'reversed'.",
     "This is our headline finding.",
     "We first measured coverage by <b>land area</b>. Measured that way, the empty "
@@ -244,43 +240,39 @@ story += slide(
 )
 
 story += handover("Mehedi will finish with our recommendations.")
-story += part("Mehedi Hasan Aziz", "10 – 13", "6:15 – 8:00", AMBER)
+story += part("Mehedi Hasan Aziz", "10 – 13", "5:55 – 8:00", AMBER)
 
 story += slide(
-    10, "Where new facilities should go", "6:15 – 7:00",
+    10, "Where new facilities should go", "5:55 – 6:40",
     "Point at the red stars. End on the number.",
     "The red stars are our proposed sites, each placed where it brings the most "
-    "underserved people back within reach.",
-    "We also screen them — water, wetland, drainage, military and airport land are all "
-    "excluded. A site is no use if nothing can be built on it.",
+    "underserved people back within reach. Water, wetland and drainage are excluded — "
+    "a site is no use if nothing can be built on it.",
     "<b>Three new fire stations alone bring nine hundred and forty-six thousand people "
     "back within reach.</b>",
 )
 
 story += slide(
-    11, "Three ways we checked our answer", "7:00 – 7:35",
+    11, "Three ways we checked our answer", "6:40 – 7:15",
     "Volunteer the road result. Do not wait to be asked.",
-    "Three checks. Our ranking agrees with the standard method. Our fast placement "
+    "Three checks. Our ranking agrees with the standard method, and our fast placement "
     "matches the exhaustive best answer.",
-    "And on Dhaka's real road network, journeys run about one and a half times longer "
-    "and <b>the number of people too far roughly doubles</b>. That means our headline "
-    "figures are optimistic, and we report it rather than hide it.",
+    "And on real roads, <b>the number of people too far roughly doubles</b>. Our "
+    "headline figures are optimistic, and we say so rather than hide it.",
 )
 
 story += slide(
-    12, "What the model does not do", "7:35 – 7:50",
+    12, "What the model does not do", "7:15 – 7:35",
     "Plainly, without apology. Do not elaborate.",
     "Straight-line distance, not travel time. Volunteered map data, so our counts are a "
-    "minimum. Facility size not counted. And our eight areas are our own.",
-    "Each has a matching next step, listed on the slide.",
+    "minimum. Facility size not counted. Each has a matching next step on the slide.",
 )
 
 story += slide(
-    13, "What the study delivers", "7:50 – 8:00",
+    13, "What the study delivers", "7:35 – 8:00",
     "Stop. Do not keep talking into the questions.",
-    "We deliver a map of who is served and who is not across six services, a ranking by "
-    "the people affected rather than by empty land, and a list of where to build — all "
-    "reproducible from one command.",
+    "We deliver a map of who is served, a ranking by people rather than by land, and a "
+    "list of where to build — all reproducible from one command.",
     "<b>Thank you. We are happy to take your questions.</b>",
 )
 
