@@ -118,6 +118,8 @@ DECLARATION_TEXT = [
 EXAMINERS = [
     ("Dr. Md. Manzurul Hasan",
      "Associate Professor & Supervisor, Department of Computer Science"),
+    ("Kazi Sadia",
+     "Assistant Professor & External, Department of Computer Science"),
     ("Prof. Dr. Muhammad Firoz Mridha",
      "Professor, Department of Computer Science"),
     ("Dr. Khandaker Tabin Hasan",
