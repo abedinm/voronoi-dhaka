@@ -121,13 +121,11 @@ EXAMINERS = [
     ("Kazi Sadia",
      "Assistant Professor & External, Department of Computer Science"),
     ("Prof. Dr. Muhammad Firoz Mridha",
-     "Professor, Department of Computer Science"),
+     "Professor & Head, Department of Computer Science"),
     ("Dr. Khandaker Tabin Hasan",
      "Professor & Associate Dean, Department of Computer Science"),
     ("Prof. Dr. Dip Nandi",
      "Professor & Dean, Faculty of Science and Technology"),
-    ("Mashiour Rahman",
-     "Senior Associate Professor, Faculty"),
 ]
 ABBREVIATIONS = [
     ("2SFCA", "Two-Step Floating Catchment Area"),
@@ -2556,6 +2554,47 @@ def set_page_numbering(section, fmt: str, start: int | None = None):
     sectPr.append(pg)
 
 
+UNIVERSITY_LINE = "American International University-Bangladesh"
+
+
+def _centre(cell, lines, bold_index=None):
+    """Write centred lines into a table cell, bolding one of them."""
+    from docx.enum.text import WD_ALIGN_PARAGRAPH as _AL
+    cell.text = ""
+    for i, line in enumerate(lines):
+        para = cell.paragraphs[0] if i == 0 else cell.add_paragraph()
+        para.alignment = _AL.CENTER
+        run = para.add_run(line)
+        run.bold = (i == bold_index)
+
+
+def _pair_grid(doc, blocks, borders):
+    """Lay blocks out two per row with a blank spacer row between, as the
+    official template does. Each block is a list of lines for one cell."""
+    rows = (len(blocks) + 1) // 2
+    tbl = doc.add_table(rows=rows * 2 - 1, cols=2)
+    tbl.style = "Table Grid" if borders else "Normal Table"
+    for i, lines in enumerate(blocks):
+        cell = tbl.rows[(i // 2) * 2].cells[i % 2]
+        # the name is line 0 for the board, line 1 under the signature rule
+        _centre(cell, lines, bold_index=1 if lines[0].startswith("___") else 0)
+    return tbl
+
+
+def _signature_grid(doc, people):
+    """Declaration page: signature line above a bold name, two per row, no
+    borders — matching the AIUB template."""
+    return _pair_grid(doc, [["_______________________________", nm, sid, dept]
+                            for nm, sid, dept in people], borders=False)
+
+
+def _board_grid(doc, examiners):
+    """Approval page: bold name, rank, department, university — two per row.
+    The template carries no signature lines in this table."""
+    return _pair_grid(doc, [[nm, rank, UNIVERSITY_LINE] for nm, rank in examiners],
+                      borders=True)
+
+
 def _caption_page_map(docx_path, captions) -> dict:
     """Map each figure/table caption to its printed page number.
 
@@ -2786,11 +2825,7 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
     for t in DECLARATION_TEXT:
         para(t)
     doc.add_paragraph()
-    sig = doc.add_table(rows=len(AUTHORS), cols=2)
-    sig.style = "Table Grid"
-    for i, (nm, sid) in enumerate(AUTHORS):
-        sig.rows[i].cells[0].text = f"{nm}\n{sid}"
-        sig.rows[i].cells[1].text = "\n______________________\nSignature"
+    _signature_grid(doc, [(nm, sid, DEPARTMENT) for nm, sid in AUTHORS])
     doc.add_page_break()
 
     h1("Approval")
@@ -2799,15 +2834,7 @@ def _render_aiub(table, sb, ext, recs, flagship_key, voronois, FIGURE_INDEX, TAB
          "partial fulfilment of the requirements for the degree of Bachelor of Science in "
          "Computer Science on " + DEFENSE_DATE + " and has been accepted as satisfactory.")
     doc.add_paragraph()
-    ex = doc.add_table(rows=len(EXAMINERS), cols=2)
-    ex.style = "Table Grid"
-    for i, (nm, rank) in enumerate(EXAMINERS):
-        c0 = ex.rows[i].cells[0]
-        c0.text = nm
-        for r in c0.paragraphs[0].runs:
-            r.bold = True
-        c0.add_paragraph(rank)
-        ex.rows[i].cells[1].text = "\n______________________\nSignature"
+    _board_grid(doc, EXAMINERS)
     doc.add_page_break()
 
     h1("Acknowledgement")
