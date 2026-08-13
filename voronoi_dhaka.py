@@ -2569,30 +2569,49 @@ def _centre(cell, lines, bold_index=None):
 
 
 def _pair_grid(doc, blocks, borders):
-    """Lay blocks out two per row with a blank spacer row between, as the
-    official template does. Each block is a list of lines for one cell."""
-    rows = (len(blocks) + 1) // 2
-    tbl = doc.add_table(rows=rows * 2 - 1, cols=2)
+    """Lay blocks out two per row with a blank spacer row between.
+
+    When the count is odd the middle row carries a single centred entry, which
+    is the shape the AIUB template uses for a five-member board: two, one, two."""
+    n = len(blocks)
+    if n % 2 == 1 and n > 1:
+        mid = n // 2                       # the lone centred entry
+        layout = [blocks[i:i + 2] for i in range(0, mid, 2)]
+        layout.append([blocks[mid]])
+        layout += [blocks[i:i + 2] for i in range(mid + 1, n, 2)]
+    else:
+        layout = [blocks[i:i + 2] for i in range(0, n, 2)]
+
+    tbl = doc.add_table(rows=len(layout) * 2 - 1, cols=2)
     tbl.style = "Table Grid" if borders else "Normal Table"
-    for i, lines in enumerate(blocks):
-        cell = tbl.rows[(i // 2) * 2].cells[i % 2]
-        # the name is line 0 for the board, line 1 under the signature rule
-        _centre(cell, lines, bold_index=1 if lines[0].startswith("___") else 0)
+    tbl.autofit = True
+    for ri, row_blocks in enumerate(layout):
+        cells = tbl.rows[ri * 2].cells
+        if len(row_blocks) == 1:           # merge so the single entry centres
+            cell = cells[0].merge(cells[1])
+            _centre(cell, row_blocks[0], bold_index=1)
+        else:
+            for ci, lines in enumerate(row_blocks):
+                _centre(cells[ci], lines, bold_index=1)
     return tbl
 
 
 def _signature_grid(doc, people):
-    """Declaration page: signature line above a bold name, two per row, no
-    borders — matching the AIUB template."""
+    """Declaration page: signature rule above a bold name, two per row."""
     return _pair_grid(doc, [["_______________________________", nm, sid, dept]
                             for nm, sid, dept in people], borders=False)
 
 
 def _board_grid(doc, examiners):
-    """Approval page: bold name, rank, department, university — two per row.
-    The template carries no signature lines in this table."""
-    return _pair_grid(doc, [[nm, rank, UNIVERSITY_LINE] for nm, rank in examiners],
-                      borders=True)
+    """Approval page: signature rule, bold name, rank, department, university.
+
+    No borders — the template shows only the signature rules."""
+    blocks = []
+    for nm, rank in examiners:
+        role, _, dept = rank.partition(", ")
+        blocks.append(["_______________________________", nm, role,
+                       dept or DEPARTMENT, UNIVERSITY_LINE])
+    return _pair_grid(doc, blocks, borders=False)
 
 
 def _caption_page_map(docx_path, captions) -> dict:
