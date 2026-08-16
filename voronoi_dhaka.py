@@ -98,7 +98,10 @@ SUPERVISOR_RANK = "Associate Professor, Faculty"
 AIUB_LOGO = ROOT / "data" / "templates" / "aiub_logo.png"
 # Scanned signatures, by author name. Anyone without one keeps a blank rule
 # to sign by hand.
-SIGNATURES = {"Minhazul Abedin": ROOT / "data" / "templates" / "signature_abedin.png"}
+SIGNATURES = {
+    "Minhazul Abedin": ROOT / "data" / "templates" / "signature_abedin.png",
+    "Abdullah Al Noman": ROOT / "data" / "templates" / "signature_noman.png",
+}
 DEGREE_LINES = [
     "A Thesis submitted for the degree of Bachelor of Science (BSc) in",
     "Computer Science and Engineering (CSE) at",
