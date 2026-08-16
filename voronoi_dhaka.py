@@ -98,9 +98,13 @@ SUPERVISOR_RANK = "Associate Professor, Faculty"
 AIUB_LOGO = ROOT / "data" / "templates" / "aiub_logo.png"
 # Scanned signatures, by author name. Anyone without one keeps a blank rule
 # to sign by hand.
+SIGNATURE_MAX_W, SIGNATURE_MAX_H = 1.55, 0.46   # inches
+# Kept small deliberately: four signature blocks plus the declaration text fill
+# the page, and at 0.62 in tall the last line spilled onto the Approval page.
 SIGNATURES = {
     "Minhazul Abedin": ROOT / "data" / "templates" / "signature_abedin.png",
     "Abdullah Al Noman": ROOT / "data" / "templates" / "signature_noman.png",
+    "Zarin Tasnim Rayta": ROOT / "data" / "templates" / "signature_rayta.png",
 }
 DEGREE_LINES = [
     "A Thesis submitted for the degree of Bachelor of Science (BSc) in",
@@ -2617,10 +2621,17 @@ def _signature_grid(doc, people):
         path = SIGNATURES.get(nm)
         if path is None or not path.exists():
             continue
+        # Signatures differ in shape — some long and low, some tall and compact.
+        # Fit each inside the same box so they read as comparable handwriting
+        # rather than scaling a tall one until it towers over the rule.
+        from PIL import Image as _Img
+        with _Img.open(path) as _im:
+            aspect = _im.size[0] / _im.size[1]
+        width = min(SIGNATURE_MAX_W, SIGNATURE_MAX_H * aspect)
         cell = tbl.rows[(i // 2) * 2].cells[i % 2]
         img = cell.paragraphs[0].insert_paragraph_before()
         img.alignment = _AL.CENTER
-        img.add_run().add_picture(str(path), width=_In(1.6))
+        img.add_run().add_picture(str(path), width=_In(width))
     return tbl
 
 
