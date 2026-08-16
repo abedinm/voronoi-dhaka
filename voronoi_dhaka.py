@@ -2561,7 +2561,9 @@ UNIVERSITY_LINE = "American International University-Bangladesh"
 
 
 def _centre(cell, lines, bold_index=None):
-    """Write centred lines into a table cell, bolding one of them."""
+    """Write centred lines into a table cell, bolding one of them.
+
+    """
     from docx.enum.text import WD_ALIGN_PARAGRAPH as _AL
     cell.text = ""
     for i, line in enumerate(lines):
