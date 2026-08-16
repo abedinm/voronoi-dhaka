@@ -96,6 +96,9 @@ DEFENSE_DATE = "06.07.2026"
 SUPERVISOR = "Dr. Md. Manzurul Hasan"
 SUPERVISOR_RANK = "Associate Professor, Faculty"
 AIUB_LOGO = ROOT / "data" / "templates" / "aiub_logo.png"
+# Scanned signatures, by author name. Anyone without one keeps a blank rule
+# to sign by hand.
+SIGNATURES = {"Minhazul Abedin": ROOT / "data" / "templates" / "signature_abedin.png"}
 DEGREE_LINES = [
     "A Thesis submitted for the degree of Bachelor of Science (BSc) in",
     "Computer Science and Engineering (CSE) at",
@@ -2597,9 +2600,23 @@ def _pair_grid(doc, blocks, borders):
 
 
 def _signature_grid(doc, people):
-    """Declaration page: signature rule above a bold name, two per row."""
-    return _pair_grid(doc, [["_______________________________", nm, sid, dept]
-                            for nm, sid, dept in people], borders=False)
+    """Declaration page: signature rule above a bold name, two per row.
+
+    Where a scanned signature exists it is drawn above the rule, as it would be
+    if signed on the line."""
+    tbl = _pair_grid(doc, [["_______________________________", nm, sid, dept]
+                           for nm, sid, dept in people], borders=False)
+    from docx.enum.text import WD_ALIGN_PARAGRAPH as _AL
+    from docx.shared import Inches as _In
+    for i, (nm, _sid, _dept) in enumerate(people):
+        path = SIGNATURES.get(nm)
+        if path is None or not path.exists():
+            continue
+        cell = tbl.rows[(i // 2) * 2].cells[i % 2]
+        img = cell.paragraphs[0].insert_paragraph_before()
+        img.alignment = _AL.CENTER
+        img.add_run().add_picture(str(path), width=_In(1.6))
+    return tbl
 
 
 def _board_grid(doc, examiners):
